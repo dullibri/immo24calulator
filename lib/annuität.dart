@@ -133,45 +133,45 @@ List<MortgagePayment> calculateMortgagePayments({
   return payments;
 }
 
-void main() {
-  // Test
-  double principal = 544000;
-  double annualInterestRate = 3.61;
-  double initialPayment = 2617.67;
-  double monthlySpecialPayment = 1185; // Zusätzliche monatliche Sonderzahlungen
-  double maxSpecialPaymentPercent =
-      5; // Maximal 5% der ursprünglichen Kreditsumme als zusätzliche Sonderzahlungen
-  double rentalShare = 530063 /
-      544000; // Verhältnis von vermietetem/gewerblichem Anteil zu Gesamtkredit
-  double topTaxRate = 0.42; // 42% Spitzensteuersatz
-  double purchasePrice = 700000;
-  double annualDepreciationRate = 0.03;
+// void main() {
+//   // Test
+//   double principal = 544000;
+//   double annualInterestRate = 3.61;
+//   double initialPayment = 2617.67;
+//   double monthlySpecialPayment = 1185; // Zusätzliche monatliche Sonderzahlungen
+//   double maxSpecialPaymentPercent =
+//       5; // Maximal 5% der ursprünglichen Kreditsumme als zusätzliche Sonderzahlungen
+//   double rentalShare = 530063 /
+//       544000; // Verhältnis von vermietetem/gewerblichem Anteil zu Gesamtkredit
+//   double topTaxRate = 0.42; // 42% Spitzensteuersatz
+//   double purchasePrice = 700000;
+//   double annualDepreciationRate = 0.03;
 
-  List<MortgagePayment> payments = calculateMortgagePayments(
-    principal: principal,
-    annualInterestRate: annualInterestRate,
-    initialPayment: initialPayment,
-    monthlySpecialPayment: monthlySpecialPayment,
-    maxSpecialPaymentPercent: maxSpecialPaymentPercent,
-    rentalShare: rentalShare,
-    topTaxRate: topTaxRate,
-    purchasePrice: purchasePrice,
-    annualDepreciationRate: annualDepreciationRate,
-  );
+//   List<MortgagePayment> payments = calculateMortgagePayments(
+//     principal: principal,
+//     annualInterestRate: annualInterestRate,
+//     initialPayment: initialPayment,
+//     monthlySpecialPayment: monthlySpecialPayment,
+//     maxSpecialPaymentPercent: maxSpecialPaymentPercent,
+//     rentalShare: rentalShare,
+//     topTaxRate: topTaxRate,
+//     purchasePrice: purchasePrice,
+//     annualDepreciationRate: annualDepreciationRate,
+//   );
 
-  // Print table header
-  print(
-      'Month | Principal Payment | Interest Payment | Remaining Balance | Special Payment | Remaining Special Payment | Interest Rebate | Depreciation');
+//   // Print table header
+//   print(
+//       'Month | Principal Payment | Interest Payment | Remaining Balance | Special Payment | Remaining Special Payment | Interest Rebate | Depreciation');
 
-  // Print each payment
-  for (var payment in payments) {
-    print('${payment.month.toString().padLeft(5)} '
-        '| ${payment.principalPayment.toStringAsFixed(2).padLeft(17)} '
-        '| ${payment.interestPayment.toStringAsFixed(2).padLeft(16)} '
-        '| ${payment.remainingBalance.toStringAsFixed(2).padLeft(17)} '
-        '| ${payment.specialPayment.toStringAsFixed(2).padLeft(14)} '
-        '| ${payment.remainingSpecialPayment.toStringAsFixed(2).padLeft(25)} '
-        '| ${payment.interestRebate.toStringAsFixed(2).padLeft(14)} '
-        '| ${payment.depreciation.toStringAsFixed(2).padLeft(11)}');
-  }
-}
+//   // Print each payment
+//   for (var payment in payments) {
+//     print('${payment.month.toString().padLeft(5)} '
+//         '| ${payment.principalPayment.toStringAsFixed(2).padLeft(17)} '
+//         '| ${payment.interestPayment.toStringAsFixed(2).padLeft(16)} '
+//         '| ${payment.remainingBalance.toStringAsFixed(2).padLeft(17)} '
+//         '| ${payment.specialPayment.toStringAsFixed(2).padLeft(14)} '
+//         '| ${payment.remainingSpecialPayment.toStringAsFixed(2).padLeft(25)} '
+//         '| ${payment.interestRebate.toStringAsFixed(2).padLeft(14)} '
+//         '| ${payment.depreciation.toStringAsFixed(2).padLeft(11)}');
+//   }
+// }
