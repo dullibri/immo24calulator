@@ -53,10 +53,10 @@ List<MortgagePayment> calculateMortgagePayments({
 
   while (remainingBalance > 0) {
     // Calculate interest rebate and depreciation every 12 months starting from month 18
-    if (month > 18 && (month - 6) % 12 == 0) {
+    if (month > 12 && (month - 6) % 12 == 0) {
       interestRebate = calculateInterestRebate(
           totalInterestPaidLastYear, topTaxRate, rentalShare);
-      depreciation = purchasePrice * annualDepreciationRate;
+      depreciation = purchasePrice * annualDepreciationRate * topTaxRate;
       remainingBalance -= (interestRebate + depreciation);
     }
 
