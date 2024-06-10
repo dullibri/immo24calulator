@@ -57,7 +57,6 @@ List<MortgagePayment> calculateMortgagePayments({
       interestRebate = calculateInterestRebate(
           totalInterestPaidLastYear, topTaxRate, rentalShare);
       depreciation = purchasePrice * annualDepreciationRate * topTaxRate;
-      remainingBalance -= (interestRebate + depreciation);
     }
 
     // Reset the annual special payments and interest rebate at the start of each year
@@ -82,6 +81,10 @@ List<MortgagePayment> calculateMortgagePayments({
     final double principalPayment =
         min(totalPayment - interestPayment, remainingBalance);
     remainingBalance -= principalPayment;
+
+    if (month > 12 && (month - 6) % 12 == 0) {
+      remainingBalance -= (interestRebate + depreciation);
+    }
 
     if (remainingBalance < 0) remainingBalance = 0;
 
