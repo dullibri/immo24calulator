@@ -147,10 +147,19 @@ class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('Ergebnisse:'),
-                  for (var payment in payments!)
-                    Text(
-                      'Monat ${payment.month}: Restschuld ${payment.remainingBalance.toStringAsFixed(2)}',
-                    ),
+                  DataTable(
+                    columns: [
+                      DataColumn(label: Text('Monat')),
+                      DataColumn(label: Text('Restschuld')),
+                    ],
+                    rows: payments!.map((payment) {
+                      return DataRow(cells: [
+                        DataCell(Text(payment.month.toString())),
+                        DataCell(
+                            Text(payment.remainingBalance.toStringAsFixed(2))),
+                      ]);
+                    }).toList(),
+                  ),
                 ],
               ),
           ],
