@@ -67,50 +67,70 @@ class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
           children: [
             Text('Eingabedaten:'),
             TextFormField(
-              decoration: InputDecoration(labelText: 'Kreditsumme'),
+              decoration: InputDecoration(
+                labelText: 'Kreditsumme',
+                hintText: principal.toString(),
+              ),
               keyboardType: TextInputType.number,
               onChanged: (value) {
                 principal = double.tryParse(value) ?? 0.0;
               },
             ),
             TextFormField(
-              decoration: InputDecoration(labelText: 'Jährlicher Zinssatz'),
+              decoration: InputDecoration(
+                labelText: 'Jährlicher Zinssatz',
+                hintText: annualInterestRate.toString(),
+              ),
               keyboardType: TextInputType.number,
               onChanged: (value) {
                 annualInterestRate = double.tryParse(value) ?? 0.0;
               },
             ),
             TextFormField(
-              decoration: InputDecoration(labelText: 'Anfangszahlung'),
+              decoration: InputDecoration(
+                labelText: 'Anfangszahlung',
+                hintText: initialPayment.toString(),
+              ),
               keyboardType: TextInputType.number,
               onChanged: (value) {
                 initialPayment = double.tryParse(value) ?? 0.0;
               },
             ),
             TextFormField(
-              decoration:
-                  InputDecoration(labelText: 'Monatliche Sonderzahlung'),
+              decoration: InputDecoration(
+                labelText: 'Monatliche Sonderzahlung',
+                hintText: monthlySpecialPayment.toString(),
+              ),
               keyboardType: TextInputType.number,
               onChanged: (value) {
                 monthlySpecialPayment = double.tryParse(value) ?? 0.0;
               },
             ),
             TextFormField(
-              decoration: InputDecoration(labelText: 'Mietanteil'),
+              decoration: InputDecoration(
+                labelText: 'Mietanteil',
+                hintText: rentalShare.toString(),
+              ),
               keyboardType: TextInputType.number,
               onChanged: (value) {
                 rentalShare = double.tryParse(value) ?? 0.0;
               },
             ),
             TextFormField(
-              decoration: InputDecoration(labelText: 'Kaufpreis'),
+              decoration: InputDecoration(
+                labelText: 'Kaufpreis',
+                hintText: purchasePrice.toString(),
+              ),
               keyboardType: TextInputType.number,
               onChanged: (value) {
                 purchasePrice = double.tryParse(value) ?? 0.0;
               },
             ),
             TextFormField(
-              decoration: InputDecoration(labelText: 'Jährliche Abschreibung'),
+              decoration: InputDecoration(
+                labelText: 'Jährliche Abschreibung',
+                hintText: annualDepreciationRate.toString(),
+              ),
               keyboardType: TextInputType.number,
               onChanged: (value) {
                 annualDepreciationRate = double.tryParse(value) ?? 0.0;
