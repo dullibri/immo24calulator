@@ -80,7 +80,42 @@ class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
                 annualInterestRate = double.tryParse(value) ?? 0.0;
               },
             ),
-            // Weitere Eingabefelder für andere Parameter hinzufügen...
+            TextFormField(
+              decoration: InputDecoration(labelText: 'Anfangszahlung'),
+              keyboardType: TextInputType.number,
+              onChanged: (value) {
+                initialPayment = double.tryParse(value) ?? 0.0;
+              },
+            ),
+            TextFormField(
+              decoration:
+                  InputDecoration(labelText: 'Monatliche Sonderzahlung'),
+              keyboardType: TextInputType.number,
+              onChanged: (value) {
+                monthlySpecialPayment = double.tryParse(value) ?? 0.0;
+              },
+            ),
+            TextFormField(
+              decoration: InputDecoration(labelText: 'Mietanteil'),
+              keyboardType: TextInputType.number,
+              onChanged: (value) {
+                rentalShare = double.tryParse(value) ?? 0.0;
+              },
+            ),
+            TextFormField(
+              decoration: InputDecoration(labelText: 'Kaufpreis'),
+              keyboardType: TextInputType.number,
+              onChanged: (value) {
+                purchasePrice = double.tryParse(value) ?? 0.0;
+              },
+            ),
+            TextFormField(
+              decoration: InputDecoration(labelText: 'Jährliche Abschreibung'),
+              keyboardType: TextInputType.number,
+              onChanged: (value) {
+                annualDepreciationRate = double.tryParse(value) ?? 0.0;
+              },
+            ),
             SizedBox(height: 16.0),
             ElevatedButton(
               onPressed: calculatePayments,
