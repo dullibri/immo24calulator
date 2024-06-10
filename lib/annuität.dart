@@ -27,6 +27,11 @@ double calculateInterestRebate(
   return interestForRebate * topTaxRate * rentalShare;
 }
 
+double calculateDepreciation(
+    double purchasePrice, double annualDepreciationRate, double topTaxRate) {
+  return purchasePrice * annualDepreciationRate * topTaxRate;
+}
+
 List<MortgagePayment> calculateMortgagePayments({
   required double principal,
   required double annualInterestRate,
@@ -41,7 +46,6 @@ List<MortgagePayment> calculateMortgagePayments({
   final double monthlyInterestRate = annualInterestRate / 12 / 100;
   final double maxAnnualSpecialPayment =
       principal * (maxSpecialPaymentPercent / 100);
-  double interestForRebate = 0;
   double totalInterestPaidLastYear = 0;
 
   List<MortgagePayment> payments = [];
@@ -52,29 +56,43 @@ List<MortgagePayment> calculateMortgagePayments({
   double depreciation = 0;
 
   while (remainingBalance > 0) {
+    // Reset the annual special payments and interest rebate at the start of each year
+    if ((month - 1) % 12 == 0) {
+      totalSpecialPaymentsPerYear = 0;
+      totalInterestPaidLastYear = 0;
+    }
+
     // Calculate interest rebate and depreciation every 12 months starting from month 18
     if (month > 12 && (month - 6) % 12 == 0) {
       interestRebate = calculateInterestRebate(
           totalInterestPaidLastYear, topTaxRate, rentalShare);
-      depreciation = purchasePrice * annualDepreciationRate * topTaxRate;
-    }
-
-    // Reset the annual special payments and interest rebate at the start of each year
-    if ((month - 1) % 12 == 0) {
-      totalSpecialPaymentsPerYear = 0;
-      interestForRebate =
-          totalInterestPaidLastYear; // Use interest paid in the previous year for rebate calculation
-      totalInterestPaidLastYear = 0;
+      depreciation = calculateDepreciation(
+          purchasePrice, annualDepreciationRate, topTaxRate);
     }
 
     double specialPayment = monthlySpecialPayment;
 
     // Limit special payments to the specified percentage of the initial loan amount per year
-    if (totalSpecialPaymentsPerYear + specialPayment >
+    double totalExtraPayments = specialPayment + interestRebate + depreciation;
+    if (totalSpecialPaymentsPerYear + totalExtraPayments >
         maxAnnualSpecialPayment) {
-      specialPayment = maxAnnualSpecialPayment - totalSpecialPaymentsPerYear;
+      double remainingAllowedPayment =
+          maxAnnualSpecialPayment - totalSpecialPaymentsPerYear;
+      if (remainingAllowedPayment > 0) {
+        specialPayment = min(specialPayment, remainingAllowedPayment);
+        remainingAllowedPayment -= specialPayment;
+        interestRebate = min(interestRebate, remainingAllowedPayment);
+        remainingAllowedPayment -= interestRebate;
+        depreciation = min(depreciation, remainingAllowedPayment);
+      } else {
+        specialPayment = 0;
+        interestRebate = 0;
+        depreciation = 0;
+      }
     }
-    totalSpecialPaymentsPerYear += specialPayment;
+
+    totalSpecialPaymentsPerYear +=
+        (specialPayment + interestRebate + depreciation);
 
     final double interestPayment = remainingBalance * monthlyInterestRate;
     final double totalPayment = initialPayment + specialPayment;
@@ -88,8 +106,7 @@ List<MortgagePayment> calculateMortgagePayments({
 
     if (remainingBalance < 0) remainingBalance = 0;
 
-    totalInterestPaidLastYear +=
-        interestPayment; // Accumulate interest payments for rebate calculation
+    totalInterestPaidLastYear += interestPayment;
 
     double remainingSpecialPayment =
         maxAnnualSpecialPayment - totalSpecialPaymentsPerYear;
