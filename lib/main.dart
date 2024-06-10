@@ -37,6 +37,8 @@ class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
   double annualDepreciationRate = 0.03;
 
   List<MortgagePayment>? payments;
+  int _sortColumnIndex = 0;
+  bool _sortAscending = true;
 
   void calculatePayments() {
     setState(() {
@@ -148,33 +150,154 @@ class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
                 children: [
                   Text('Ergebnisse:'),
                   DataTable(
+                    sortColumnIndex: _sortColumnIndex,
+                    sortAscending: _sortAscending,
                     columns: [
-                      DataColumn(label: Text('Monat')),
-                      DataColumn(label: Text('Restschuld')),
-                      DataColumn(label: Text('Hauptzahlung')),
-                      DataColumn(label: Text('Zinszahlung')),
-                      DataColumn(label: Text('Sonderzahlung')),
-                      DataColumn(label: Text('Verbleibende Sonderzahlung')),
-                      DataColumn(label: Text('Zinsvorteil')),
-                      DataColumn(label: Text('Abschreibung')),
+                      DataColumn(
+                          label: Text('Monat'),
+                          onSort: (columnIndex, ascending) {
+                            setState(() {
+                              _sortColumnIndex = columnIndex;
+                              _sortAscending = ascending;
+                              if (ascending) {
+                                payments!
+                                    .sort((a, b) => a.month.compareTo(b.month));
+                              } else {
+                                payments!
+                                    .sort((a, b) => b.month.compareTo(a.month));
+                              }
+                            });
+                          }),
+                      DataColumn(
+                          label: Text('Restschuld'),
+                          onSort: (columnIndex, ascending) {
+                            setState(() {
+                              _sortColumnIndex = columnIndex;
+                              _sortAscending = ascending;
+                              if (ascending) {
+                                payments!.sort((a, b) => a.remainingBalance
+                                    .compareTo(b.remainingBalance));
+                              } else {
+                                payments!.sort((a, b) => b.remainingBalance
+                                    .compareTo(a.remainingBalance));
+                              }
+                            });
+                          }),
+                      DataColumn(
+                          label: Text('Hauptzahlung'),
+                          onSort: (columnIndex, ascending) {
+                            setState(() {
+                              _sortColumnIndex = columnIndex;
+                              _sortAscending = ascending;
+                              if (ascending) {
+                                payments!.sort((a, b) => a.principalPayment
+                                    .compareTo(b.principalPayment));
+                              } else {
+                                payments!.sort((a, b) => b.principalPayment
+                                    .compareTo(a.principalPayment));
+                              }
+                            });
+                          }),
+                      DataColumn(
+                          label: Text('Zinszahlung'),
+                          onSort: (columnIndex, ascending) {
+                            setState(() {
+                              _sortColumnIndex = columnIndex;
+                              _sortAscending = ascending;
+                              if (ascending) {
+                                payments!.sort((a, b) => a.interestPayment
+                                    .compareTo(b.interestPayment));
+                              } else {
+                                payments!.sort((a, b) => b.interestPayment
+                                    .compareTo(a.interestPayment));
+                              }
+                            });
+                          }),
+                      DataColumn(
+                          label: Text('Sonderzahlung'),
+                          onSort: (columnIndex, ascending) {
+                            setState(() {
+                              _sortColumnIndex = columnIndex;
+                              _sortAscending = ascending;
+                              if (ascending) {
+                                payments!.sort((a, b) => a.specialPayment
+                                    .compareTo(b.specialPayment));
+                              } else {
+                                payments!.sort((a, b) => b.specialPayment
+                                    .compareTo(a.specialPayment));
+                                payments!.sort((a, b) => b.specialPayment
+                                    .compareTo(a.specialPayment));
+                              }
+                            });
+                          }),
+                      DataColumn(
+                          label: Text('Rest-Sonderzahlung'),
+                          onSort: (columnIndex, ascending) {
+                            setState(() {
+                              _sortColumnIndex = columnIndex;
+                              _sortAscending = ascending;
+                              if (ascending) {
+                                payments!.sort((a, b) => a
+                                    .remainingSpecialPayment
+                                    .compareTo(b.remainingSpecialPayment));
+                              } else {
+                                payments!.sort((a, b) => b
+                                    .remainingSpecialPayment
+                                    .compareTo(a.remainingSpecialPayment));
+                              }
+                            });
+                          }),
+                      DataColumn(
+                          label: Text('Zinsrabatt'),
+                          onSort: (columnIndex, ascending) {
+                            setState(() {
+                              _sortColumnIndex = columnIndex;
+                              _sortAscending = ascending;
+                              if (ascending) {
+                                payments!.sort((a, b) => a.interestRebate
+                                    .compareTo(b.interestRebate));
+                              } else {
+                                payments!.sort((a, b) => b.interestRebate
+                                    .compareTo(a.interestRebate));
+                              }
+                            });
+                          }),
+                      DataColumn(
+                          label: Text('Abschreibung'),
+                          onSort: (columnIndex, ascending) {
+                            setState(() {
+                              _sortColumnIndex = columnIndex;
+                              _sortAscending = ascending;
+                              if (ascending) {
+                                payments!.sort((a, b) =>
+                                    a.depreciation.compareTo(b.depreciation));
+                              } else {
+                                payments!.sort((a, b) =>
+                                    b.depreciation.compareTo(a.depreciation));
+                              }
+                            });
+                          }),
                     ],
                     rows: payments!.map((payment) {
-                      return DataRow(cells: [
-                        DataCell(Text(payment.month.toString())),
-                        DataCell(
-                            Text(payment.remainingBalance.toStringAsFixed(2))),
-                        DataCell(
-                            Text(payment.principalPayment.toStringAsFixed(2))),
-                        DataCell(
-                            Text(payment.interestPayment.toStringAsFixed(2))),
-                        DataCell(
-                            Text(payment.specialPayment.toStringAsFixed(2))),
-                        DataCell(Text(payment.remainingSpecialPayment
-                            .toStringAsFixed(2))),
-                        DataCell(
-                            Text(payment.interestRebate.toStringAsFixed(2))),
-                        DataCell(Text(payment.depreciation.toStringAsFixed(2))),
-                      ]);
+                      return DataRow(
+                        cells: [
+                          DataCell(Text(payment.month.toString())),
+                          DataCell(Text(
+                              payment.remainingBalance.toStringAsFixed(2))),
+                          DataCell(Text(
+                              payment.principalPayment.toStringAsFixed(2))),
+                          DataCell(
+                              Text(payment.interestPayment.toStringAsFixed(2))),
+                          DataCell(
+                              Text(payment.specialPayment.toStringAsFixed(2))),
+                          DataCell(Text(payment.remainingSpecialPayment
+                              .toStringAsFixed(2))),
+                          DataCell(
+                              Text(payment.interestRebate.toStringAsFixed(2))),
+                          DataCell(
+                              Text(payment.depreciation.toStringAsFixed(2))),
+                        ],
+                      );
                     }).toList(),
                   ),
                 ],
