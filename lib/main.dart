@@ -151,12 +151,29 @@ class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
                     columns: [
                       DataColumn(label: Text('Monat')),
                       DataColumn(label: Text('Restschuld')),
+                      DataColumn(label: Text('Hauptzahlung')),
+                      DataColumn(label: Text('Zinszahlung')),
+                      DataColumn(label: Text('Sonderzahlung')),
+                      DataColumn(label: Text('Verbleibende Sonderzahlung')),
+                      DataColumn(label: Text('Zinsvorteil')),
+                      DataColumn(label: Text('Abschreibung')),
                     ],
                     rows: payments!.map((payment) {
                       return DataRow(cells: [
                         DataCell(Text(payment.month.toString())),
                         DataCell(
                             Text(payment.remainingBalance.toStringAsFixed(2))),
+                        DataCell(
+                            Text(payment.principalPayment.toStringAsFixed(2))),
+                        DataCell(
+                            Text(payment.interestPayment.toStringAsFixed(2))),
+                        DataCell(
+                            Text(payment.specialPayment.toStringAsFixed(2))),
+                        DataCell(Text(payment.remainingSpecialPayment
+                            .toStringAsFixed(2))),
+                        DataCell(
+                            Text(payment.interestRebate.toStringAsFixed(2))),
+                        DataCell(Text(payment.depreciation.toStringAsFixed(2))),
                       ]);
                     }).toList(),
                   ),
