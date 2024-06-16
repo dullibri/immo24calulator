@@ -40,6 +40,17 @@ class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
   int? _sortColumnIndex;
   bool _sortAscending = true;
 
+  Map<String, bool> columnVisibility = {
+    'Monat': true,
+    'Restschuld': true,
+    'Hauptzahlung': true,
+    'Zinszahlung': true,
+    'Sonderzahlung': true,
+    'Rest-Sonderzahlung': true,
+    'Zinsrabatt': true,
+    'Abschreibung': true,
+  };
+
   void calculatePayments() {
     setState(() {
       payments = calculateMortgagePayments(
@@ -71,7 +82,19 @@ class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
   DataColumn buildDataColumn(String label, int columnIndex,
       int Function(MortgagePayment a, MortgagePayment b) compare) {
     return DataColumn(
-      label: Text(label),
+      label: Row(
+        children: [
+          Text(label),
+          Checkbox(
+            value: columnVisibility[label],
+            onChanged: (value) {
+              setState(() {
+                columnVisibility[label] = value!;
+              });
+            },
+          ),
+        ],
+      ),
       onSort: (index, ascending) {
         setState(() {
           _sortColumnIndex = columnIndex;
@@ -80,6 +103,83 @@ class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
         });
       },
     );
+  }
+
+  List<DataColumn> getVisibleColumns() {
+    int index = 0;
+    List<String> labels = [
+      'Monat',
+      'Restschuld',
+      'Hauptzahlung',
+      'Zinszahlung',
+      'Sonderzahlung',
+      'Rest-Sonderzahlung',
+      'Zinsrabatt',
+      'Abschreibung'
+    ];
+    List<int Function(MortgagePayment, MortgagePayment)> comparators = [
+      (a, b) => a.month.compareTo(b.month),
+      (a, b) => a.remainingBalance.compareTo(b.remainingBalance),
+      (a, b) => a.principalPayment.compareTo(b.principalPayment),
+      (a, b) => a.interestPayment.compareTo(b.interestPayment),
+      (a, b) => a.specialPayment.compareTo(b.specialPayment),
+      (a, b) => a.remainingSpecialPayment.compareTo(b.remainingSpecialPayment),
+      (a, b) => a.interestRebate.compareTo(b.interestRebate),
+      (a, b) => a.depreciation.compareTo(b.depreciation),
+    ];
+
+    return labels
+        .asMap()
+        .entries
+        .map((entry) {
+          int index = entry.key;
+          String label = entry.value;
+          if (columnVisibility[label]!) {
+            return buildDataColumn(label, index, comparators[index]);
+          }
+          return null;
+        })
+        .where((column) => column != null)
+        .cast<DataColumn>()
+        .toList();
+  }
+
+  List<DataCell> getVisibleCells(MortgagePayment payment) {
+    List<String> labels = [
+      'Monat',
+      'Restschuld',
+      'Hauptzahlung',
+      'Zinszahlung',
+      'Sonderzahlung',
+      'Rest-Sonderzahlung',
+      'Zinsrabatt',
+      'Abschreibung'
+    ];
+    List<DataCell> cells = [
+      DataCell(Text(payment.month.toString())),
+      DataCell(Text(payment.remainingBalance.toStringAsFixed(0))),
+      DataCell(Text(payment.principalPayment.toStringAsFixed(0))),
+      DataCell(Text(payment.interestPayment.toStringAsFixed(0))),
+      DataCell(Text(payment.specialPayment.toStringAsFixed(0))),
+      DataCell(Text(payment.remainingSpecialPayment.toStringAsFixed(0))),
+      DataCell(Text(payment.interestRebate.toStringAsFixed(0))),
+      DataCell(Text(payment.depreciation.toStringAsFixed(0))),
+    ];
+
+    return labels
+        .asMap()
+        .entries
+        .map((entry) {
+          int index = entry.key;
+          String label = entry.value;
+          if (columnVisibility[label]!) {
+            return cells[index];
+          }
+          return null;
+        })
+        .where((cell) => cell != null)
+        .cast<DataCell>()
+        .toList();
   }
 
   @override
@@ -157,61 +257,10 @@ class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
                   DataTable(
                     sortColumnIndex: _sortColumnIndex,
                     sortAscending: _sortAscending,
-                    columns: [
-                      buildDataColumn(
-                          'Monat', 0, (a, b) => a.month.compareTo(b.month)),
-                      buildDataColumn(
-                          'Restschuld',
-                          1,
-                          (a, b) =>
-                              a.remainingBalance.compareTo(b.remainingBalance)),
-                      buildDataColumn(
-                          'Hauptzahlung',
-                          2,
-                          (a, b) =>
-                              a.principalPayment.compareTo(b.principalPayment)),
-                      buildDataColumn(
-                          'Zinszahlung',
-                          3,
-                          (a, b) =>
-                              a.interestPayment.compareTo(b.interestPayment)),
-                      buildDataColumn(
-                          'Sonderzahlung',
-                          4,
-                          (a, b) =>
-                              a.specialPayment.compareTo(b.specialPayment)),
-                      buildDataColumn(
-                          'Rest-Sonderzahlung',
-                          5,
-                          (a, b) => a.remainingSpecialPayment
-                              .compareTo(b.remainingSpecialPayment)),
-                      buildDataColumn(
-                          'Zinsrabatt',
-                          6,
-                          (a, b) =>
-                              a.interestRebate.compareTo(b.interestRebate)),
-                      buildDataColumn('Abschreibung', 7,
-                          (a, b) => a.depreciation.compareTo(b.depreciation)),
-                    ],
+                    columns: getVisibleColumns(),
                     rows: payments!.map((payment) {
                       return DataRow(
-                        cells: [
-                          DataCell(Text(payment.month.toString())),
-                          DataCell(Text(
-                              payment.remainingBalance.toStringAsFixed(0))),
-                          DataCell(Text(
-                              payment.principalPayment.toStringAsFixed(0))),
-                          DataCell(
-                              Text(payment.interestPayment.toStringAsFixed(0))),
-                          DataCell(
-                              Text(payment.specialPayment.toStringAsFixed(0))),
-                          DataCell(Text(payment.remainingSpecialPayment
-                              .toStringAsFixed(0))),
-                          DataCell(
-                              Text(payment.interestRebate.toStringAsFixed(0))),
-                          DataCell(
-                              Text(payment.depreciation.toStringAsFixed(0))),
-                        ],
+                        cells: getVisibleCells(payment),
                       );
                     }).toList(),
                   ),
