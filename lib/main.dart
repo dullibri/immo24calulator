@@ -198,19 +198,19 @@ class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
                         cells: [
                           DataCell(Text(payment.month.toString())),
                           DataCell(Text(
-                              payment.remainingBalance.toStringAsFixed(2))),
+                              payment.remainingBalance.toStringAsFixed(0))),
                           DataCell(Text(
-                              payment.principalPayment.toStringAsFixed(2))),
+                              payment.principalPayment.toStringAsFixed(0))),
                           DataCell(
-                              Text(payment.interestPayment.toStringAsFixed(2))),
+                              Text(payment.interestPayment.toStringAsFixed(0))),
                           DataCell(
-                              Text(payment.specialPayment.toStringAsFixed(2))),
+                              Text(payment.specialPayment.toStringAsFixed(0))),
                           DataCell(Text(payment.remainingSpecialPayment
-                              .toStringAsFixed(2))),
+                              .toStringAsFixed(0))),
                           DataCell(
-                              Text(payment.interestRebate.toStringAsFixed(2))),
+                              Text(payment.interestRebate.toStringAsFixed(0))),
                           DataCell(
-                              Text(payment.depreciation.toStringAsFixed(2))),
+                              Text(payment.depreciation.toStringAsFixed(0))),
                         ],
                       );
                     }).toList(),
