@@ -37,7 +37,7 @@ class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
   double annualDepreciationRate = 0.03;
 
   List<MortgagePayment>? payments;
-  int _sortColumnIndex = 0;
+  int? _sortColumnIndex;
   bool _sortAscending = true;
 
   void calculatePayments() {
@@ -56,6 +56,32 @@ class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
     });
   }
 
+  Widget buildInputField(
+      String label, String initialValue, Function(String) onChanged) {
+    return TextFormField(
+      decoration: InputDecoration(
+        labelText: label,
+        hintText: initialValue,
+      ),
+      keyboardType: TextInputType.number,
+      onChanged: onChanged,
+    );
+  }
+
+  DataColumn buildDataColumn(String label, int columnIndex,
+      int Function(MortgagePayment a, MortgagePayment b) compare) {
+    return DataColumn(
+      label: Text(label),
+      onSort: (index, ascending) {
+        setState(() {
+          _sortColumnIndex = columnIndex;
+          _sortAscending = ascending;
+          payments!.sort((a, b) => ascending ? compare(a, b) : compare(b, a));
+        });
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -68,72 +94,51 @@ class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Eingabedaten:'),
-            TextFormField(
-              decoration: InputDecoration(
-                labelText: 'Kreditsumme',
-                hintText: principal.toString(),
-              ),
-              keyboardType: TextInputType.number,
+            MortgageInputField(
+              label: 'Kreditsumme',
+              initialValue: principal.toString(),
               onChanged: (value) {
                 principal = double.tryParse(value) ?? 0.0;
               },
             ),
-            TextFormField(
-              decoration: InputDecoration(
-                labelText: 'Jährlicher Zinssatz',
-                hintText: annualInterestRate.toString(),
-              ),
-              keyboardType: TextInputType.number,
+            MortgageInputField(
+              label: 'Jährlicher Zinssatz',
+              initialValue: annualInterestRate.toString(),
               onChanged: (value) {
                 annualInterestRate = double.tryParse(value) ?? 0.0;
               },
             ),
-            TextFormField(
-              decoration: InputDecoration(
-                labelText: 'Anfangszahlung',
-                hintText: initialPayment.toString(),
-              ),
-              keyboardType: TextInputType.number,
+            MortgageInputField(
+              label: 'Anfangszahlung',
+              initialValue: initialPayment.toString(),
               onChanged: (value) {
                 initialPayment = double.tryParse(value) ?? 0.0;
               },
             ),
-            TextFormField(
-              decoration: InputDecoration(
-                labelText: 'Monatliche Sonderzahlung',
-                hintText: monthlySpecialPayment.toString(),
-              ),
-              keyboardType: TextInputType.number,
+            MortgageInputField(
+              label: 'Monatliche Sonderzahlung',
+              initialValue: monthlySpecialPayment.toString(),
               onChanged: (value) {
                 monthlySpecialPayment = double.tryParse(value) ?? 0.0;
               },
             ),
-            TextFormField(
-              decoration: InputDecoration(
-                labelText: 'Mietanteil',
-                hintText: rentalShare.toString(),
-              ),
-              keyboardType: TextInputType.number,
+            MortgageInputField(
+              label: 'Mietanteil',
+              initialValue: rentalShare.toString(),
               onChanged: (value) {
                 rentalShare = double.tryParse(value) ?? 0.0;
               },
             ),
-            TextFormField(
-              decoration: InputDecoration(
-                labelText: 'Kaufpreis',
-                hintText: purchasePrice.toString(),
-              ),
-              keyboardType: TextInputType.number,
+            MortgageInputField(
+              label: 'Kaufpreis',
+              initialValue: purchasePrice.toString(),
               onChanged: (value) {
                 purchasePrice = double.tryParse(value) ?? 0.0;
               },
             ),
-            TextFormField(
-              decoration: InputDecoration(
-                labelText: 'Jährliche Abschreibung',
-                hintText: annualDepreciationRate.toString(),
-              ),
-              keyboardType: TextInputType.number,
+            MortgageInputField(
+              label: 'Jährliche Abschreibung',
+              initialValue: annualDepreciationRate.toString(),
               onChanged: (value) {
                 annualDepreciationRate = double.tryParse(value) ?? 0.0;
               },
@@ -153,130 +158,40 @@ class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
                     sortColumnIndex: _sortColumnIndex,
                     sortAscending: _sortAscending,
                     columns: [
-                      DataColumn(
-                          label: Text('Monat'),
-                          onSort: (columnIndex, ascending) {
-                            setState(() {
-                              _sortColumnIndex = columnIndex;
-                              _sortAscending = ascending;
-                              if (ascending) {
-                                payments!
-                                    .sort((a, b) => a.month.compareTo(b.month));
-                              } else {
-                                payments!
-                                    .sort((a, b) => b.month.compareTo(a.month));
-                              }
-                            });
-                          }),
-                      DataColumn(
-                          label: Text('Restschuld'),
-                          onSort: (columnIndex, ascending) {
-                            setState(() {
-                              _sortColumnIndex = columnIndex;
-                              _sortAscending = ascending;
-                              if (ascending) {
-                                payments!.sort((a, b) => a.remainingBalance
-                                    .compareTo(b.remainingBalance));
-                              } else {
-                                payments!.sort((a, b) => b.remainingBalance
-                                    .compareTo(a.remainingBalance));
-                              }
-                            });
-                          }),
-                      DataColumn(
-                          label: Text('Hauptzahlung'),
-                          onSort: (columnIndex, ascending) {
-                            setState(() {
-                              _sortColumnIndex = columnIndex;
-                              _sortAscending = ascending;
-                              if (ascending) {
-                                payments!.sort((a, b) => a.principalPayment
-                                    .compareTo(b.principalPayment));
-                              } else {
-                                payments!.sort((a, b) => b.principalPayment
-                                    .compareTo(a.principalPayment));
-                              }
-                            });
-                          }),
-                      DataColumn(
-                          label: Text('Zinszahlung'),
-                          onSort: (columnIndex, ascending) {
-                            setState(() {
-                              _sortColumnIndex = columnIndex;
-                              _sortAscending = ascending;
-                              if (ascending) {
-                                payments!.sort((a, b) => a.interestPayment
-                                    .compareTo(b.interestPayment));
-                              } else {
-                                payments!.sort((a, b) => b.interestPayment
-                                    .compareTo(a.interestPayment));
-                              }
-                            });
-                          }),
-                      DataColumn(
-                          label: Text('Sonderzahlung'),
-                          onSort: (columnIndex, ascending) {
-                            setState(() {
-                              _sortColumnIndex = columnIndex;
-                              _sortAscending = ascending;
-                              if (ascending) {
-                                payments!.sort((a, b) => a.specialPayment
-                                    .compareTo(b.specialPayment));
-                              } else {
-                                payments!.sort((a, b) => b.specialPayment
-                                    .compareTo(a.specialPayment));
-                                payments!.sort((a, b) => b.specialPayment
-                                    .compareTo(a.specialPayment));
-                              }
-                            });
-                          }),
-                      DataColumn(
-                          label: Text('Rest-Sonderzahlung'),
-                          onSort: (columnIndex, ascending) {
-                            setState(() {
-                              _sortColumnIndex = columnIndex;
-                              _sortAscending = ascending;
-                              if (ascending) {
-                                payments!.sort((a, b) => a
-                                    .remainingSpecialPayment
-                                    .compareTo(b.remainingSpecialPayment));
-                              } else {
-                                payments!.sort((a, b) => b
-                                    .remainingSpecialPayment
-                                    .compareTo(a.remainingSpecialPayment));
-                              }
-                            });
-                          }),
-                      DataColumn(
-                          label: Text('Zinsrabatt'),
-                          onSort: (columnIndex, ascending) {
-                            setState(() {
-                              _sortColumnIndex = columnIndex;
-                              _sortAscending = ascending;
-                              if (ascending) {
-                                payments!.sort((a, b) => a.interestRebate
-                                    .compareTo(b.interestRebate));
-                              } else {
-                                payments!.sort((a, b) => b.interestRebate
-                                    .compareTo(a.interestRebate));
-                              }
-                            });
-                          }),
-                      DataColumn(
-                          label: Text('Abschreibung'),
-                          onSort: (columnIndex, ascending) {
-                            setState(() {
-                              _sortColumnIndex = columnIndex;
-                              _sortAscending = ascending;
-                              if (ascending) {
-                                payments!.sort((a, b) =>
-                                    a.depreciation.compareTo(b.depreciation));
-                              } else {
-                                payments!.sort((a, b) =>
-                                    b.depreciation.compareTo(a.depreciation));
-                              }
-                            });
-                          }),
+                      buildDataColumn(
+                          'Monat', 0, (a, b) => a.month.compareTo(b.month)),
+                      buildDataColumn(
+                          'Restschuld',
+                          1,
+                          (a, b) =>
+                              a.remainingBalance.compareTo(b.remainingBalance)),
+                      buildDataColumn(
+                          'Hauptzahlung',
+                          2,
+                          (a, b) =>
+                              a.principalPayment.compareTo(b.principalPayment)),
+                      buildDataColumn(
+                          'Zinszahlung',
+                          3,
+                          (a, b) =>
+                              a.interestPayment.compareTo(b.interestPayment)),
+                      buildDataColumn(
+                          'Sonderzahlung',
+                          4,
+                          (a, b) =>
+                              a.specialPayment.compareTo(b.specialPayment)),
+                      buildDataColumn(
+                          'Rest-Sonderzahlung',
+                          5,
+                          (a, b) => a.remainingSpecialPayment
+                              .compareTo(b.remainingSpecialPayment)),
+                      buildDataColumn(
+                          'Zinsrabatt',
+                          6,
+                          (a, b) =>
+                              a.interestRebate.compareTo(b.interestRebate)),
+                      buildDataColumn('Abschreibung', 7,
+                          (a, b) => a.depreciation.compareTo(b.depreciation)),
                     ],
                     rows: payments!.map((payment) {
                       return DataRow(
@@ -305,6 +220,30 @@ class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class MortgageInputField extends StatelessWidget {
+  final String label;
+  final String initialValue;
+  final Function(String) onChanged;
+
+  MortgageInputField({
+    required this.label,
+    required this.initialValue,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      decoration: InputDecoration(
+        labelText: label,
+        hintText: initialValue,
+      ),
+      keyboardType: TextInputType.number,
+      onChanged: onChanged,
     );
   }
 }
