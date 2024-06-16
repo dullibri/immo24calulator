@@ -182,6 +182,43 @@ class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
         .toList();
   }
 
+  void showColumnToggleDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Spalten ein-/ausblenden'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: columnVisibility.keys.map((label) {
+              return Row(
+                children: [
+                  Text(label),
+                  Checkbox(
+                    value: columnVisibility[label],
+                    onChanged: (value) {
+                      setState(() {
+                        columnVisibility[label] = value!;
+                      });
+                    },
+                  ),
+                ],
+              );
+            }).toList(),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Schließen'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -268,6 +305,10 @@ class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
               ),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: showColumnToggleDialog,
+        child: Icon(Icons.settings),
       ),
     );
   }
