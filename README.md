@@ -1,3 +1,3 @@
-# patterns_codelab
+# Immo24Calculator
 
 A new Flutter project.
