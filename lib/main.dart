@@ -24,16 +24,16 @@ class MortgageCalculatorPage extends StatefulWidget {
 }
 
 class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
-  double principal = 544000;
+  double principal = 600000;
   double annualInterestRate = 3.61;
-  double initialPayment = 2617.67;
+  double initialPayment = 3200.00;
   double monthlySpecialPayment = 1185; // Zusätzliche monatliche Sonderzahlungen
   double maxSpecialPaymentPercent =
       5; // Maximal 5% der ursprünglichen Kreditsumme als zusätzliche Sonderzahlungen
-  double rentalShare = 530063 /
+  double rentalShare = 580000 /
       544000; // Verhältnis von vermietetem/gewerblichem Anteil zu Gesamtkredit
   double topTaxRate = 0.42; // 42% Spitzensteuersatz
-  double purchasePrice = 700000;
+  double purchasePrice = 800000;
   double annualDepreciationRate = 0.03;
 
   List<MortgagePayment>? payments;
