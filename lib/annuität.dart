@@ -22,6 +22,18 @@ class MortgagePayment {
   });
 }
 
+class CalculationResult {
+  final List<MortgagePayment> payments;
+  final int totalMonths;
+  final double totalSum;
+
+  CalculationResult({
+    required this.payments,
+    required this.totalMonths,
+    required this.totalSum,
+  });
+}
+
 double calculateInterestRebate(
     double interestForRebate, double topTaxRate, double rentalShare) {
   return interestForRebate * topTaxRate * rentalShare;
@@ -32,7 +44,7 @@ double calculateDepreciation(
   return purchasePrice * annualDepreciationRate * topTaxRate;
 }
 
-List<MortgagePayment> calculateMortgagePayments({
+CalculationResult calculateMortgagePayments({
   required double principal,
   required double annualInterestRate,
   required double initialPayment,
@@ -54,6 +66,7 @@ List<MortgagePayment> calculateMortgagePayments({
   double totalSpecialPaymentsPerYear = 0;
   double interestRebate = 0;
   double depreciation = 0;
+  double totalSum = 0;
 
   while (remainingBalance > 0) {
     // Reset the annual special payments and interest rebate at the start of each year
@@ -122,6 +135,12 @@ List<MortgagePayment> calculateMortgagePayments({
       depreciation: depreciation,
     ));
 
+    totalSum += principalPayment +
+        interestPayment +
+        specialPayment +
+        interestRebate +
+        depreciation;
+
     month++;
     // Reset interest rebate and depreciation after it has been applied
     if (month > 18 && (month - 6) % 12 == 1) {
@@ -130,48 +149,9 @@ List<MortgagePayment> calculateMortgagePayments({
     }
   }
 
-  return payments;
+  return CalculationResult(
+    payments: payments,
+    totalMonths: month - 1,
+    totalSum: totalSum,
+  );
 }
-
-// void main() {
-//   // Test
-//   double principal = 544000;
-//   double annualInterestRate = 3.61;
-//   double initialPayment = 2617.67;
-//   double monthlySpecialPayment = 1185; // Zusätzliche monatliche Sonderzahlungen
-//   double maxSpecialPaymentPercent =
-//       5; // Maximal 5% der ursprünglichen Kreditsumme als zusätzliche Sonderzahlungen
-//   double rentalShare = 530063 /
-//       544000; // Verhältnis von vermietetem/gewerblichem Anteil zu Gesamtkredit
-//   double topTaxRate = 0.42; // 42% Spitzensteuersatz
-//   double purchasePrice = 700000;
-//   double annualDepreciationRate = 0.03;
-
-//   List<MortgagePayment> payments = calculateMortgagePayments(
-//     principal: principal,
-//     annualInterestRate: annualInterestRate,
-//     initialPayment: initialPayment,
-//     monthlySpecialPayment: monthlySpecialPayment,
-//     maxSpecialPaymentPercent: maxSpecialPaymentPercent,
-//     rentalShare: rentalShare,
-//     topTaxRate: topTaxRate,
-//     purchasePrice: purchasePrice,
-//     annualDepreciationRate: annualDepreciationRate,
-//   );
-
-//   // Print table header
-//   print(
-//       'Month | Principal Payment | Interest Payment | Remaining Balance | Special Payment | Remaining Special Payment | Interest Rebate | Depreciation');
-
-//   // Print each payment
-//   for (var payment in payments) {
-//     print('${payment.month.toString().padLeft(5)} '
-//         '| ${payment.principalPayment.toStringAsFixed(2).padLeft(17)} '
-//         '| ${payment.interestPayment.toStringAsFixed(2).padLeft(16)} '
-//         '| ${payment.remainingBalance.toStringAsFixed(2).padLeft(17)} '
-//         '| ${payment.specialPayment.toStringAsFixed(2).padLeft(14)} '
-//         '| ${payment.remainingSpecialPayment.toStringAsFixed(2).padLeft(25)} '
-//         '| ${payment.interestRebate.toStringAsFixed(2).padLeft(14)} '
-//         '| ${payment.depreciation.toStringAsFixed(2).padLeft(11)}');
-//   }
-// }
