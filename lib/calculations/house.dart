@@ -34,8 +34,7 @@ HousePriceOutput calculateTotalHousePrice(HousePriceInput house) {
   double notaryFees = house.notaryFeesRate * house.housePrice;
   double landRegistryFees = house.landRegistryFeesRate * house.housePrice;
   double brockerCommission = house.brokerCommissionRate * house.housePrice;
-  double totalHousePrice = house.housePrice * (1 + totalChargesRate);
-  double totalChargesRate =
+  double totalHousePrice =
       house.housePrice + brockerCommission + notaryFees + landRegistryFees;
   return HousePriceOutput(
       totalHousePrice: totalHousePrice,
