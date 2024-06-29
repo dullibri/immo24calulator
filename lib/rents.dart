@@ -36,22 +36,18 @@ class RentResults {
   });
 }
 
-RentResults calculateRent({
-  required double totalSquareMeters,
-  required double letSquareMeters,
-  required double rentPerSquareMeter,
-  required int numMonths,
-  required double topTaxRate,
-}) {
-  final rentMonthly = rentPerSquareMeter * letSquareMeters;
-  final rentMonthlyNet = rentMonthly * (1 - topTaxRate);
-  final rentTotal = rentMonthly * numMonths;
-  final rentTotalNet = rentTotal * (1 - topTaxRate);
+RentResults calculateRent(RentIncome income) {
+  final rentMonthly = income.rentPerSquareMeter * income.letSquareMeters;
+  final rentMonthlyNet = rentMonthly * (1 - income.topTaxRate);
+  final rentTotal = rentMonthly * income.numMonths;
+  final rentTotalNet = rentTotal * (1 - income.topTaxRate);
 
-  final potentialRentMonthly = rentPerSquareMeter * totalSquareMeters;
-  final potentialRentMonthlyNet = potentialRentMonthly * (1 - topTaxRate);
-  final potentialRentTotal = potentialRentMonthly * numMonths;
-  final potentialRentTotalNet = potentialRentTotal * (1 - topTaxRate);
+  final potentialRentMonthly =
+      income.rentPerSquareMeter * income.totalSquareMeters;
+  final potentialRentMonthlyNet =
+      potentialRentMonthly * (1 - income.topTaxRate);
+  final potentialRentTotal = potentialRentMonthly * income.numMonths;
+  final potentialRentTotalNet = potentialRentTotal * (1 - income.topTaxRate);
 
   return RentResults(
     rentTotal: rentTotal,
