@@ -1,6 +1,6 @@
 import 'dart:math';
 
-class MortgagePayment {
+class Payment {
   final int month;
   final double principalPayment;
   final double interestPayment;
@@ -10,7 +10,7 @@ class MortgagePayment {
   final double interestRebate;
   final double depreciation;
 
-  MortgagePayment({
+  Payment({
     required this.month,
     required this.principalPayment,
     required this.interestPayment,
@@ -23,7 +23,7 @@ class MortgagePayment {
 }
 
 class CalculationResult {
-  final List<MortgagePayment> payments;
+  final List<Payment> payments;
   final int totalMonths;
   final double totalSum;
   final double totalTaxRepayment;
@@ -62,7 +62,7 @@ CalculationResult calculateMortgagePayments({
       principal * (maxSpecialPaymentPercent / 100);
   double totalInterestPaidLastYear = 0;
 
-  List<MortgagePayment> payments = [];
+  List<Payment> payments = [];
   double remainingBalance = principal;
   int month = 1;
   double totalSpecialPaymentsPerYear = 0;
@@ -72,7 +72,7 @@ CalculationResult calculateMortgagePayments({
   double totalTaxRepayment = 0;
 
   while (remainingBalance > 0) {
-    // Reset the annual special payments and interest rebate at the start of each year
+    // Reset annual special payments and interest rebate at the start of each year
     if ((month - 1) % 12 == 0) {
       totalSpecialPaymentsPerYear = 0;
       totalInterestPaidLastYear = 0;
@@ -127,7 +127,7 @@ CalculationResult calculateMortgagePayments({
     double remainingSpecialPayment =
         maxAnnualSpecialPayment - totalSpecialPaymentsPerYear;
 
-    payments.add(MortgagePayment(
+    payments.add(Payment(
       month: month,
       principalPayment: principalPayment,
       interestPayment: interestPayment,
@@ -147,7 +147,8 @@ CalculationResult calculateMortgagePayments({
     totalTaxRepayment += interestRebate + depreciation;
 
     month++;
-    // Reset interest rebate and depreciation after it has been applied
+
+    // Reset interest rebate and depreciation after application
     if (month > 18 && (month - 6) % 12 == 1) {
       interestRebate = 0;
       depreciation = 0;
@@ -160,4 +161,42 @@ CalculationResult calculateMortgagePayments({
     totalSum: totalSum,
     totalTaxRepayment: totalTaxRepayment,
   );
+}
+
+// Function to group payments by year
+List<Payment> groupPaymentsByYear(List<Payment> payments) {
+  List<Payment> annualPayments = [];
+
+  for (int i = 0; i < payments.length; i += 12) {
+    double totalRemainingBalance = 0;
+    double totalPrincipalPayment = 0;
+    double totalInterestPayment = 0;
+    double totalSpecialPayment = 0;
+    double totalRemainingSpecialPayment = 0;
+    double totalInterestRebate = 0;
+    double totalDepreciation = 0;
+
+    for (int j = i; j < i + 12 && j < payments.length; j++) {
+      totalRemainingBalance = payments[j].remainingBalance;
+      totalPrincipalPayment += payments[j].principalPayment;
+      totalInterestPayment += payments[j].interestPayment;
+      totalSpecialPayment += payments[j].specialPayment;
+      totalRemainingSpecialPayment = payments[j].remainingSpecialPayment;
+      totalInterestRebate += payments[j].interestRebate;
+      totalDepreciation += payments[j].depreciation;
+    }
+
+    annualPayments.add(Payment(
+      month: (i ~/ 12) + 1,
+      remainingBalance: totalRemainingBalance,
+      principalPayment: totalPrincipalPayment,
+      interestPayment: totalInterestPayment,
+      specialPayment: totalSpecialPayment,
+      remainingSpecialPayment: totalRemainingSpecialPayment,
+      interestRebate: totalInterestRebate,
+      depreciation: totalDepreciation,
+    ));
+  }
+
+  return annualPayments;
 }
