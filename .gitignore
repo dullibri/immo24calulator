@@ -33,3 +33,15 @@ web/
 windows/
 linux/
 .idea/
+
+# Terraform specific
+.terraform/
+terraform.tfstate
+terraform.tfstate.backup
+.terraform.lock.hcl
+*.auto.tfvars
+*.tfvars
+*.override.tf
+terraform.log
+.terraformrc
+.tfrc
