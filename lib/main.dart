@@ -95,21 +95,21 @@ class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
         const Text('Zusammenfassung:',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         Text(
-            'Gesamtkosten: ${housePriceOutput!.totalHousePrice.toStringAsFixed(2)} €'),
-        Text('Kreditsumme: ${principal.toStringAsFixed(2)} €'),
+            'Gesamtkosten: ${housePriceOutput!.totalHousePrice.toStringAsFixed(0)} €'),
+        Text('Kreditsumme: ${principal.toStringAsFixed(0)} €'),
         Text(
             'Dauer bis zur Rückzahlung: ${calculationResult!.totalMonths} Monate'),
         Text(
-            'Gesamtsumme über alle Zahlungen: ${calculationResult!.totalSum.toStringAsFixed(2)} €'),
+            'Gesamtsumme über alle Zahlungen: ${calculationResult!.totalSum.toStringAsFixed(0)} €'),
         const SizedBox(height: 16.0),
         const Text('Zusätzliche Kosten:',
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         Text(
-            'Notargebühren: ${housePriceOutput!.notaryFees.toStringAsFixed(2)} €'),
+            'Notargebühren: ${housePriceOutput!.notaryFees.toStringAsFixed(0)} €'),
         Text(
-            'Grundbuchgebühren: ${housePriceOutput!.landRegistryFees.toStringAsFixed(2)} €'),
+            'Grundbuchgebühren: ${housePriceOutput!.landRegistryFees.toStringAsFixed(0)} €'),
         Text(
-            'Maklerprovision: ${housePriceOutput!.brockerCommision.toStringAsFixed(2)} €'),
+            'Maklerprovision: ${housePriceOutput!.brockerCommision.toStringAsFixed(0)} €'),
         const SizedBox(height: 16.0),
         SwitchListTile(
           title: const Text('Jährliche Werte anzeigen'),
@@ -131,7 +131,7 @@ class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
         : calculationResult!.payments;
 
     return DataTable(
-      columns: const [
+      columns: [
         DataColumn(label: Text('Periode')),
         DataColumn(label: Text('Restschuld')),
         DataColumn(label: Text('Tilgung')),
@@ -142,17 +142,19 @@ class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
         DataColumn(label: Text('Abschreibung')),
       ],
       rows: payments.map((payment) {
+        final periodLabel = showAnnual
+            ? '${payment.month ~/ 12 + 1}'
+            : '${payment.month % 12 == 0 ? 12 : payment.month % 12}';
+
         return DataRow(cells: [
-          DataCell(Text(showAnnual
-              ? 'Jahr ${payment.month ~/ 12 + 1}'
-              : 'Monat ${payment.month}')),
-          DataCell(Text(payment.remainingBalance.toStringAsFixed(2))),
-          DataCell(Text(payment.principalPayment.toStringAsFixed(2))),
-          DataCell(Text(payment.interestPayment.toStringAsFixed(2))),
-          DataCell(Text(payment.specialPayment.toStringAsFixed(2))),
-          DataCell(Text(payment.remainingSpecialPayment.toStringAsFixed(2))),
-          DataCell(Text(payment.interestRebate.toStringAsFixed(2))),
-          DataCell(Text(payment.depreciation.toStringAsFixed(2))),
+          DataCell(Text(periodLabel)),
+          DataCell(Text(payment.remainingBalance.toStringAsFixed(0))),
+          DataCell(Text(payment.principalPayment.toStringAsFixed(0))),
+          DataCell(Text(payment.interestPayment.toStringAsFixed(0))),
+          DataCell(Text(payment.specialPayment.toStringAsFixed(0))),
+          DataCell(Text(payment.remainingSpecialPayment.toStringAsFixed(0))),
+          DataCell(Text(payment.interestRebate.toStringAsFixed(0))),
+          DataCell(Text(payment.depreciation.toStringAsFixed(0))),
         ]);
       }).toList(),
     );
@@ -213,7 +215,7 @@ class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
             SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const Text('Hauptfaktoren:',
                       style:
@@ -267,7 +269,7 @@ class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
             SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const Text('Voreingestellte Rahmenwerte:',
                       style:
