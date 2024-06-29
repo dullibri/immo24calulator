@@ -26,11 +26,13 @@ class CalculationResult {
   final List<MortgagePayment> payments;
   final int totalMonths;
   final double totalSum;
+  final double totalTaxRepayment;
 
   CalculationResult({
     required this.payments,
     required this.totalMonths,
     required this.totalSum,
+    required this.totalTaxRepayment,
   });
 }
 
@@ -67,6 +69,7 @@ CalculationResult calculateMortgagePayments({
   double interestRebate = 0;
   double depreciation = 0;
   double totalSum = 0;
+  double totalTaxRepayment = 0;
 
   while (remainingBalance > 0) {
     // Reset the annual special payments and interest rebate at the start of each year
@@ -141,6 +144,8 @@ CalculationResult calculateMortgagePayments({
         interestRebate +
         depreciation;
 
+    totalTaxRepayment += interestRebate + depreciation;
+
     month++;
     // Reset interest rebate and depreciation after it has been applied
     if (month > 18 && (month - 6) % 12 == 1) {
@@ -153,5 +158,6 @@ CalculationResult calculateMortgagePayments({
     payments: payments,
     totalMonths: month - 1,
     totalSum: totalSum,
+    totalTaxRepayment: totalTaxRepayment,
   );
 }
