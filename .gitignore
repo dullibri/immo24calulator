@@ -45,3 +45,6 @@ terraform.tfstate.backup
 terraform.log
 .terraformrc
 .tfrc
+
+# Personal files
+playgroung.dart
