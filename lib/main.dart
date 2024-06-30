@@ -25,6 +25,7 @@ class MortgageCalculatorPage extends StatefulWidget {
 }
 
 class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
+  // Default values
   double annualInterestRate = 3.61;
   double initialPayment = 3200.00;
   double monthlySpecialPayment = 1185;
@@ -35,6 +36,7 @@ class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
   double annualDepreciationRate = 0.03;
   double equity = 100000;
 
+  // Default rates
   double notaryFeesRate = 0.015;
   double landRegistryFeesRate = 0.005;
   double brokerCommissionRate = 0.035;
@@ -45,6 +47,7 @@ class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
   HousePriceOutput? housePriceOutput;
   bool showAnnual = false;
 
+  // Method to calculate mortgage payments
   void calculatePayments() {
     final houseInput = HousePriceInput(
       squareMeters: 0,
@@ -72,29 +75,40 @@ class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
     });
   }
 
+  // Method to build input fields
   Widget buildInputField(String label, String initialValue,
-      Function(String) onChanged, bool positiveOnly) {
+      Function(String)? onChanged, bool positiveOnly) {
     return TextFormField(
       decoration: InputDecoration(
         labelText: label,
         hintText: initialValue,
       ),
       keyboardType: TextInputType.number,
-      onChanged: (value) {
-        if (positiveOnly &&
-            double.tryParse(value) != null &&
-            double.parse(value) < 0) {
-          // Handle negative input (show error or prevent change)
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Wert darf nicht negativ sein')),
-          );
-        } else {
-          onChanged(value);
-        }
-      },
+      onChanged: onChanged != null
+          ? (value) {
+              if (positiveOnly &&
+                  double.tryParse(value) != null &&
+                  double.parse(value) < 0) {
+                // Handle negative input (show error or prevent change)
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Wert darf nicht negativ sein')),
+                );
+              } else {
+                onChanged(value);
+              }
+            }
+          : null,
     );
   }
 
+  // Method to handle text field changes and validation
+  void handleTextFieldChange(String value, Function(double) updateFunction) {
+    if (double.tryParse(value) != null) {
+      updateFunction(double.parse(value));
+    }
+  }
+
+  // Method to build summary widget
   Widget buildSummary() {
     if (calculationResult == null || housePriceOutput == null) {
       return const SizedBox();
@@ -136,6 +150,7 @@ class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
     );
   }
 
+  // Method to build data table widget
   Widget buildDataTable() {
     final payments = showAnnual
         ? groupPaymentsByYear(calculationResult!.payments)
@@ -171,6 +186,7 @@ class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
     );
   }
 
+  // Method to group payments by year
   List<Payment> groupPaymentsByYear(List<Payment> payments) {
     List<Payment> annualPayments = [];
     for (int i = 0; i < payments.length; i += 12) {
@@ -234,53 +250,57 @@ class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
                   buildInputField(
                     'Kaufpreis',
                     purchasePrice.toString(),
-                    (value) {
+                    (value) => handleTextFieldChange(value, (newValue) {
                       setState(() {
-                        purchasePrice = double.tryParse(value) ?? 0.0;
+                        purchasePrice = newValue;
                         if (equity > purchasePrice) {
-                          // Adjust equity to ensure it's not greater than purchasePrice
                           equity = purchasePrice;
                         }
                       });
-                    },
+                    }),
                     true, // Positive only
                   ),
                   buildInputField(
                     'Eigenkapital',
                     equity.toString(),
-                    (value) {
+                    (value) => handleTextFieldChange(value, (newValue) {
                       setState(() {
-                        equity = double.tryParse(value) ?? 0.0;
+                        equity = newValue;
                         if (equity > purchasePrice) {
-                          // Adjust equity to ensure it's not greater than purchasePrice
                           purchasePrice = equity;
                         }
                       });
-                    },
+                    }),
                     true, // Positive only
                   ),
                   buildInputField(
                     'Jährlicher Zinssatz',
                     annualInterestRate.toString(),
-                    (value) {
-                      annualInterestRate = double.tryParse(value) ?? 0.0;
-                    },
-                    false, // Allow negative values for interest rate
+                    (value) => handleTextFieldChange(value, (newValue) {
+                      setState(() {
+                        annualInterestRate = newValue;
+                      });
+                    }),
+                    false, // Allow negative values
                   ),
                   buildInputField(
                     'Anfangszahlung',
                     initialPayment.toString(),
-                    (value) {
-                      initialPayment = double.tryParse(value) ?? 0.0;
-                    },
+                    (value) => handleTextFieldChange(value, (newValue) {
+                      setState(() {
+                        initialPayment = newValue;
+                      });
+                    }),
                     true, // Positive only
                   ),
                   buildInputField(
                     'Monatliche Sonderzahlung',
                     monthlySpecialPayment.toString(),
-                    (value) {
-                      monthlySpecialPayment = double.tryParse(value) ?? 0.0;
-                    },
+                    (value) => handleTextFieldChange(value, (newValue) {
+                      setState(() {
+                        monthlySpecialPayment = newValue;
+                      });
+                    }),
                     true, // Positive only
                   ),
                   const SizedBox(height: 16.0),
@@ -315,59 +335,71 @@ class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
                   buildInputField(
                     'Notargebührenrate (%)',
                     (notaryFeesRate * 100).toString(),
-                    (value) {
-                      notaryFeesRate = (double.tryParse(value) ?? 0.0) / 100;
-                    },
+                    (value) => handleTextFieldChange(value, (newValue) {
+                      setState(() {
+                        notaryFeesRate = newValue / 100;
+                      });
+                    }),
                     true, // Positive only
                   ),
                   buildInputField(
                     'Grundbuchgebührenrate (%)',
                     (landRegistryFeesRate * 100).toString(),
-                    (value) {
-                      landRegistryFeesRate =
-                          (double.tryParse(value) ?? 0.0) / 100;
-                    },
+                    (value) => handleTextFieldChange(value, (newValue) {
+                      setState(() {
+                        landRegistryFeesRate = newValue / 100;
+                      });
+                    }),
                     true, // Positive only
                   ),
                   buildInputField(
                     'Maklerprovisionrate (%)',
                     (brokerCommissionRate * 100).toString(),
-                    (value) {
-                      brokerCommissionRate =
-                          (double.tryParse(value) ?? 0.0) / 100;
-                    },
+                    (value) => handleTextFieldChange(value, (newValue) {
+                      setState(() {
+                        brokerCommissionRate = newValue / 100;
+                      });
+                    }),
                     true, // Positive only
                   ),
                   buildInputField(
                     'Max. Sonderzahlungsprozentsatz (%)',
                     maxSpecialPaymentPercent.toString(),
-                    (value) {
-                      maxSpecialPaymentPercent = double.tryParse(value) ?? 0.0;
-                    },
+                    (value) => handleTextFieldChange(value, (newValue) {
+                      setState(() {
+                        maxSpecialPaymentPercent = newValue;
+                      });
+                    }),
                     true, // Positive only
                   ),
                   buildInputField(
                     'Mietanteil',
                     rentalShare.toString(),
-                    (value) {
-                      rentalShare = double.tryParse(value) ?? 0.0;
-                    },
+                    (value) => handleTextFieldChange(value, (newValue) {
+                      setState(() {
+                        rentalShare = newValue;
+                      });
+                    }),
                     false, // Allow negative values for rental share
                   ),
                   buildInputField(
                     'Spitzensteuersatz',
                     topTaxRate.toString(),
-                    (value) {
-                      topTaxRate = double.tryParse(value) ?? 0.0;
-                    },
+                    (value) => handleTextFieldChange(value, (newValue) {
+                      setState(() {
+                        topTaxRate = newValue;
+                      });
+                    }),
                     false, // Allow negative values for tax rate
                   ),
                   buildInputField(
                     'Jährliche Abschreibung',
                     annualDepreciationRate.toString(),
-                    (value) {
-                      annualDepreciationRate = double.tryParse(value) ?? 0.0;
-                    },
+                    (value) => handleTextFieldChange(value, (newValue) {
+                      setState(() {
+                        annualDepreciationRate = newValue;
+                      });
+                    }),
                     false, // Allow negative values for depreciation rate
                   ),
                 ],
