@@ -72,15 +72,26 @@ class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
     });
   }
 
-  Widget buildInputField(
-      String label, String initialValue, Function(String) onChanged) {
+  Widget buildInputField(String label, String initialValue,
+      Function(String) onChanged, bool positiveOnly) {
     return TextFormField(
       decoration: InputDecoration(
         labelText: label,
         hintText: initialValue,
       ),
       keyboardType: TextInputType.number,
-      onChanged: onChanged,
+      onChanged: (value) {
+        if (positiveOnly &&
+            double.tryParse(value) != null &&
+            double.parse(value) < 0) {
+          // Handle negative input (show error or prevent change)
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Wert darf nicht negativ sein')),
+          );
+        } else {
+          onChanged(value);
+        }
+      },
     );
   }
 
@@ -224,15 +235,29 @@ class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
                     'Kaufpreis',
                     purchasePrice.toString(),
                     (value) {
-                      purchasePrice = double.tryParse(value) ?? 0.0;
+                      setState(() {
+                        purchasePrice = double.tryParse(value) ?? 0.0;
+                        if (equity > purchasePrice) {
+                          // Adjust equity to ensure it's not greater than purchasePrice
+                          equity = purchasePrice;
+                        }
+                      });
                     },
+                    true, // Positive only
                   ),
                   buildInputField(
                     'Eigenkapital',
                     equity.toString(),
                     (value) {
-                      equity = double.tryParse(value) ?? 0.0;
+                      setState(() {
+                        equity = double.tryParse(value) ?? 0.0;
+                        if (equity > purchasePrice) {
+                          // Adjust equity to ensure it's not greater than purchasePrice
+                          purchasePrice = equity;
+                        }
+                      });
                     },
+                    true, // Positive only
                   ),
                   buildInputField(
                     'Jährlicher Zinssatz',
@@ -240,6 +265,7 @@ class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
                     (value) {
                       annualInterestRate = double.tryParse(value) ?? 0.0;
                     },
+                    false, // Allow negative values for interest rate
                   ),
                   buildInputField(
                     'Anfangszahlung',
@@ -247,6 +273,7 @@ class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
                     (value) {
                       initialPayment = double.tryParse(value) ?? 0.0;
                     },
+                    true, // Positive only
                   ),
                   buildInputField(
                     'Monatliche Sonderzahlung',
@@ -254,10 +281,21 @@ class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
                     (value) {
                       monthlySpecialPayment = double.tryParse(value) ?? 0.0;
                     },
+                    true, // Positive only
                   ),
                   const SizedBox(height: 16.0),
                   ElevatedButton(
-                    onPressed: calculatePayments,
+                    onPressed: () {
+                      if (equity >= purchasePrice) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                              content: Text(
+                                  'Eigenkapital muss kleiner als Kaufpreis sein')),
+                        );
+                      } else {
+                        calculatePayments();
+                      }
+                    },
                     child: const Text('Berechnen'),
                   ),
                   const SizedBox(height: 16.0),
@@ -280,6 +318,7 @@ class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
                     (value) {
                       notaryFeesRate = (double.tryParse(value) ?? 0.0) / 100;
                     },
+                    true, // Positive only
                   ),
                   buildInputField(
                     'Grundbuchgebührenrate (%)',
@@ -288,6 +327,7 @@ class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
                       landRegistryFeesRate =
                           (double.tryParse(value) ?? 0.0) / 100;
                     },
+                    true, // Positive only
                   ),
                   buildInputField(
                     'Maklerprovisionrate (%)',
@@ -296,6 +336,7 @@ class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
                       brokerCommissionRate =
                           (double.tryParse(value) ?? 0.0) / 100;
                     },
+                    true, // Positive only
                   ),
                   buildInputField(
                     'Max. Sonderzahlungsprozentsatz (%)',
@@ -303,6 +344,7 @@ class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
                     (value) {
                       maxSpecialPaymentPercent = double.tryParse(value) ?? 0.0;
                     },
+                    true, // Positive only
                   ),
                   buildInputField(
                     'Mietanteil',
@@ -310,6 +352,7 @@ class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
                     (value) {
                       rentalShare = double.tryParse(value) ?? 0.0;
                     },
+                    false, // Allow negative values for rental share
                   ),
                   buildInputField(
                     'Spitzensteuersatz',
@@ -317,6 +360,7 @@ class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
                     (value) {
                       topTaxRate = double.tryParse(value) ?? 0.0;
                     },
+                    false, // Allow negative values for tax rate
                   ),
                   buildInputField(
                     'Jährliche Abschreibung',
@@ -324,6 +368,7 @@ class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
                     (value) {
                       annualDepreciationRate = double.tryParse(value) ?? 0.0;
                     },
+                    false, // Allow negative values for depreciation rate
                   ),
                 ],
               ),
