@@ -225,7 +225,7 @@ class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 2,
+      length: 4, // Update the length to 4 for new tabs
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Hypothekenrechner'),
@@ -233,6 +233,8 @@ class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
             tabs: [
               Tab(text: 'Hauptfaktoren'),
               Tab(text: 'Rahmenwerte'),
+              Tab(text: 'Zusammenfassung'), // New Summary Tab
+              Tab(text: 'Jährliche Werte'), // New Annual Values Tab
             ],
           ),
         ),
@@ -319,7 +321,6 @@ class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
                     child: const Text('Berechnen'),
                   ),
                   const SizedBox(height: 16.0),
-                  buildSummary(),
                 ],
               ),
             ),
@@ -402,6 +403,25 @@ class _MortgageCalculatorPageState extends State<MortgageCalculatorPage> {
                     }),
                     false, // Allow negative values for depreciation rate
                   ),
+                ],
+              ),
+            ),
+            // Zusammenfassung Tab
+            SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: buildSummary(),
+            ),
+            // Jährliche Werte Tab
+            SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Jährliche Werte:',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  if (calculationResult != null)
+                    buildDataTable(), // Display annual values
                 ],
               ),
             ),
