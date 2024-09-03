@@ -1,63 +1,14 @@
-// Import the necessary Flutter package
 import 'package:flutter/material.dart';
+import 'package:immo_credit/calculations/house.dart';
+import 'package:provider/provider.dart';
+import 'package:immo_credit/calculations/annuität.dart';
 
-// Define a stateful widget for the values page
-class ValuesPage extends StatefulWidget {
-  @override
-  _ValuesPageState createState() => _ValuesPageState();
-}
-
-// Define the state class for the values page
-class _ValuesPageState extends State<ValuesPage> {
-  // Initialize variables to store the rates and percentages
-  double notaryFeesRate = 0.015; // Notary fees rate
-  double landRegistryFeesRate = 0.005; // Land registry fees rate
-  double brokerCommissionRate = 0.035; // Broker commission rate
-  double maxSpecialPaymentPercent = 5; // Maximum special payment percentage
-  double rentalShare = 580000 / 544000; // Rental share
-  double topTaxRate = 0.42; // Top tax rate
-  double annualDepreciationRate = 0.03; // Annual depreciation rate
-
-  // Function to handle text field changes
-  void handleTextFieldChange(String value, Function(double) updateFunction) {
-    // Check if the input value can be parsed to a double
-    if (double.tryParse(value) != null) {
-      // Update the corresponding rate or percentage
-      updateFunction(double.parse(value));
-    }
-  }
-
-  // Function to build an input field
-  Widget buildInputField(String label, String initialValue,
-      Function(String)? onChanged, bool positiveOnly) {
-    // Return a text form field with the specified label and initial value
-    return TextFormField(
-      decoration: InputDecoration(
-        labelText: label,
-        hintText: initialValue,
-      ),
-      keyboardType: TextInputType.number,
-      onChanged: onChanged != null
-          ? (value) {
-              // Check if the input value is negative and show a snackbar if necessary
-              if (positiveOnly &&
-                  double.tryParse(value) != null &&
-                  double.parse(value) < 0) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Wert darf nicht negativ sein')),
-                );
-              } else {
-                // Call the onChanged function with the input value
-                onChanged(value);
-              }
-            }
-          : null,
-    );
-  }
-
+class ValuesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // Return a scaffold with an app bar and a scrollable body
+    final mortgageProvider = Provider.of<MortgageCalculatorProvider>(context);
+    final housePriceProvider = Provider.of<HousePriceProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Rahmenwerte'),
@@ -67,83 +18,157 @@ class _ValuesPageState extends State<ValuesPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Display a header text
             const Text('Voreingestellte Rahmenwerte:',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            // Build input fields for each rate and percentage
             buildInputField(
+              context,
               'Notargebührenrate (%)',
-              (notaryFeesRate * 100).toString(),
-              (value) => handleTextFieldChange(value, (newValue) {
-                setState(() {
-                  notaryFeesRate = newValue / 100;
+              (housePriceProvider.housePriceInput.notaryFeesRate * 100)
+                  .toString(),
+              (value) {
+                handleTextFieldChange(context, value, (newValue) {
+                  housePriceProvider.updateNotaryFeesRate(newValue / 100);
+                  housePriceProvider.updateHousePriceInput(
+                      notaryFeesRate: newValue / 100);
                 });
-              }),
+              },
               true,
             ),
             buildInputField(
+              context,
               'Grundbuchgebührenrate (%)',
-              (landRegistryFeesRate * 100).toString(),
-              (value) => handleTextFieldChange(value, (newValue) {
-                setState(() {
-                  landRegistryFeesRate = newValue / 100;
+              (mortgageProvider.landRegistryFeesRate * 100).toString(),
+              (value) {
+                handleTextFieldChange(context, value, (newValue) {
+                  mortgageProvider.updateLandRegistryFeesRate(newValue / 100);
+                  housePriceProvider.updateHousePriceInput(
+                      landRegistryFeesRate: newValue / 100);
                 });
-              }),
+              },
               true,
             ),
             buildInputField(
+              context,
               'Maklerprovisionrate (%)',
-              (brokerCommissionRate * 100).toString(),
-              (value) => handleTextFieldChange(value, (newValue) {
-                setState(() {
-                  brokerCommissionRate = newValue / 100;
+              (mortgageProvider.brokerCommissionRate * 100).toString(),
+              (value) {
+                handleTextFieldChange(context, value, (newValue) {
+                  mortgageProvider.updateBrokerCommissionRate(newValue / 100);
+                  housePriceProvider.updateHousePriceInput(
+                      brokerCommissionRate: newValue / 100);
                 });
-              }),
+              },
               true,
             ),
             buildInputField(
+              context,
               'Max. Sonderzahlungsprozentsatz (%)',
-              maxSpecialPaymentPercent.toString(),
-              (value) => handleTextFieldChange(value, (newValue) {
-                setState(() {
-                  maxSpecialPaymentPercent = newValue;
-                });
-              }),
+              mortgageProvider.maxSpecialPaymentPercent.toString(),
+              (value) => handleTextFieldChange(context, value,
+                  mortgageProvider.updateMaxSpecialPaymentPercent),
               true,
             ),
             buildInputField(
+              context,
               'Mietanteil',
-              rentalShare.toString(),
-              (value) => handleTextFieldChange(value, (newValue) {
-                setState(() {
-                  rentalShare = newValue;
-                });
-              }),
+              mortgageProvider.rentalShare.toString(),
+              (value) => handleTextFieldChange(
+                  context, value, mortgageProvider.updateRentalShare),
               false,
             ),
             buildInputField(
+              context,
               'Spitzensteuersatz',
-              topTaxRate.toString(),
-              (value) => handleTextFieldChange(value, (newValue) {
-                setState(() {
-                  topTaxRate = newValue;
-                });
-              }),
+              mortgageProvider.topTaxRate.toString(),
+              (value) => handleTextFieldChange(
+                  context, value, mortgageProvider.updateTopTaxRate),
               false,
             ),
             buildInputField(
+              context,
               'Jährliche Abschreibung',
-              annualDepreciationRate.toString(),
-              (value) => handleTextFieldChange(value, (newValue) {
-                setState(() {
-                  annualDepreciationRate = newValue;
-                });
-              }),
+              mortgageProvider.annualDepreciationRate.toString(),
+              (value) => handleTextFieldChange(context, value,
+                  mortgageProvider.updateAnnualDepreciationRate),
               false,
             ),
+            buildInputField(
+              context,
+              'Quadratmeter',
+              housePriceProvider.housePriceInput.squareMeters.toString(),
+              (value) => handleTextFieldChange(
+                  context,
+                  value,
+                  (newValue) => housePriceProvider.updateHousePriceInput(
+                      squareMeters: newValue)),
+              true,
+            ),
+            buildInputField(
+              context,
+              'Vermietete Quadratmeter',
+              housePriceProvider.housePriceInput.letSquareMeters.toString(),
+              (value) => handleTextFieldChange(
+                  context,
+                  value,
+                  (newValue) => housePriceProvider.updateHousePriceInput(
+                      letSquareMeters: newValue)),
+              true,
+            ),
+            buildInputField(
+              context,
+              'Hauspreis',
+              housePriceProvider.housePriceInput.housePrice.toString(),
+              (value) => handleTextFieldChange(
+                  context,
+                  value,
+                  (newValue) => housePriceProvider.updateHousePriceInput(
+                      housePrice: newValue)),
+              true,
+            ),
+            SizedBox(height: 20),
+            Text(
+                'Gesamthauspreis: ${housePriceProvider.housePriceOutput?.totalHousePrice.toStringAsFixed(2) ?? 'N/A'}'),
+            Text(
+                'Notargebühren: ${housePriceProvider.housePriceOutput?.notaryFees.toStringAsFixed(2) ?? 'N/A'}'),
+            Text(
+                'Grundbuchgebühren: ${housePriceProvider.housePriceOutput?.landRegistryFees.toStringAsFixed(2) ?? 'N/A'}'),
+            Text(
+                'Maklerprovision: ${housePriceProvider.housePriceOutput?.brokerCommission.toStringAsFixed(2) ?? 'N/A'}'),
           ],
         ),
       ),
     );
+  }
+
+  Widget buildInputField(BuildContext context, String label,
+      String initialValue, Function(String)? onChanged, bool positiveOnly) {
+    return TextFormField(
+      decoration: InputDecoration(
+        labelText: label,
+        hintText: initialValue,
+      ),
+      keyboardType: TextInputType.number,
+      initialValue: initialValue,
+      onChanged: onChanged != null
+          ? (value) {
+              if (positiveOnly &&
+                  double.tryParse(value) != null &&
+                  double.parse(value) < 0) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Wert darf nicht negativ sein')),
+                );
+              } else {
+                onChanged(value);
+              }
+            }
+          : null,
+    );
+  }
+
+  void handleTextFieldChange(
+      BuildContext context, String value, Function(double) updateFunction) {
+    if (double.tryParse(value) != null) {
+      updateFunction(double.parse(value));
+    }
   }
 }

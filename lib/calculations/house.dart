@@ -1,21 +1,122 @@
 import 'package:flutter/material.dart';
 
-class HousePriceInput {
-  final double squareMeters;
-  final double housePrice;
-  final double letSquareMeters;
-  final double notaryFeesRate; // 1.5% of purchase price
-  final double landRegistryFeesRate; // 0.5% of purchase price
-  final double brokerCommissionRate; // 3.5% of purchase price
+import 'package:flutter/foundation.dart';
+
+class HousePriceInput extends ChangeNotifier {
+  double _squareMeters;
+  double _housePrice;
+  double _letSquareMeters;
+  double _notaryFeesRate;
+  double _landRegistryFeesRate;
+  double _brokerCommissionRate;
 
   HousePriceInput({
-    required this.squareMeters,
-    required this.housePrice,
-    this.letSquareMeters = 0,
-    this.notaryFeesRate = 0.015,
-    this.landRegistryFeesRate = 0.005,
-    this.brokerCommissionRate = 0.035,
-  });
+    required double squareMeters,
+    required double housePrice,
+    double letSquareMeters = 0,
+    double notaryFeesRate = 0.015,
+    double landRegistryFeesRate = 0.005,
+    double brokerCommissionRate = 0.035,
+  })  : _squareMeters = squareMeters,
+        _housePrice = housePrice,
+        _letSquareMeters = letSquareMeters,
+        _notaryFeesRate = notaryFeesRate,
+        _landRegistryFeesRate = landRegistryFeesRate,
+        _brokerCommissionRate = brokerCommissionRate;
+
+  // Getters
+  double get squareMeters => _squareMeters;
+  double get housePrice => _housePrice;
+  double get letSquareMeters => _letSquareMeters;
+  double get notaryFeesRate => _notaryFeesRate;
+  double get landRegistryFeesRate => _landRegistryFeesRate;
+  double get brokerCommissionRate => _brokerCommissionRate;
+
+  // Setters
+  set squareMeters(double value) {
+    if (_squareMeters != value) {
+      _squareMeters = value;
+      notifyListeners();
+    }
+  }
+
+  set housePrice(double value) {
+    if (_housePrice != value) {
+      _housePrice = value;
+      notifyListeners();
+    }
+  }
+
+  set letSquareMeters(double value) {
+    if (_letSquareMeters != value) {
+      _letSquareMeters = value;
+      notifyListeners();
+    }
+  }
+
+  set notaryFeesRate(double value) {
+    if (_notaryFeesRate != value) {
+      _notaryFeesRate = value;
+      notifyListeners();
+    }
+  }
+
+  set landRegistryFeesRate(double value) {
+    if (_landRegistryFeesRate != value) {
+      _landRegistryFeesRate = value;
+      notifyListeners();
+    }
+  }
+
+  set brokerCommissionRate(double value) {
+    if (_brokerCommissionRate != value) {
+      _brokerCommissionRate = value;
+      notifyListeners();
+    }
+  }
+
+  // Method to update multiple properties at once
+  void updateProperties({
+    double? squareMeters,
+    double? housePrice,
+    double? letSquareMeters,
+    double? notaryFeesRate,
+    double? landRegistryFeesRate,
+    double? brokerCommissionRate,
+  }) {
+    bool shouldNotify = false;
+
+    if (squareMeters != null && _squareMeters != squareMeters) {
+      _squareMeters = squareMeters;
+      shouldNotify = true;
+    }
+    if (housePrice != null && _housePrice != housePrice) {
+      _housePrice = housePrice;
+      shouldNotify = true;
+    }
+    if (letSquareMeters != null && _letSquareMeters != letSquareMeters) {
+      _letSquareMeters = letSquareMeters;
+      shouldNotify = true;
+    }
+    if (notaryFeesRate != null && _notaryFeesRate != notaryFeesRate) {
+      _notaryFeesRate = notaryFeesRate;
+      shouldNotify = true;
+    }
+    if (landRegistryFeesRate != null &&
+        _landRegistryFeesRate != landRegistryFeesRate) {
+      _landRegistryFeesRate = landRegistryFeesRate;
+      shouldNotify = true;
+    }
+    if (brokerCommissionRate != null &&
+        _brokerCommissionRate != brokerCommissionRate) {
+      _brokerCommissionRate = brokerCommissionRate;
+      shouldNotify = true;
+    }
+
+    if (shouldNotify) {
+      notifyListeners();
+    }
+  }
 }
 
 class HousePriceOutput {
@@ -32,17 +133,22 @@ class HousePriceOutput {
   });
 }
 
-class HousePriceCalculator extends ChangeNotifier {
-  HousePriceInput _housePriceInput;
+class HousePriceProvider extends ChangeNotifier {
+  final HousePriceInput _housePriceInput;
   HousePriceOutput? _housePriceOutput;
 
-  HousePriceCalculator({required HousePriceInput initialInput})
+  HousePriceProvider({required HousePriceInput initialInput})
       : _housePriceInput = initialInput {
+    _housePriceInput.addListener(_onInputChanged);
     calculateTotalHousePrice();
   }
 
   HousePriceInput get housePriceInput => _housePriceInput;
   HousePriceOutput? get housePriceOutput => _housePriceOutput;
+
+  void _onInputChanged() {
+    calculateTotalHousePrice();
+  }
 
   void calculateTotalHousePrice() {
     double notaryFees =
@@ -74,61 +180,22 @@ class HousePriceCalculator extends ChangeNotifier {
     double? brokerCommissionRate,
   }) {
     if (housePrice != null && housePrice < 0) {
-      // Handle the case when housePrice is negative
       throw ArgumentError('House price cannot be negative');
-    } else {
-      _housePriceInput = HousePriceInput(
-        squareMeters: squareMeters ?? _housePriceInput.squareMeters,
-        housePrice: housePrice ?? _housePriceInput.housePrice,
-        letSquareMeters: letSquareMeters ?? _housePriceInput.letSquareMeters,
-        notaryFeesRate: notaryFeesRate ?? _housePriceInput.notaryFeesRate,
-        landRegistryFeesRate:
-            landRegistryFeesRate ?? _housePriceInput.landRegistryFeesRate,
-        brokerCommissionRate:
-            brokerCommissionRate ?? _housePriceInput.brokerCommissionRate,
-      );
-      calculateTotalHousePrice();
     }
-  }
-}
 
-// Include your existing HousePriceInput, HousePriceOutput, and HousePriceCalculator classes here
-
-class HousePriceProvider extends ChangeNotifier {
-  final HousePriceCalculator _calculator;
-
-  HousePriceProvider({required HousePriceInput initialInput})
-      : _calculator = HousePriceCalculator(initialInput: initialInput);
-
-  HousePriceInput get housePriceInput => _calculator.housePriceInput;
-  HousePriceOutput? get housePriceOutput => _calculator.housePriceOutput;
-
-  void updateHousePriceInput({
-    double? squareMeters,
-    double? housePrice,
-    double? letSquareMeters,
-    double? notaryFeesRate,
-    double? landRegistryFeesRate,
-    double? brokerCommissionRate,
-  }) {
-    try {
-      _calculator.updateHousePriceInput(
-        squareMeters: squareMeters,
-        housePrice: housePrice,
-        letSquareMeters: letSquareMeters,
-        notaryFeesRate: notaryFeesRate,
-        landRegistryFeesRate: landRegistryFeesRate,
-        brokerCommissionRate: brokerCommissionRate,
-      );
-      notifyListeners();
-    } catch (e) {
-      // Handle the error, perhaps by showing a dialog or snackbar
-      print('Error updating house price input: $e');
-    }
+    _housePriceInput.updateProperties(
+      squareMeters: squareMeters,
+      housePrice: housePrice,
+      letSquareMeters: letSquareMeters,
+      notaryFeesRate: notaryFeesRate,
+      landRegistryFeesRate: landRegistryFeesRate,
+      brokerCommissionRate: brokerCommissionRate,
+    );
   }
 
-  void calculateTotalHousePrice() {
-    _calculator.calculateTotalHousePrice();
-    notifyListeners();
+  @override
+  void dispose() {
+    _housePriceInput.removeListener(_onInputChanged);
+    super.dispose();
   }
 }
