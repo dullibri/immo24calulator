@@ -27,7 +27,6 @@ class ValuesPage extends StatelessWidget {
                   .toString(),
               (value) {
                 handleTextFieldChange(context, value, (newValue) {
-                  housePriceProvider.updateNotaryFeesRate(newValue / 100);
                   housePriceProvider.updateHousePriceInput(
                       notaryFeesRate: newValue / 100);
                 });
@@ -37,10 +36,10 @@ class ValuesPage extends StatelessWidget {
             buildInputField(
               context,
               'Grundbuchgebührenrate (%)',
-              (mortgageProvider.landRegistryFeesRate * 100).toString(),
+              (housePriceProvider.housePriceInput.landRegistryFeesRate * 100)
+                  .toString(),
               (value) {
                 handleTextFieldChange(context, value, (newValue) {
-                  mortgageProvider.updateLandRegistryFeesRate(newValue / 100);
                   housePriceProvider.updateHousePriceInput(
                       landRegistryFeesRate: newValue / 100);
                 });
@@ -50,10 +49,10 @@ class ValuesPage extends StatelessWidget {
             buildInputField(
               context,
               'Maklerprovisionrate (%)',
-              (mortgageProvider.brokerCommissionRate * 100).toString(),
+              (housePriceProvider.housePriceInput.brokerCommissionRate * 100)
+                  .toString(),
               (value) {
                 handleTextFieldChange(context, value, (newValue) {
-                  mortgageProvider.updateBrokerCommissionRate(newValue / 100);
                   housePriceProvider.updateHousePriceInput(
                       brokerCommissionRate: newValue / 100);
                 });

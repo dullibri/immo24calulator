@@ -6,7 +6,7 @@ import 'summary_page.dart';
 class FactorsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<MortgageCalculatorProvider>(context);
+    final mortgageProvider = Provider.of<MortgageCalculatorProvider>(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -22,11 +22,10 @@ class FactorsPage extends StatelessWidget {
             buildInputField(
               context,
               'Kaufpreis',
-              provider.purchasePrice.toString(),
+              mortgageProvider.purchasePrice.toString(),
               (value) => handleTextFieldChange(context, value, (newValue) {
-                provider.updatePurchasePrice(newValue);
-                if (provider.equity > newValue) {
-                  provider.updateEquity(newValue);
+                if (newValue > mortgageProvider.purchasePrice) {
+                  mortgageProvider.updatePurchasePrice(newValue);
                 }
               }),
               true,
@@ -34,11 +33,10 @@ class FactorsPage extends StatelessWidget {
             buildInputField(
               context,
               'Eigenkapital',
-              provider.equity.toString(),
+              mortgageProvider.initialPayment.toString(),
               (value) => handleTextFieldChange(context, value, (newValue) {
-                provider.updateEquity(newValue);
-                if (newValue > provider.purchasePrice) {
-                  provider.updatePurchasePrice(newValue);
+                if (newValue > mortgageProvider.initialPayment) {
+                  mortgageProvider.updateInitialPayment(newValue);
                 }
               }),
               true,
@@ -46,41 +44,41 @@ class FactorsPage extends StatelessWidget {
             buildInputField(
               context,
               'Jährlicher Zinssatz (%)',
-              provider.annualInterestRate.toString(),
+              mortgageProvider.annualInterestRate.toString(),
               (value) => handleTextFieldChange(
-                  context, value, provider.updateAnnualInterestRate),
+                  context, value, mortgageProvider.updateAnnualInterestRate),
               true,
             ),
             buildInputField(
               context,
               'Anfängliche Zahlung',
-              provider.initialPayment.toString(),
+              mortgageProvider.initialPayment.toString(),
               (value) => handleTextFieldChange(
-                  context, value, provider.updateInitialPayment),
+                  context, value, mortgageProvider.updateInitialPayment),
               true,
             ),
             buildInputField(
               context,
               'Monatliche Sonderzahlung',
-              provider.monthlySpecialPayment.toString(),
+              mortgageProvider.monthlySpecialPayment.toString(),
               (value) => handleTextFieldChange(
-                  context, value, provider.updateMonthlySpecialPayment),
+                  context, value, mortgageProvider.updateMonthlySpecialPayment),
               true,
             ),
             buildInputField(
               context,
               'Max. Sonderzahlung (%)',
-              provider.maxSpecialPaymentPercent.toString(),
-              (value) => handleTextFieldChange(
-                  context, value, provider.updateMaxSpecialPaymentPercent),
+              mortgageProvider.maxSpecialPaymentPercent.toString(),
+              (value) => handleTextFieldChange(context, value,
+                  mortgageProvider.updateMaxSpecialPaymentPercent),
               true,
             ),
             buildInputField(
               context,
               'Mietanteil',
-              provider.rentalShare.toString(),
+              mortgageProvider.rentalShare.toString(),
               (value) => handleTextFieldChange(
-                  context, value, provider.updateRentalShare),
+                  context, value, mortgageProvider.updateRentalShare),
               false,
             ),
             const SizedBox(height: 16.0),
@@ -127,16 +125,17 @@ class FactorsPage extends StatelessWidget {
   }
 
   void calculateAndNavigate(BuildContext context) {
-    final provider =
+    final mortgageProvider =
         Provider.of<MortgageCalculatorProvider>(context, listen: false);
-    provider.updatePrincipal(provider.purchasePrice - provider.equity);
-    final calculationResult = provider.calculateMortgagePayments();
+    mortgageProvider.updatePrincipal(
+        mortgageProvider.purchasePrice - mortgageProvider.initialPayment);
+    final calculationResult = mortgageProvider.calculateMortgagePayments();
 
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => SummaryPage(
-          principal: provider.principal,
+          principal: mortgageProvider.principal,
           calculationResult: calculationResult,
           housePriceOutput: null,
         ),
