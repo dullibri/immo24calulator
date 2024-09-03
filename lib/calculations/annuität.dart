@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'dart:math';
 
 class Payment {
@@ -46,7 +47,92 @@ double calculateDepreciation(
   return purchasePrice * annualDepreciationRate * topTaxRate;
 }
 
-CalculationResult calculateMortgagePayments({
+class MortgageCalculatorProvider extends ChangeNotifier {
+  double _principal = 0.0;
+  double _annualInterestRate = 0.0;
+  double _initialPayment = 0.0;
+  double _monthlySpecialPayment = 0.0;
+  double _maxSpecialPaymentPercent = 0.0;
+  double _rentalShare = 0.0;
+  double _topTaxRate = 0.0;
+  double _purchasePrice = 0.0;
+  double _annualDepreciationRate = 0.0;
+
+  // Getters
+  double get principal => _principal;
+  double get annualInterestRate => _annualInterestRate;
+  double get initialPayment => _initialPayment;
+  double get monthlySpecialPayment => _monthlySpecialPayment;
+  double get maxSpecialPaymentPercent => _maxSpecialPaymentPercent;
+  double get rentalShare => _rentalShare;
+  double get topTaxRate => _topTaxRate;
+  double get purchasePrice => _purchasePrice;
+  double get annualDepreciationRate => _annualDepreciationRate;
+
+  // Setters
+  void updatePrincipal(double value) {
+    _principal = value;
+    notifyListeners();
+  }
+
+  void updateAnnualInterestRate(double value) {
+    _annualInterestRate = value;
+    notifyListeners();
+  }
+
+  void updateInitialPayment(double value) {
+    _initialPayment = value;
+    notifyListeners();
+  }
+
+  void updateMonthlySpecialPayment(double value) {
+    _monthlySpecialPayment = value;
+    notifyListeners();
+  }
+
+  void updateMaxSpecialPaymentPercent(double value) {
+    _maxSpecialPaymentPercent = value;
+    notifyListeners();
+  }
+
+  void updateRentalShare(double value) {
+    _rentalShare = value;
+    notifyListeners();
+  }
+
+  void updateTopTaxRate(double value) {
+    _topTaxRate = value;
+    notifyListeners();
+  }
+
+  void updatePurchasePrice(double value) {
+    _purchasePrice = value;
+    notifyListeners();
+  }
+
+  void updateAnnualDepreciationRate(double value) {
+    _annualDepreciationRate = value;
+    notifyListeners();
+  }
+
+  // Calculate mortgage payments
+  CalculationResult calculateMortgagePayments() {
+    return calculateMortgagePaymentsFunction(
+      principal: _principal,
+      annualInterestRate: _annualInterestRate,
+      initialPayment: _initialPayment,
+      monthlySpecialPayment: _monthlySpecialPayment,
+      maxSpecialPaymentPercent: _maxSpecialPaymentPercent,
+      rentalShare: _rentalShare,
+      topTaxRate: _topTaxRate,
+      purchasePrice: _purchasePrice,
+      annualDepreciationRate: _annualDepreciationRate,
+    );
+  }
+}
+
+// Renamed the original function to avoid confusion
+CalculationResult calculateMortgagePaymentsFunction({
   required double principal,
   required double annualInterestRate,
   required double initialPayment,
@@ -57,6 +143,9 @@ CalculationResult calculateMortgagePayments({
   required double purchasePrice,
   required double annualDepreciationRate,
 }) {
+  // The rest of the function remains the same
+  // ...
+
   final double monthlyInterestRate = annualInterestRate / 12 / 100;
   final double maxAnnualSpecialPayment =
       principal * (maxSpecialPaymentPercent / 100);
