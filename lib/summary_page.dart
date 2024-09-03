@@ -1,21 +1,34 @@
 import 'package:flutter/material.dart';
-import 'calculations/annuität.dart'; // Importiere die Berechnungslogik
-import 'calculations/house.dart'; // Importiere HousePriceOutput
+import 'package:immo_credit/calculations/house.dart';
+import 'package:provider/provider.dart';
+import 'calculations/annuität.dart';
 
 class SummaryPage extends StatelessWidget {
-  final double principal; // Kreditsumme
-  final CalculationResult? calculationResult;
-  final HousePriceOutput? housePriceOutput;
+  @override
+  Widget build(BuildContext context) {
+    final mortgageProvider = Provider.of<MortgageCalculatorProvider>(context);
+    final housePriceProvider = Provider.of<HousePriceProvider>(context);
 
-  SummaryPage({
-    required this.principal,
-    this.calculationResult,
-    this.housePriceOutput,
-  });
+    final calculationResult = mortgageProvider.calculateMortgagePayments();
+    final housePriceOutput = housePriceProvider.housePriceOutput;
+    final principal = mortgageProvider.principal;
 
-  Widget buildSummary() {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Zusammenfassung'),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: buildSummary(calculationResult, housePriceOutput, principal),
+      ),
+    );
+  }
+
+  Widget buildSummary(CalculationResult? calculationResult,
+      HousePriceOutput? housePriceOutput, double principal) {
     if (calculationResult == null || housePriceOutput == null) {
-      return const SizedBox();
+      return const Text(
+          'Keine Daten verfügbar. Bitte berechnen Sie zuerst die Hypothek und den Hauspreis.');
     }
 
     return Column(
@@ -24,36 +37,22 @@ class SummaryPage extends StatelessWidget {
         const Text('Zusammenfassung:',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         Text(
-            'Gesamtkosten: ${housePriceOutput!.totalHousePrice.toStringAsFixed(0)} €'),
+            'Gesamtkosten: ${housePriceOutput.totalHousePrice.toStringAsFixed(0)} €'),
+        Text('Kreditsumme: ${principal.toStringAsFixed(0)} €'),
         Text(
-            'Kreditsumme: ${principal.toStringAsFixed(0)} €'), // Zeigt die Kreditsumme an
+            'Dauer bis zur Rückzahlung: ${calculationResult.totalMonths} Monate'),
         Text(
-            'Dauer bis zur Rückzahlung: ${calculationResult!.totalMonths} Monate'),
-        Text(
-            'Gesamtsumme über alle Zahlungen: ${calculationResult!.totalSum.toStringAsFixed(0)} €'),
+            'Gesamtsumme über alle Zahlungen: ${calculationResult.totalSum.toStringAsFixed(0)} €'),
         const SizedBox(height: 16.0),
         const Text('Zusätzliche Kosten:',
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         Text(
-            'Notargebühren: ${housePriceOutput!.notaryFees.toStringAsFixed(0)} €'),
+            'Notargebühren: ${housePriceOutput.notaryFees.toStringAsFixed(0)} €'),
         Text(
-            'Grundbuchgebühren: ${housePriceOutput!.landRegistryFees.toStringAsFixed(0)} €'),
+            'Grundbuchgebühren: ${housePriceOutput.landRegistryFees.toStringAsFixed(0)} €'),
         Text(
-            'Maklerprovision: ${housePriceOutput!.brockerCommision.toStringAsFixed(0)} €'),
+            'Maklerprovision: ${housePriceOutput.brokerCommission.toStringAsFixed(0)} €'),
       ],
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Zusammenfassung'),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: buildSummary(),
-      ),
     );
   }
 }

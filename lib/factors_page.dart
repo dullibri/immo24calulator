@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:immo_credit/calculations/annuit%C3%A4t.dart';
 import 'package:provider/provider.dart';
-import 'summary_page.dart';
 
 class FactorsPage extends StatelessWidget {
   @override
@@ -130,16 +129,5 @@ class FactorsPage extends StatelessWidget {
     mortgageProvider.updatePrincipal(
         mortgageProvider.purchasePrice - mortgageProvider.initialPayment);
     final calculationResult = mortgageProvider.calculateMortgagePayments();
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => SummaryPage(
-          principal: mortgageProvider.principal,
-          calculationResult: calculationResult,
-          housePriceOutput: null,
-        ),
-      ),
-    );
   }
 }
