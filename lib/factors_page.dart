@@ -1,58 +1,13 @@
 import 'package:flutter/material.dart';
-import 'calculations/house.dart';
-import 'calculations/annuität.dart'; // Importiere die Berechnungslogik
+import 'package:immo_credit/calculations/annuit%C3%A4t.dart';
+import 'package:provider/provider.dart';
 import 'summary_page.dart';
 
-class FactorsPage extends StatefulWidget {
-  @override
-  _FactorsPageState createState() => _FactorsPageState();
-}
-
-class _FactorsPageState extends State<FactorsPage> {
-  // Variablen für die Eingabewerte
-  double annualInterestRate = 3.61;
-  double initialPayment = 3200.00;
-  double monthlySpecialPayment = 1185;
-  double maxSpecialPaymentPercent = 5;
-  double rentalShare = 580000 / 544000;
-  double purchasePrice = 800000;
-  double equity = 100000;
-  double principal = 0.0; // Kreditsumme
-
-  void calculateAndNavigate() {
-    // Berechne die Kreditsumme
-    principal = purchasePrice - equity;
-
-    // Berechne die Ergebnisse für die Hypothek
-    final calculationResult = calculateMortgagePayments(
-      principal: principal,
-      annualInterestRate: annualInterestRate,
-      initialPayment: initialPayment,
-      monthlySpecialPayment: monthlySpecialPayment,
-      maxSpecialPaymentPercent: maxSpecialPaymentPercent,
-      rentalShare: rentalShare,
-      topTaxRate: 0.42, // Beispielwert
-      purchasePrice: purchasePrice,
-      annualDepreciationRate: 0.03, // Beispielwert
-    );
-
-    // Navigiere zur SummaryPage und übergebe die berechneten Werte
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => SummaryPage(
-          principal: principal, // Übergebe die berechnete Kreditsumme
-          calculationResult:
-              calculationResult, // Übergebe das Berechnungsergebnis
-          housePriceOutput:
-              null, // Optional: Falls du Hauspreise übergeben möchtest
-        ),
-      ),
-    );
-  }
-
+class FactorsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<MortgageCalculatorProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Hauptfaktoren'),
@@ -64,37 +19,73 @@ class _FactorsPageState extends State<FactorsPage> {
           children: [
             const Text('Hauptfaktoren:',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            // Eingabefelder für die verschiedenen Parameter
             buildInputField(
+              context,
               'Kaufpreis',
-              purchasePrice.toString(),
-              (value) => handleTextFieldChange(value, (newValue) {
-                setState(() {
-                  purchasePrice = newValue;
-                  if (equity > purchasePrice) {
-                    equity = purchasePrice;
-                  }
-                });
+              provider.purchasePrice.toString(),
+              (value) => handleTextFieldChange(context, value, (newValue) {
+                provider.updatePurchasePrice(newValue);
+                if (provider.equity > newValue) {
+                  provider.updateEquity(newValue);
+                }
               }),
               true,
             ),
             buildInputField(
+              context,
               'Eigenkapital',
-              equity.toString(),
-              (value) => handleTextFieldChange(value, (newValue) {
-                setState(() {
-                  equity = newValue;
-                  if (equity > purchasePrice) {
-                    purchasePrice = equity;
-                  }
-                });
+              provider.equity.toString(),
+              (value) => handleTextFieldChange(context, value, (newValue) {
+                provider.updateEquity(newValue);
+                if (newValue > provider.purchasePrice) {
+                  provider.updatePurchasePrice(newValue);
+                }
               }),
               true,
             ),
-            // Weitere Eingabefelder hier...
+            buildInputField(
+              context,
+              'Jährlicher Zinssatz (%)',
+              provider.annualInterestRate.toString(),
+              (value) => handleTextFieldChange(
+                  context, value, provider.updateAnnualInterestRate),
+              true,
+            ),
+            buildInputField(
+              context,
+              'Anfängliche Zahlung',
+              provider.initialPayment.toString(),
+              (value) => handleTextFieldChange(
+                  context, value, provider.updateInitialPayment),
+              true,
+            ),
+            buildInputField(
+              context,
+              'Monatliche Sonderzahlung',
+              provider.monthlySpecialPayment.toString(),
+              (value) => handleTextFieldChange(
+                  context, value, provider.updateMonthlySpecialPayment),
+              true,
+            ),
+            buildInputField(
+              context,
+              'Max. Sonderzahlung (%)',
+              provider.maxSpecialPaymentPercent.toString(),
+              (value) => handleTextFieldChange(
+                  context, value, provider.updateMaxSpecialPaymentPercent),
+              true,
+            ),
+            buildInputField(
+              context,
+              'Mietanteil',
+              provider.rentalShare.toString(),
+              (value) => handleTextFieldChange(
+                  context, value, provider.updateRentalShare),
+              false,
+            ),
             const SizedBox(height: 16.0),
             ElevatedButton(
-              onPressed: calculateAndNavigate,
+              onPressed: () => calculateAndNavigate(context),
               child: const Text('Berechnen'),
             ),
           ],
@@ -103,20 +94,20 @@ class _FactorsPageState extends State<FactorsPage> {
     );
   }
 
-  Widget buildInputField(String label, String initialValue,
-      Function(String)? onChanged, bool positiveOnly) {
+  Widget buildInputField(BuildContext context, String label,
+      String initialValue, Function(String)? onChanged, bool positiveOnly) {
     return TextFormField(
       decoration: InputDecoration(
         labelText: label,
         hintText: initialValue,
       ),
       keyboardType: TextInputType.number,
+      initialValue: initialValue,
       onChanged: onChanged != null
           ? (value) {
               if (positiveOnly &&
                   double.tryParse(value) != null &&
                   double.parse(value) < 0) {
-                // Verhindere negative Eingaben
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text('Wert darf nicht negativ sein')),
                 );
@@ -128,9 +119,28 @@ class _FactorsPageState extends State<FactorsPage> {
     );
   }
 
-  void handleTextFieldChange(String value, Function(double) updateFunction) {
+  void handleTextFieldChange(
+      BuildContext context, String value, Function(double) updateFunction) {
     if (double.tryParse(value) != null) {
       updateFunction(double.parse(value));
     }
+  }
+
+  void calculateAndNavigate(BuildContext context) {
+    final provider =
+        Provider.of<MortgageCalculatorProvider>(context, listen: false);
+    provider.updatePrincipal(provider.purchasePrice - provider.equity);
+    final calculationResult = provider.calculateMortgagePayments();
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SummaryPage(
+          principal: provider.principal,
+          calculationResult: calculationResult,
+          housePriceOutput: null,
+        ),
+      ),
+    );
   }
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class HousePriceInput {
   final double squareMeters;
@@ -90,5 +89,46 @@ class HousePriceCalculator extends ChangeNotifier {
       );
       calculateTotalHousePrice();
     }
+  }
+}
+
+// Include your existing HousePriceInput, HousePriceOutput, and HousePriceCalculator classes here
+
+class HousePriceProvider extends ChangeNotifier {
+  final HousePriceCalculator _calculator;
+
+  HousePriceProvider({required HousePriceInput initialInput})
+      : _calculator = HousePriceCalculator(initialInput: initialInput);
+
+  HousePriceInput get housePriceInput => _calculator.housePriceInput;
+  HousePriceOutput? get housePriceOutput => _calculator.housePriceOutput;
+
+  void updateHousePriceInput({
+    double? squareMeters,
+    double? housePrice,
+    double? letSquareMeters,
+    double? notaryFeesRate,
+    double? landRegistryFeesRate,
+    double? brokerCommissionRate,
+  }) {
+    try {
+      _calculator.updateHousePriceInput(
+        squareMeters: squareMeters,
+        housePrice: housePrice,
+        letSquareMeters: letSquareMeters,
+        notaryFeesRate: notaryFeesRate,
+        landRegistryFeesRate: landRegistryFeesRate,
+        brokerCommissionRate: brokerCommissionRate,
+      );
+      notifyListeners();
+    } catch (e) {
+      // Handle the error, perhaps by showing a dialog or snackbar
+      print('Error updating house price input: $e');
+    }
+  }
+
+  void calculateTotalHousePrice() {
+    _calculator.calculateTotalHousePrice();
+    notifyListeners();
   }
 }

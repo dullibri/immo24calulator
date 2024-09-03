@@ -1,59 +1,120 @@
 import 'package:flutter/material.dart';
-import 'calculations/annuität.dart'; // Importiere die Berechnungslogik
-import 'calculations/house.dart'; // Importiere HousePriceOutput
+import 'package:immo_credit/calculations/annuit%C3%A4t.dart';
+import 'package:provider/provider.dart';
 
-class SummaryPage extends StatelessWidget {
-  final double principal; // Kreditsumme
-  final CalculationResult? calculationResult;
-  final HousePriceOutput? housePriceOutput;
-
-  SummaryPage({
-    required this.principal,
-    this.calculationResult,
-    this.housePriceOutput,
-  });
-
-  Widget buildSummary() {
-    if (calculationResult == null || housePriceOutput == null) {
-      return const SizedBox();
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text('Zusammenfassung:',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-        Text(
-            'Gesamtkosten: ${housePriceOutput!.totalHousePrice.toStringAsFixed(0)} €'),
-        Text(
-            'Kreditsumme: ${principal.toStringAsFixed(0)} €'), // Zeigt die Kreditsumme an
-        Text(
-            'Dauer bis zur Rückzahlung: ${calculationResult!.totalMonths} Monate'),
-        Text(
-            'Gesamtsumme über alle Zahlungen: ${calculationResult!.totalSum.toStringAsFixed(0)} €'),
-        const SizedBox(height: 16.0),
-        const Text('Zusätzliche Kosten:',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-        Text(
-            'Notargebühren: ${housePriceOutput!.notaryFees.toStringAsFixed(0)} €'),
-        Text(
-            'Grundbuchgebühren: ${housePriceOutput!.landRegistryFees.toStringAsFixed(0)} €'),
-        Text(
-            'Maklerprovision: ${housePriceOutput!.brockerCommision.toStringAsFixed(0)} €'),
-      ],
-    );
-  }
-
+class ValuesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<MortgageCalculatorProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Zusammenfassung'),
+        title: const Text('Rahmenwerte'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
-        child: buildSummary(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text('Voreingestellte Rahmenwerte:',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            buildInputField(
+              context,
+              'Notargebührenrate (%)',
+              (provider.notaryFeesRate * 100).toString(),
+              (value) => handleTextFieldChange(context, value,
+                  (newValue) => provider.updateNotaryFeesRate(newValue / 100)),
+              true,
+            ),
+            buildInputField(
+              context,
+              'Grundbuchgebührenrate (%)',
+              (provider.landRegistryFeesRate * 100).toString(),
+              (value) => handleTextFieldChange(
+                  context,
+                  value,
+                  (newValue) =>
+                      provider.updateLandRegistryFeesRate(newValue / 100)),
+              true,
+            ),
+            buildInputField(
+              context,
+              'Maklerprovisionrate (%)',
+              (provider.brokerCommissionRate * 100).toString(),
+              (value) => handleTextFieldChange(
+                  context,
+                  value,
+                  (newValue) =>
+                      provider.updateBrokerCommissionRate(newValue / 100)),
+              true,
+            ),
+            buildInputField(
+              context,
+              'Max. Sonderzahlungsprozentsatz (%)',
+              provider.maxSpecialPaymentPercent.toString(),
+              (value) => handleTextFieldChange(
+                  context, value, provider.updateMaxSpecialPaymentPercent),
+              true,
+            ),
+            buildInputField(
+              context,
+              'Mietanteil',
+              provider.rentalShare.toString(),
+              (value) => handleTextFieldChange(
+                  context, value, provider.updateRentalShare),
+              false,
+            ),
+            buildInputField(
+              context,
+              'Spitzensteuersatz',
+              provider.topTaxRate.toString(),
+              (value) => handleTextFieldChange(
+                  context, value, provider.updateTopTaxRate),
+              false,
+            ),
+            buildInputField(
+              context,
+              'Jährliche Abschreibung',
+              provider.annualDepreciationRate.toString(),
+              (value) => handleTextFieldChange(
+                  context, value, provider.updateAnnualDepreciationRate),
+              false,
+            ),
+          ],
+        ),
       ),
     );
+  }
+
+  Widget buildInputField(BuildContext context, String label,
+      String initialValue, Function(String)? onChanged, bool positiveOnly) {
+    return TextFormField(
+      decoration: InputDecoration(
+        labelText: label,
+        hintText: initialValue,
+      ),
+      keyboardType: TextInputType.number,
+      initialValue: initialValue,
+      onChanged: onChanged != null
+          ? (value) {
+              if (positiveOnly &&
+                  double.tryParse(value) != null &&
+                  double.parse(value) < 0) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Wert darf nicht negativ sein')),
+                );
+              } else {
+                onChanged(value);
+              }
+            }
+          : null,
+    );
+  }
+
+  void handleTextFieldChange(
+      BuildContext context, String value, Function(double) updateFunction) {
+    if (double.tryParse(value) != null) {
+      updateFunction(double.parse(value));
+    }
   }
 }
