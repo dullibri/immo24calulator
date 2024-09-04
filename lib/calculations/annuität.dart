@@ -31,11 +31,23 @@ class CalculationResult {
   final double totalSum;
   final double totalTaxRepayment;
 
+  // Neue Summenfelder
+  final double totalPrincipalPayment;
+  final double totalInterestPayment;
+  final double totalSpecialPayment;
+  final double totalInterestRebate;
+  final double totalDepreciation;
+
   CalculationResult({
     required this.payments,
     required this.totalMonths,
     required this.totalSum,
     required this.totalTaxRepayment,
+    required this.totalPrincipalPayment,
+    required this.totalInterestPayment,
+    required this.totalSpecialPayment,
+    required this.totalInterestRebate,
+    required this.totalDepreciation,
   });
 }
 
@@ -54,6 +66,18 @@ class MortgageCalculatorProvider extends ChangeNotifier {
 
   MortgageCalculatorProvider(this._housePriceProvider) {
     _housePriceProvider.addListener(_onHousePriceChanged);
+  }
+  void initializeValues() {
+    _purchasePrice = 300000.0;
+    _equity = 60000.0;
+    _housePriceProvider.updateHousePriceInput(
+      housePrice: _purchasePrice,
+      squareMeters:
+          100, // Setzen Sie hier einen Standardwert für die Quadratmeter
+    );
+    _updatePrincipal();
+    invalidateCalculations();
+    notifyListeners();
   }
 
   // Angepasste und neue Startwerte
@@ -217,6 +241,13 @@ CalculationResult calculateMortgagePaymentsFunction({
   double totalSum = 0;
   double totalTaxRepayment = 0;
 
+  // Neue Summen-Variablen
+  double totalPrincipalPayment = 0;
+  double totalInterestPayment = 0;
+  double totalSpecialPayment = 0;
+  double totalInterestRebate = 0;
+  double totalDepreciation = 0;
+
   while (remainingBalance > 0) {
     if ((month - 1) % 12 == 0) {
       totalSpecialPaymentsPerYear = 0;
@@ -265,6 +296,11 @@ CalculationResult calculateMortgagePaymentsFunction({
 
     totalSum += principalPayment + interestPayment + specialPayment;
     totalTaxRepayment += interestRebate + depreciation;
+    totalPrincipalPayment += principalPayment;
+    totalInterestPayment += interestPayment;
+    totalSpecialPayment += specialPayment;
+    totalInterestRebate += interestRebate;
+    totalDepreciation += depreciation;
 
     month++;
 
@@ -276,6 +312,11 @@ CalculationResult calculateMortgagePaymentsFunction({
     totalMonths: month - 1,
     totalSum: totalSum,
     totalTaxRepayment: totalTaxRepayment,
+    totalPrincipalPayment: totalPrincipalPayment,
+    totalInterestPayment: totalInterestPayment,
+    totalSpecialPayment: totalSpecialPayment,
+    totalInterestRebate: totalInterestRebate,
+    totalDepreciation: totalDepreciation,
   );
 }
 

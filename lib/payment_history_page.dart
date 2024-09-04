@@ -22,6 +22,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
       body: Column(
         children: [
           _buildViewToggle(),
+          _buildSummary(widget.calculationResult),
           Expanded(
             child: SingleChildScrollView(
               scrollDirection: Axis.vertical,
@@ -86,5 +87,34 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
         ]);
       }).toList(),
     );
+  }
+
+  Widget _buildSummary(CalculationResult result) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Gesamtzusammenfassung:',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            SizedBox(height: 8),
+            _buildSummaryRow('Gesamte Tilgung', result.totalPrincipalPayment),
+            _buildSummaryRow(
+                'Gesamte Zinszahlungen', result.totalInterestPayment),
+            _buildSummaryRow(
+                'Gesamte Sonderzahlungen', result.totalSpecialPayment),
+            _buildSummaryRow(
+                'Gesamter Zinsvorteil', result.totalInterestRebate),
+            _buildSummaryRow('Gesamte Abschreibung', result.totalDepreciation),
+            _buildSummaryRow('Gesamtsumme aller Zahlungen', result.totalSum),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSummaryRow(String label, double? value) {
+    return Text('$label: ${value?.toStringAsFixed(2) ?? 'N/A'} €');
   }
 }
