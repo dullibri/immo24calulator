@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:immo_credit/calculations/annuität.dart';
 import 'package:immo_credit/calculations/house.dart';
+import 'package:immo_credit/welcome_page.dart';
 import 'package:provider/provider.dart';
 
 import 'home_page.dart';
@@ -21,8 +22,9 @@ class MyApp extends StatelessWidget {
       title: 'Hypothekenrechner',
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: HomePage(),
+      home: WelcomePage(),
     );
   }
 }

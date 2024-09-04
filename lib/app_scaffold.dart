@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:immo_credit/welcome_page.dart';
 import 'package:provider/provider.dart';
 import 'package:immo_credit/calculations/annuität.dart';
 import 'factors_page.dart';
@@ -42,6 +43,16 @@ class AppDrawer extends StatelessWidget {
                 fontSize: 24,
               ),
             ),
+          ),
+          ListTile(
+            leading: Icon(Icons.home),
+            title: Text('Startseite'),
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => WelcomePage()),
+              );
+            },
           ),
           ListTile(
             leading: Icon(Icons.home),
