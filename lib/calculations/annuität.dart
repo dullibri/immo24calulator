@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'dart:math';
 
+import 'package:immo_credit/calculations/house.dart';
+
 class Payment {
   final int month;
   final double principalPayment;
@@ -48,14 +50,19 @@ double calculateDepreciation(
 }
 
 class MortgageCalculatorProvider extends ChangeNotifier {
-  double _principal = 0.0;
+  final HousePriceProvider _housePriceProvider;
+
+  MortgageCalculatorProvider(this._housePriceProvider) {
+    _housePriceProvider.addListener(_onHousePriceChanged);
+  }
+
+  double _principal = 500000.0;
   double _annualInterestRate = 0.0;
   double _initialPayment = 0.0;
   double _monthlySpecialPayment = 0.0;
   double _maxSpecialPaymentPercent = 0.0;
   double _rentalShare = 0.0;
   double _topTaxRate = 0.0;
-  double _purchasePrice = 0.0;
   double _annualDepreciationRate = 0.0;
 
   // Getters
@@ -66,8 +73,10 @@ class MortgageCalculatorProvider extends ChangeNotifier {
   double get maxSpecialPaymentPercent => _maxSpecialPaymentPercent;
   double get rentalShare => _rentalShare;
   double get topTaxRate => _topTaxRate;
-  double get purchasePrice => _purchasePrice;
   double get annualDepreciationRate => _annualDepreciationRate;
+
+  // Use housePrice from HousePriceProvider
+  double get purchasePrice => _housePriceProvider.housePriceInput.housePrice;
 
   // Setters
   void updatePrincipal(double value) {
@@ -105,13 +114,13 @@ class MortgageCalculatorProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updatePurchasePrice(double value) {
-    _purchasePrice = value;
+  void updateAnnualDepreciationRate(double value) {
+    _annualDepreciationRate = value;
     notifyListeners();
   }
 
-  void updateAnnualDepreciationRate(double value) {
-    _annualDepreciationRate = value;
+  void _onHousePriceChanged() {
+    // Recalculate mortgage when house price changes
     notifyListeners();
   }
 
@@ -125,9 +134,16 @@ class MortgageCalculatorProvider extends ChangeNotifier {
       maxSpecialPaymentPercent: _maxSpecialPaymentPercent,
       rentalShare: _rentalShare,
       topTaxRate: _topTaxRate,
-      purchasePrice: _purchasePrice,
+      purchasePrice:
+          purchasePrice, // Use the getter that accesses HousePriceProvider
       annualDepreciationRate: _annualDepreciationRate,
     );
+  }
+
+  @override
+  void dispose() {
+    _housePriceProvider.removeListener(_onHousePriceChanged);
+    super.dispose();
   }
 }
 

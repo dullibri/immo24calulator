@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:immo_credit/calculations/annuit%C3%A4t.dart';
+import 'package:immo_credit/calculations/annuität.dart';
 import 'package:immo_credit/calculations/house.dart';
 import 'package:provider/provider.dart';
 
@@ -9,7 +9,6 @@ void main() {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => MortgageCalculatorProvider()),
         ChangeNotifierProvider(
           create: (_) => HousePriceProvider(
             initialInput: HousePriceInput(
@@ -17,6 +16,14 @@ void main() {
               housePrice: 500000,
             ),
           ),
+        ),
+        ChangeNotifierProxyProvider<HousePriceProvider,
+            MortgageCalculatorProvider>(
+          create: (context) => MortgageCalculatorProvider(
+            Provider.of<HousePriceProvider>(context, listen: false),
+          ),
+          update: (context, housePriceProvider, previous) =>
+              previous ?? MortgageCalculatorProvider(housePriceProvider),
         ),
       ],
       child: MyApp(),
