@@ -81,23 +81,24 @@ class Mortgage with ChangeNotifier {
   double _topTaxRate;
   double _annualDepreciationRate;
 
+  late HousePriceOutput _housePriceOutput;
   CalculationResult? _lastCalculationResult;
 
   Mortgage({
-    double squareMeters = 100,
-    double housePrice = 300000,
-    double letSquareMeters = 50,
+    double squareMeters = 291,
+    double housePrice = 695000,
+    double letSquareMeters = 155.5,
     double notaryFeesRate = 0.015,
     double landRegistryFeesRate = 0.065,
     double brokerCommissionRate = 0.0,
-    double equity = 60000,
-    double annualInterestRate = 2.5,
-    double monthlyPayment = 1000,
-    double monthlySpecialPayment = 100,
+    double equity = 194000,
+    double annualInterestRate = 3.65,
+    double monthlyPayment = 2617,
+    double monthlySpecialPayment = 1185,
     double maxSpecialPaymentPercent = 5.0,
-    double rentalShare = 0.5,
+    double rentalShare = 0.95,
     double topTaxRate = 0.42,
-    double annualDepreciationRate = 0.02,
+    double annualDepreciationRate = 0.03,
   })  : _squareMeters = squareMeters,
         _housePrice = housePrice,
         _letSquareMeters = letSquareMeters,
@@ -114,6 +115,7 @@ class Mortgage with ChangeNotifier {
         _topTaxRate = topTaxRate,
         _annualDepreciationRate = annualDepreciationRate {
     calculateTotalHousePrice();
+    _updatePrincipal();
   }
 
   // Getters for all properties
@@ -134,7 +136,6 @@ class Mortgage with ChangeNotifier {
   double get annualDepreciationRate => _annualDepreciationRate;
 
   // House price output
-  late HousePriceOutput _housePriceOutput;
   HousePriceOutput get housePriceOutput => _housePriceOutput;
 
   // Methods to update properties
@@ -143,14 +144,14 @@ class Mortgage with ChangeNotifier {
     if (_equity != value) {
       _equity = value;
       _updatePrincipal();
-      invalidateCalculations();
       notifyListeners();
     }
   }
 
   void _updatePrincipal() {
-    _principal = _housePrice - _equity;
+    _principal = _housePriceOutput.totalHousePrice - _equity;
     if (_principal < 0) _principal = 0;
+    invalidateCalculations();
   }
 
   void updateNotaryFeesRate(double value) {
@@ -226,9 +227,7 @@ class Mortgage with ChangeNotifier {
   void updateHousePrice(double value) {
     if (_housePrice != value) {
       _housePrice = value;
-      _updatePrincipal();
       calculateTotalHousePrice();
-      invalidateCalculations();
       notifyListeners();
     }
   }
@@ -270,6 +269,7 @@ class Mortgage with ChangeNotifier {
       landRegistryFees: landRegistryFees,
       brokerCommission: brokerCommission,
     );
+    _updatePrincipal();
     notifyListeners();
   }
 
@@ -284,7 +284,7 @@ class Mortgage with ChangeNotifier {
     }
 
     _lastCalculationResult = calculateMortgagePaymentsFunction(
-      purchasePrice: _housePrice,
+      purchasePrice: _housePriceOutput.totalHousePrice,
       equity: _equity,
       principal: _principal,
       annualInterestRate: _annualInterestRate,
