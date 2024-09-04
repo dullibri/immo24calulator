@@ -56,10 +56,12 @@ class MortgageCalculatorProvider extends ChangeNotifier {
     _housePriceProvider.addListener(_onHousePriceChanged);
   }
 
-  // Angepasste Startwerte
-  double _principal = 300000.0;
+  // Angepasste und neue Startwerte
+  double _purchasePrice = 300000.0;
+  double _equity = 60000.0;
+  double _principal = 240000.0;
   double _annualInterestRate = 2.5;
-  double _initialPayment = 1000.0; // Monatliche Rate, nicht Anzahlung
+  double _monthlyPayment = 1000.0;
   double _monthlySpecialPayment = 100.0;
   double _maxSpecialPaymentPercent = 5.0;
   double _rentalShare = 0.5;
@@ -70,24 +72,37 @@ class MortgageCalculatorProvider extends ChangeNotifier {
   bool _isCalculating = false;
 
   // Getters
+  double get purchasePrice => _purchasePrice;
+  double get equity => _equity;
   double get principal => _principal;
   double get annualInterestRate => _annualInterestRate;
-  double get initialPayment => _initialPayment;
+  double get monthlyPayment => _monthlyPayment;
   double get monthlySpecialPayment => _monthlySpecialPayment;
   double get maxSpecialPaymentPercent => _maxSpecialPaymentPercent;
   double get rentalShare => _rentalShare;
   double get topTaxRate => _topTaxRate;
   double get annualDepreciationRate => _annualDepreciationRate;
 
-  // Use housePrice from HousePriceProvider
-  double get purchasePrice => _housePriceProvider.housePriceInput.housePrice;
-
-  // Setters with invalidation
-  void updatePrincipal(double value) {
-    if (_principal != value) {
-      _principal = value;
+  // Setters mit Aktualisierungslogik
+  void updatePurchasePrice(double value) {
+    if (_purchasePrice != value) {
+      _purchasePrice = value;
+      _updatePrincipal();
       invalidateCalculations();
     }
+  }
+
+  void updateEquity(double value) {
+    if (_equity != value) {
+      _equity = value;
+      _updatePrincipal();
+      invalidateCalculations();
+    }
+  }
+
+  void _updatePrincipal() {
+    _principal = _purchasePrice - _equity;
+    if (_principal < 0) _principal = 0;
   }
 
   void updateAnnualInterestRate(double value) {
@@ -97,9 +112,9 @@ class MortgageCalculatorProvider extends ChangeNotifier {
     }
   }
 
-  void updateInitialPayment(double value) {
-    if (_initialPayment != value) {
-      _initialPayment = value;
+  void updateMonthlyPayment(double value) {
+    if (_monthlyPayment != value) {
+      _monthlyPayment = value;
       invalidateCalculations();
     }
   }
@@ -140,7 +155,7 @@ class MortgageCalculatorProvider extends ChangeNotifier {
   }
 
   void _onHousePriceChanged() {
-    invalidateCalculations();
+    updatePurchasePrice(_housePriceProvider.housePriceInput.housePrice);
   }
 
   void invalidateCalculations() {
@@ -148,21 +163,21 @@ class MortgageCalculatorProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Calculate mortgage payments
   CalculationResult calculateMortgagePayments() {
     if (_lastCalculationResult != null) {
       return _lastCalculationResult!;
     }
 
     _lastCalculationResult = calculateMortgagePaymentsFunction(
+      purchasePrice: _purchasePrice,
+      equity: _equity,
       principal: _principal,
       annualInterestRate: _annualInterestRate,
-      initialPayment: _initialPayment,
+      monthlyPayment: _monthlyPayment,
       monthlySpecialPayment: _monthlySpecialPayment,
       maxSpecialPaymentPercent: _maxSpecialPaymentPercent,
       rentalShare: _rentalShare,
       topTaxRate: _topTaxRate,
-      purchasePrice: purchasePrice,
       annualDepreciationRate: _annualDepreciationRate,
     );
 
@@ -176,16 +191,16 @@ class MortgageCalculatorProvider extends ChangeNotifier {
   }
 }
 
-// Renamed the original function to avoid confusion
 CalculationResult calculateMortgagePaymentsFunction({
+  required double purchasePrice,
+  required double equity,
   required double principal,
   required double annualInterestRate,
-  required double initialPayment,
+  required double monthlyPayment,
   required double monthlySpecialPayment,
   required double maxSpecialPaymentPercent,
   required double rentalShare,
   required double topTaxRate,
-  required double purchasePrice,
   required double annualDepreciationRate,
 }) {
   final double monthlyInterestRate = annualInterestRate / 12 / 100;
@@ -205,9 +220,8 @@ CalculationResult calculateMortgagePaymentsFunction({
     }
 
     double interestPayment = remainingBalance * monthlyInterestRate;
-    double principalPayment = initialPayment - interestPayment;
+    double principalPayment = monthlyPayment - interestPayment;
 
-    // Überprüfen Sie, ob die Tilgung größer als die Restschuld ist
     if (principalPayment > remainingBalance) {
       principalPayment = remainingBalance;
     }
@@ -251,7 +265,6 @@ CalculationResult calculateMortgagePaymentsFunction({
 
     month++;
 
-    // Beenden Sie die Schleife, wenn die Restschuld sehr klein ist
     if (remainingBalance < 0.01) break;
   }
 

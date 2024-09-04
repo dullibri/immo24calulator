@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:immo_credit/calculations/annuit%C3%A4t.dart';
+import 'package:immo_credit/calculations/annuität.dart';
 import 'package:immo_credit/calculations/house.dart';
 import 'package:provider/provider.dart';
 import 'summary_page.dart';
@@ -24,25 +24,24 @@ class FactorsPage extends StatelessWidget {
               context,
               'Kaufpreis',
               mortgageProvider.purchasePrice.toString(),
-              (value) => handleTextFieldChange(context, value, (newValue) {
-                if (newValue > mortgageProvider.purchasePrice) {
-                  final housePriceProvider =
-                      Provider.of<HousePriceProvider>(context, listen: false);
-                  housePriceProvider.updateHousePriceInput(
-                      housePrice: newValue);
-                }
-              }),
+              (value) => handleTextFieldChange(
+                  context, value, mortgageProvider.updatePurchasePrice),
+              true,
+            ),
+            buildInputField(
+              context,
+              'Eigenkapital',
+              mortgageProvider.equity.toString(),
+              (value) => handleTextFieldChange(
+                  context, value, mortgageProvider.updateEquity),
               true,
             ),
             buildInputField(
               context,
               'Monatliche Rate',
-              mortgageProvider.initialPayment.toString(),
-              (value) => handleTextFieldChange(context, value, (newValue) {
-                if (newValue > mortgageProvider.initialPayment) {
-                  mortgageProvider.updateInitialPayment(newValue);
-                }
-              }),
+              mortgageProvider.monthlyPayment.toString(),
+              (value) => handleTextFieldChange(
+                  context, value, mortgageProvider.updateMonthlyPayment),
               true,
             ),
             buildInputField(
@@ -76,6 +75,22 @@ class FactorsPage extends StatelessWidget {
               (value) => handleTextFieldChange(
                   context, value, mortgageProvider.updateRentalShare),
               false,
+            ),
+            buildInputField(
+              context,
+              'Spitzensteuersatz',
+              mortgageProvider.topTaxRate.toString(),
+              (value) => handleTextFieldChange(
+                  context, value, mortgageProvider.updateTopTaxRate),
+              false,
+            ),
+            buildInputField(
+              context,
+              'Jährliche Abschreibung (%)',
+              mortgageProvider.annualDepreciationRate.toString(),
+              (value) => handleTextFieldChange(context, value,
+                  mortgageProvider.updateAnnualDepreciationRate),
+              true,
             ),
             const SizedBox(height: 16.0),
             ElevatedButton(
@@ -126,17 +141,13 @@ class FactorsPage extends StatelessWidget {
     final housePriceProvider =
         Provider.of<HousePriceProvider>(context, listen: false);
 
-    // Aktualisieren Sie den Hauptbetrag basierend auf dem aktuellen Kaufpreis und der Anfangszahlung
-    mortgageProvider.updatePrincipal(
-        mortgageProvider.purchasePrice - mortgageProvider.initialPayment);
-
-    // Berechnen Sie die Hypothekenzahlungen neu, aber speichern Sie das Ergebnis nicht
+    // Calculate mortgage payments
     final calculationResult = mortgageProvider.calculateMortgagePayments();
 
-    // Aktualisieren Sie den Hauspreis
+    // Update house price
     housePriceProvider.calculateTotalHousePrice();
 
-    // Navigieren Sie zur Zusammenfassungsseite und übergeben Sie das Berechnungsergebnis
+    // Navigate to the summary page with the calculation result
     Navigator.push(
       context,
       MaterialPageRoute(
