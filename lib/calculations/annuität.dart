@@ -88,7 +88,9 @@ class MortgageCalculatorProvider extends ChangeNotifier {
     if (_purchasePrice != value) {
       _purchasePrice = value;
       _updatePrincipal();
+      _housePriceProvider.updateHousePriceInput(housePrice: value);
       invalidateCalculations();
+      notifyListeners();
     }
   }
 
@@ -97,6 +99,7 @@ class MortgageCalculatorProvider extends ChangeNotifier {
       _equity = value;
       _updatePrincipal();
       invalidateCalculations();
+      notifyListeners();
     }
   }
 
