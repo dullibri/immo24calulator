@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:immo_credit/app_scaffold.dart';
 import 'package:immo_credit/calculations/house.dart';
 import 'package:provider/provider.dart';
 import 'calculations/annuität.dart';
@@ -15,10 +16,8 @@ class SummaryPage extends StatelessWidget {
     final housePriceOutput = mortgage.housePriceOutput;
     final principal = mortgage.principal;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Zusammenfassung'),
-      ),
+    return AppScaffold(
+      title: 'Zusammenfassung',
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: buildSummary(calculationResult, housePriceOutput, principal),

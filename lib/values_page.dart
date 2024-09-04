@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:immo_credit/app_scaffold.dart';
 import 'package:immo_credit/calculations/house.dart';
 import 'package:provider/provider.dart';
 import 'package:immo_credit/calculations/annuität.dart';
@@ -8,10 +9,8 @@ class ValuesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final mortgage = Provider.of<Mortgage>(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Rahmenwerte'),
-      ),
+    return AppScaffold(
+      title: 'Rahmenwerte',
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
