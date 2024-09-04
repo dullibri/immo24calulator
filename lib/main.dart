@@ -10,18 +10,16 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (_) => HousePriceProvider(
-            initialInput: HousePriceInput(
-              squareMeters: 100,
-              housePrice: 500000,
-            ),
-          ),
+          create: (_) => HousePriceProvider(),
         ),
         ChangeNotifierProxyProvider<HousePriceProvider,
             MortgageCalculatorProvider>(
-          create: (context) => MortgageCalculatorProvider(
-            Provider.of<HousePriceProvider>(context, listen: false),
-          ),
+          create: (context) {
+            final housePriceProvider =
+                Provider.of<HousePriceProvider>(context, listen: false);
+            return MortgageCalculatorProvider(housePriceProvider)
+              ..initializeValues();
+          },
           update: (context, housePriceProvider, previous) =>
               previous ?? MortgageCalculatorProvider(housePriceProvider),
         ),

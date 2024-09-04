@@ -144,8 +144,8 @@ class HousePriceProvider extends ChangeNotifier {
               housePrice: 300000, // Angepasst an den neuen Principal-Wert
               letSquareMeters: 50, // Die Hälfte der Gesamtfläche
               notaryFeesRate: 0.015,
-              landRegistryFeesRate: 0.005,
-              brokerCommissionRate: 0.035,
+              landRegistryFeesRate: 0.065,
+              brokerCommissionRate: 0.0,
             ) {
     _housePriceInput.addListener(_onInputChanged);
     calculateTotalHousePrice();
