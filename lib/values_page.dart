@@ -6,8 +6,7 @@ import 'package:immo_credit/calculations/annuität.dart';
 class ValuesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final mortgageProvider = Provider.of<MortgageCalculatorProvider>(context);
-    final housePriceProvider = Provider.of<HousePriceProvider>(context);
+    final mortgage = Provider.of<Mortgage>(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -23,12 +22,10 @@ class ValuesPage extends StatelessWidget {
             buildInputField(
               context,
               'Notargebührenrate (%)',
-              (housePriceProvider.housePriceInput.notaryFeesRate * 100)
-                  .toString(),
+              (mortgage.notaryFeesRate * 100).toString(),
               (value) {
                 handleTextFieldChange(context, value, (newValue) {
-                  housePriceProvider.updateHousePriceInput(
-                      notaryFeesRate: newValue / 100);
+                  mortgage.updateNotaryFeesRate(newValue / 100);
                 });
               },
               true,
@@ -36,12 +33,10 @@ class ValuesPage extends StatelessWidget {
             buildInputField(
               context,
               'Grundbuchgebührenrate (%)',
-              (housePriceProvider.housePriceInput.landRegistryFeesRate * 100)
-                  .toString(),
+              (mortgage.landRegistryFeesRate * 100).toString(),
               (value) {
                 handleTextFieldChange(context, value, (newValue) {
-                  housePriceProvider.updateHousePriceInput(
-                      landRegistryFeesRate: newValue / 100);
+                  mortgage.updateLandRegistryFeesRate(newValue / 100);
                 });
               },
               true,
@@ -49,12 +44,10 @@ class ValuesPage extends StatelessWidget {
             buildInputField(
               context,
               'Maklerprovisionrate (%)',
-              (housePriceProvider.housePriceInput.brokerCommissionRate * 100)
-                  .toString(),
+              (mortgage.brokerCommissionRate * 100).toString(),
               (value) {
                 handleTextFieldChange(context, value, (newValue) {
-                  housePriceProvider.updateHousePriceInput(
-                      brokerCommissionRate: newValue / 100);
+                  mortgage.updateBrokerCommissionRate(newValue / 100);
                 });
               },
               true,
@@ -62,77 +55,68 @@ class ValuesPage extends StatelessWidget {
             buildInputField(
               context,
               'Max. Sonderzahlungsprozentsatz (%)',
-              mortgageProvider.maxSpecialPaymentPercent.toString(),
-              (value) => handleTextFieldChange(context, value,
-                  mortgageProvider.updateMaxSpecialPaymentPercent),
+              mortgage.maxSpecialPaymentPercent.toString(),
+              (value) => handleTextFieldChange(
+                  context, value, mortgage.updateMaxSpecialPaymentPercent),
               true,
             ),
             buildInputField(
               context,
               'Mietanteil',
-              mortgageProvider.rentalShare.toString(),
+              mortgage.rentalShare.toString(),
               (value) => handleTextFieldChange(
-                  context, value, mortgageProvider.updateRentalShare),
+                  context, value, mortgage.updateRentalShare),
               false,
             ),
             buildInputField(
               context,
               'Spitzensteuersatz',
-              mortgageProvider.topTaxRate.toString(),
+              mortgage.topTaxRate.toString(),
               (value) => handleTextFieldChange(
-                  context, value, mortgageProvider.updateTopTaxRate),
+                  context, value, mortgage.updateTopTaxRate),
               false,
             ),
             buildInputField(
               context,
               'Jährliche Abschreibung',
-              mortgageProvider.annualDepreciationRate.toString(),
-              (value) => handleTextFieldChange(context, value,
-                  mortgageProvider.updateAnnualDepreciationRate),
+              mortgage.annualDepreciationRate.toString(),
+              (value) => handleTextFieldChange(
+                  context, value, mortgage.updateAnnualDepreciationRate),
               false,
             ),
             buildInputField(
               context,
               'Quadratmeter',
-              housePriceProvider.housePriceInput.squareMeters.toString(),
-              (value) => handleTextFieldChange(
-                  context,
-                  value,
-                  (newValue) => housePriceProvider.updateHousePriceInput(
-                      squareMeters: newValue)),
+              mortgage.squareMeters.toString(),
+              (value) => handleTextFieldChange(context, value,
+                  (newValue) => mortgage.updateSquareMeters(newValue)),
               true,
             ),
             buildInputField(
               context,
               'Vermietete Quadratmeter',
-              housePriceProvider.housePriceInput.letSquareMeters.toString(),
-              (value) => handleTextFieldChange(
-                  context,
-                  value,
-                  (newValue) => housePriceProvider.updateHousePriceInput(
-                      letSquareMeters: newValue)),
+              mortgage.letSquareMeters.toString(),
+              (value) => handleTextFieldChange(context, value,
+                  (newValue) => mortgage.updateLetSquareMeters(newValue)),
               true,
             ),
             buildInputField(
               context,
               'Hauspreis',
-              housePriceProvider.housePriceInput.housePrice.toString(),
-              (value) => handleTextFieldChange(
-                  context,
-                  value,
-                  (newValue) => housePriceProvider.updateHousePriceInput(
-                      housePrice: newValue)),
+              mortgage.housePrice.toString(),
+              (value) => handleTextFieldChange(context, value,
+                  (newValue) => mortgage.updateHousePrice(newValue)),
               true,
             ),
             SizedBox(height: 20),
             Text(
-                'Gesamthauspreis: ${housePriceProvider.housePriceOutput?.totalHousePrice.toStringAsFixed(2) ?? 'N/A'}'),
+                'Gesamthauspreis: ${mortgage.housePriceOutput?.totalHousePrice.toStringAsFixed(2) ?? 'N/A'}'),
             Text(
-                'Notargebühren: ${housePriceProvider.housePriceOutput?.notaryFees.toStringAsFixed(2) ?? 'N/A'}'),
+                'Notargebühren: ${mortgage.housePriceOutput?.notaryFees.toStringAsFixed(2) ?? 'N/A'}'),
             Text(
-                'Grundbuchgebühren: ${housePriceProvider.housePriceOutput?.landRegistryFees.toStringAsFixed(2) ?? 'N/A'}'),
+                'Grundbuchgebühren: ${mortgage.housePriceOutput?.landRegistryFees.toStringAsFixed(2) ?? 'N/A'}'),
             Text(
-                'Maklerprovision: ${housePriceProvider.housePriceOutput?.brokerCommission.toStringAsFixed(2) ?? 'N/A'}'),
+                'Maklerprovision: ${mortgage.housePriceOutput?.brokerCommission.toStringAsFixed(2) ?? 'N/A'}'),
           ],
         ),
       ),

@@ -61,42 +61,68 @@ double calculateDepreciation(
   return purchasePrice * annualDepreciationRate * topTaxRate;
 }
 
-class MortgageCalculatorProvider extends ChangeNotifier {
-  final HousePriceProvider _housePriceProvider;
+class Mortgage with ChangeNotifier {
+  // House price related properties
+  double _squareMeters;
+  double _housePrice;
+  double _letSquareMeters;
+  double _notaryFeesRate;
+  double _landRegistryFeesRate;
+  double _brokerCommissionRate;
 
-  MortgageCalculatorProvider(this._housePriceProvider) {
-    _housePriceProvider.addListener(_onHousePriceChanged);
-  }
-  void initializeValues() {
-    _purchasePrice = 300000.0;
-    _equity = 60000.0;
-    _housePriceProvider.updateHousePriceInput(
-      housePrice: _purchasePrice,
-      squareMeters:
-          100, // Setzen Sie hier einen Standardwert für die Quadratmeter
-    );
-    _updatePrincipal();
-    invalidateCalculations();
-    notifyListeners();
-  }
-
-  // Angepasste und neue Startwerte
-  double _purchasePrice = 300000.0;
-  double _equity = 60000.0;
-  double _principal = 240000.0;
-  double _annualInterestRate = 2.5;
-  double _monthlyPayment = 1000.0;
-  double _monthlySpecialPayment = 100.0;
-  double _maxSpecialPaymentPercent = 5.0;
-  double _rentalShare = 0.5;
-  double _topTaxRate = 0.42;
-  double _annualDepreciationRate = 0.02;
+  // Mortgage calculation related properties
+  double _equity;
+  double _principal;
+  double _annualInterestRate;
+  double _monthlyPayment;
+  double _monthlySpecialPayment;
+  double _maxSpecialPaymentPercent;
+  double _rentalShare;
+  double _topTaxRate;
+  double _annualDepreciationRate;
 
   CalculationResult? _lastCalculationResult;
-  bool _isCalculating = false;
 
-  // Getters
-  double get purchasePrice => _purchasePrice;
+  Mortgage({
+    double squareMeters = 100,
+    double housePrice = 300000,
+    double letSquareMeters = 50,
+    double notaryFeesRate = 0.015,
+    double landRegistryFeesRate = 0.065,
+    double brokerCommissionRate = 0.0,
+    double equity = 60000,
+    double annualInterestRate = 2.5,
+    double monthlyPayment = 1000,
+    double monthlySpecialPayment = 100,
+    double maxSpecialPaymentPercent = 5.0,
+    double rentalShare = 0.5,
+    double topTaxRate = 0.42,
+    double annualDepreciationRate = 0.02,
+  })  : _squareMeters = squareMeters,
+        _housePrice = housePrice,
+        _letSquareMeters = letSquareMeters,
+        _notaryFeesRate = notaryFeesRate,
+        _landRegistryFeesRate = landRegistryFeesRate,
+        _brokerCommissionRate = brokerCommissionRate,
+        _equity = equity,
+        _principal = housePrice - equity,
+        _annualInterestRate = annualInterestRate,
+        _monthlyPayment = monthlyPayment,
+        _monthlySpecialPayment = monthlySpecialPayment,
+        _maxSpecialPaymentPercent = maxSpecialPaymentPercent,
+        _rentalShare = rentalShare,
+        _topTaxRate = topTaxRate,
+        _annualDepreciationRate = annualDepreciationRate {
+    calculateTotalHousePrice();
+  }
+
+  // Getters for all properties
+  double get squareMeters => _squareMeters;
+  double get housePrice => _housePrice;
+  double get letSquareMeters => _letSquareMeters;
+  double get notaryFeesRate => _notaryFeesRate;
+  double get landRegistryFeesRate => _landRegistryFeesRate;
+  double get brokerCommissionRate => _brokerCommissionRate;
   double get equity => _equity;
   double get principal => _principal;
   double get annualInterestRate => _annualInterestRate;
@@ -107,16 +133,11 @@ class MortgageCalculatorProvider extends ChangeNotifier {
   double get topTaxRate => _topTaxRate;
   double get annualDepreciationRate => _annualDepreciationRate;
 
-  // Setters mit Aktualisierungslogik
-  void updatePurchasePrice(double value) {
-    if (_purchasePrice != value) {
-      _purchasePrice = value;
-      _updatePrincipal();
-      _housePriceProvider.updateHousePriceInput(housePrice: value);
-      invalidateCalculations();
-      notifyListeners();
-    }
-  }
+  // House price output
+  late HousePriceOutput _housePriceOutput;
+  HousePriceOutput get housePriceOutput => _housePriceOutput;
+
+  // Methods to update properties
 
   void updateEquity(double value) {
     if (_equity != value) {
@@ -128,28 +149,31 @@ class MortgageCalculatorProvider extends ChangeNotifier {
   }
 
   void _updatePrincipal() {
-    _principal = _purchasePrice - _equity;
+    _principal = _housePrice - _equity;
     if (_principal < 0) _principal = 0;
   }
 
-  void updateAnnualInterestRate(double value) {
-    if (_annualInterestRate != value) {
-      _annualInterestRate = value;
-      invalidateCalculations();
+  void updateNotaryFeesRate(double value) {
+    if (_notaryFeesRate != value) {
+      _notaryFeesRate = value;
+      calculateTotalHousePrice();
+      notifyListeners();
     }
   }
 
-  void updateMonthlyPayment(double value) {
-    if (_monthlyPayment != value) {
-      _monthlyPayment = value;
-      invalidateCalculations();
+  void updateLandRegistryFeesRate(double value) {
+    if (_landRegistryFeesRate != value) {
+      _landRegistryFeesRate = value;
+      calculateTotalHousePrice();
+      notifyListeners();
     }
   }
 
-  void updateMonthlySpecialPayment(double value) {
-    if (_monthlySpecialPayment != value) {
-      _monthlySpecialPayment = value;
-      invalidateCalculations();
+  void updateBrokerCommissionRate(double value) {
+    if (_brokerCommissionRate != value) {
+      _brokerCommissionRate = value;
+      calculateTotalHousePrice();
+      notifyListeners();
     }
   }
 
@@ -157,6 +181,7 @@ class MortgageCalculatorProvider extends ChangeNotifier {
     if (_maxSpecialPaymentPercent != value) {
       _maxSpecialPaymentPercent = value;
       invalidateCalculations();
+      notifyListeners();
     }
   }
 
@@ -164,6 +189,7 @@ class MortgageCalculatorProvider extends ChangeNotifier {
     if (_rentalShare != value) {
       _rentalShare = value;
       invalidateCalculations();
+      notifyListeners();
     }
   }
 
@@ -171,6 +197,7 @@ class MortgageCalculatorProvider extends ChangeNotifier {
     if (_topTaxRate != value) {
       _topTaxRate = value;
       invalidateCalculations();
+      notifyListeners();
     }
   }
 
@@ -178,11 +205,72 @@ class MortgageCalculatorProvider extends ChangeNotifier {
     if (_annualDepreciationRate != value) {
       _annualDepreciationRate = value;
       invalidateCalculations();
+      notifyListeners();
     }
   }
 
-  void _onHousePriceChanged() {
-    updatePurchasePrice(_housePriceProvider.housePriceInput.housePrice);
+  void updateSquareMeters(double value) {
+    if (_squareMeters != value) {
+      _squareMeters = value;
+      notifyListeners();
+    }
+  }
+
+  void updateLetSquareMeters(double value) {
+    if (_letSquareMeters != value) {
+      _letSquareMeters = value;
+      notifyListeners();
+    }
+  }
+
+  void updateHousePrice(double value) {
+    if (_housePrice != value) {
+      _housePrice = value;
+      _updatePrincipal();
+      calculateTotalHousePrice();
+      invalidateCalculations();
+      notifyListeners();
+    }
+  }
+
+  void updateMonthlyPayment(double value) {
+    if (_monthlyPayment != value) {
+      _monthlyPayment = value;
+      invalidateCalculations();
+      notifyListeners();
+    }
+  }
+
+  void updateAnnualInterestRate(double value) {
+    if (_annualInterestRate != value) {
+      _annualInterestRate = value;
+      invalidateCalculations();
+      notifyListeners();
+    }
+  }
+
+  void updateMonthlySpecialPayment(double value) {
+    if (_monthlySpecialPayment != value) {
+      _monthlySpecialPayment = value;
+      invalidateCalculations();
+      notifyListeners();
+    }
+  }
+
+  void calculateTotalHousePrice() {
+    double notaryFees = _notaryFeesRate * _housePrice;
+    double landRegistryFees = _landRegistryFeesRate * _housePrice;
+    double brokerCommission = _brokerCommissionRate * _housePrice;
+    double totalHousePrice =
+        _housePrice + notaryFees + landRegistryFees + brokerCommission;
+
+    _housePriceOutput = HousePriceOutput(
+      totalHousePrice: totalHousePrice,
+      notaryFees: notaryFees,
+      landRegistryFees: landRegistryFees,
+      brokerCommission: brokerCommission,
+    );
+    notifyListeners();
   }
 
   void invalidateCalculations() {
@@ -196,7 +284,7 @@ class MortgageCalculatorProvider extends ChangeNotifier {
     }
 
     _lastCalculationResult = calculateMortgagePaymentsFunction(
-      purchasePrice: _purchasePrice,
+      purchasePrice: _housePrice,
       equity: _equity,
       principal: _principal,
       annualInterestRate: _annualInterestRate,
@@ -209,12 +297,6 @@ class MortgageCalculatorProvider extends ChangeNotifier {
     );
 
     return _lastCalculationResult!;
-  }
-
-  @override
-  void dispose() {
-    _housePriceProvider.removeListener(_onHousePriceChanged);
-    super.dispose();
   }
 }
 

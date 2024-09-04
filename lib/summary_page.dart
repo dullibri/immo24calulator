@@ -10,13 +10,10 @@ class SummaryPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mortgageProvider =
-        Provider.of<MortgageCalculatorProvider>(context, listen: false);
-    final housePriceProvider =
-        Provider.of<HousePriceProvider>(context, listen: false);
+    final mortgage = Provider.of<Mortgage>(context, listen: false);
 
-    final housePriceOutput = housePriceProvider.housePriceOutput;
-    final principal = mortgageProvider.principal;
+    final housePriceOutput = mortgage.housePriceOutput;
+    final principal = mortgage.principal;
 
     return Scaffold(
       appBar: AppBar(

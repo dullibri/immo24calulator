@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:immo_credit/calculations/annuität.dart';
-import 'package:immo_credit/calculations/house.dart';
 import 'package:provider/provider.dart';
 import 'summary_page.dart';
 
 class FactorsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final mortgageProvider = Provider.of<MortgageCalculatorProvider>(context);
+    final mortgage = Provider.of<Mortgage>(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -23,73 +22,73 @@ class FactorsPage extends StatelessWidget {
             buildInputField(
               context,
               'Kaufpreis',
-              mortgageProvider.purchasePrice.toString(),
+              mortgage.housePrice.toString(),
               (value) => handleTextFieldChange(
-                  context, value, mortgageProvider.updatePurchasePrice),
+                  context, value, mortgage.updateHousePrice),
               true,
             ),
             buildInputField(
               context,
               'Eigenkapital',
-              mortgageProvider.equity.toString(),
-              (value) => handleTextFieldChange(
-                  context, value, mortgageProvider.updateEquity),
+              mortgage.equity.toString(),
+              (value) =>
+                  handleTextFieldChange(context, value, mortgage.updateEquity),
               true,
             ),
             buildInputField(
               context,
               'Monatliche Rate',
-              mortgageProvider.monthlyPayment.toString(),
+              mortgage.monthlyPayment.toString(),
               (value) => handleTextFieldChange(
-                  context, value, mortgageProvider.updateMonthlyPayment),
+                  context, value, mortgage.updateMonthlyPayment),
               true,
             ),
             buildInputField(
               context,
               'Jährlicher Zinssatz (%)',
-              mortgageProvider.annualInterestRate.toString(),
+              mortgage.annualInterestRate.toString(),
               (value) => handleTextFieldChange(
-                  context, value, mortgageProvider.updateAnnualInterestRate),
+                  context, value, mortgage.updateAnnualInterestRate),
               true,
             ),
             buildInputField(
               context,
               'Monatliche Sonderzahlung',
-              mortgageProvider.monthlySpecialPayment.toString(),
+              mortgage.monthlySpecialPayment.toString(),
               (value) => handleTextFieldChange(
-                  context, value, mortgageProvider.updateMonthlySpecialPayment),
+                  context, value, mortgage.updateMonthlySpecialPayment),
               true,
             ),
             buildInputField(
               context,
               'Max. Sonderzahlung (%)',
-              mortgageProvider.maxSpecialPaymentPercent.toString(),
-              (value) => handleTextFieldChange(context, value,
-                  mortgageProvider.updateMaxSpecialPaymentPercent),
+              mortgage.maxSpecialPaymentPercent.toString(),
+              (value) => handleTextFieldChange(
+                  context, value, mortgage.updateMaxSpecialPaymentPercent),
               true,
             ),
             buildInputField(
               context,
               'Mietanteil',
-              mortgageProvider.rentalShare.toString(),
+              mortgage.rentalShare.toString(),
               (value) => handleTextFieldChange(
-                  context, value, mortgageProvider.updateRentalShare),
+                  context, value, mortgage.updateRentalShare),
               false,
             ),
             buildInputField(
               context,
               'Spitzensteuersatz',
-              mortgageProvider.topTaxRate.toString(),
+              mortgage.topTaxRate.toString(),
               (value) => handleTextFieldChange(
-                  context, value, mortgageProvider.updateTopTaxRate),
+                  context, value, mortgage.updateTopTaxRate),
               false,
             ),
             buildInputField(
               context,
               'Jährliche Abschreibung (%)',
-              mortgageProvider.annualDepreciationRate.toString(),
-              (value) => handleTextFieldChange(context, value,
-                  mortgageProvider.updateAnnualDepreciationRate),
+              mortgage.annualDepreciationRate.toString(),
+              (value) => handleTextFieldChange(
+                  context, value, mortgage.updateAnnualDepreciationRate),
               true,
             ),
             const SizedBox(height: 16.0),
@@ -136,16 +135,13 @@ class FactorsPage extends StatelessWidget {
   }
 
   void calculateAndNavigate(BuildContext context) {
-    final mortgageProvider =
-        Provider.of<MortgageCalculatorProvider>(context, listen: false);
-    final housePriceProvider =
-        Provider.of<HousePriceProvider>(context, listen: false);
+    final mortgage = Provider.of<Mortgage>(context, listen: false);
 
     // Calculate mortgage payments
-    final calculationResult = mortgageProvider.calculateMortgagePayments();
+    final calculationResult = mortgage.calculateMortgagePayments();
 
     // Update house price
-    housePriceProvider.calculateTotalHousePrice();
+    mortgage.calculateTotalHousePrice();
 
     // Navigate to the summary page with the calculation result
     Navigator.push(

@@ -56,8 +56,7 @@ class HomePage extends StatelessWidget {
               title: Text('Zusammenfassung'),
               onTap: () {
                 final mortgageProvider =
-                    Provider.of<MortgageCalculatorProvider>(context,
-                        listen: false);
+                    Provider.of<Mortgage>(context, listen: false);
                 final calculationResult =
                     mortgageProvider.calculateMortgagePayments();
                 Navigator.push(
@@ -73,8 +72,7 @@ class HomePage extends StatelessWidget {
               title: Text('Zahlungsverlauf'),
               onTap: () {
                 final mortgageProvider =
-                    Provider.of<MortgageCalculatorProvider>(context,
-                        listen: false);
+                    Provider.of<Mortgage>(context, listen: false);
                 final calculationResult =
                     mortgageProvider.calculateMortgagePayments();
                 Navigator.push(

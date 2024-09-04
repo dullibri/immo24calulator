@@ -7,23 +7,8 @@ import 'home_page.dart';
 
 void main() {
   runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(
-          create: (_) => HousePriceProvider(),
-        ),
-        ChangeNotifierProxyProvider<HousePriceProvider,
-            MortgageCalculatorProvider>(
-          create: (context) {
-            final housePriceProvider =
-                Provider.of<HousePriceProvider>(context, listen: false);
-            return MortgageCalculatorProvider(housePriceProvider)
-              ..initializeValues();
-          },
-          update: (context, housePriceProvider, previous) =>
-              previous ?? MortgageCalculatorProvider(housePriceProvider),
-        ),
-      ],
+    ChangeNotifierProvider(
+      create: (_) => Mortgage(),
       child: MyApp(),
     ),
   );
