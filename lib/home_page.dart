@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:immo_credit/payment_history_page.dart';
 import 'package:provider/provider.dart';
 import 'factors_page.dart';
 import 'values_page.dart';
@@ -69,7 +70,7 @@ class HomePage extends StatelessWidget {
             ),
             ListTile(
               leading: Icon(Icons.calendar_today),
-              title: Text('Jährliche Werte'),
+              title: Text('Zahlungsverlauf'),
               onTap: () {
                 final mortgageProvider =
                     Provider.of<MortgageCalculatorProvider>(context,
@@ -77,28 +78,11 @@ class HomePage extends StatelessWidget {
                 final calculationResult =
                     mortgageProvider.calculateMortgagePayments();
                 Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => AnnualValuesPage(
-                          calculationResult: calculationResult)),
-                );
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.calendar_view_month),
-              title: Text('Monatliche Werte'),
-              onTap: () {
-                final mortgageProvider =
-                    Provider.of<MortgageCalculatorProvider>(context,
-                        listen: false);
-                final calculationResult =
-                    mortgageProvider.calculateMortgagePayments();
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => MonthlyValuesPage(
-                          calculationResult: calculationResult)),
-                );
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PaymentHistoryPage(
+                          calculationResult: calculationResult),
+                    ));
               },
             ),
           ],
