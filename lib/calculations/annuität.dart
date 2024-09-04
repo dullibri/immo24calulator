@@ -57,15 +57,14 @@ class MortgageCalculatorProvider extends ChangeNotifier {
   }
 
   // Angepasste Startwerte
-  double _principal = 300000.0; // Reduziert von 500000
-  double _annualInterestRate = 2.5; // Realistischer Zinssatz (in Prozent)
-  double _initialPayment = 60000.0; // 20% Anzahlung
-  double _monthlySpecialPayment = 100.0; // Kleine monatliche Sonderzahlung
-  double _maxSpecialPaymentPercent =
-      5.0; // Maximale jährliche Sondertilgung in Prozent
-  double _rentalShare = 0.5; // 50% Mietanteil
-  double _topTaxRate = 0.42; // Beispiel für einen Spitzensteuersatz
-  double _annualDepreciationRate = 0.02; // 2% jährliche Abschreibung
+  double _principal = 300000.0;
+  double _annualInterestRate = 2.5;
+  double _initialPayment = 1000.0; // Monatliche Rate, nicht Anzahlung
+  double _monthlySpecialPayment = 100.0;
+  double _maxSpecialPaymentPercent = 5.0;
+  double _rentalShare = 0.5;
+  double _topTaxRate = 0.42;
+  double _annualDepreciationRate = 0.02;
 
   CalculationResult? _lastCalculationResult;
   bool _isCalculating = false;
@@ -192,72 +191,48 @@ CalculationResult calculateMortgagePaymentsFunction({
   final double monthlyInterestRate = annualInterestRate / 12 / 100;
   final double maxAnnualSpecialPayment =
       principal * (maxSpecialPaymentPercent / 100);
-  double totalInterestPaidLastYear = 0;
 
   List<Payment> payments = [];
   double remainingBalance = principal;
   int month = 1;
   double totalSpecialPaymentsPerYear = 0;
-  double interestRebate = 0;
-  double depreciation = 0;
   double totalSum = 0;
   double totalTaxRepayment = 0;
 
   while (remainingBalance > 0) {
-    // Reset annual special payments and interest rebate at the start of each year
     if ((month - 1) % 12 == 0) {
       totalSpecialPaymentsPerYear = 0;
-      totalInterestPaidLastYear = 0;
     }
 
-    // Calculate interest rebate and depreciation every 12 months starting from month 18
+    double interestPayment = remainingBalance * monthlyInterestRate;
+    double principalPayment = initialPayment - interestPayment;
+
+    // Überprüfen Sie, ob die Tilgung größer als die Restschuld ist
+    if (principalPayment > remainingBalance) {
+      principalPayment = remainingBalance;
+    }
+
+    double specialPayment = monthlySpecialPayment;
+    if (totalSpecialPaymentsPerYear + specialPayment >
+        maxAnnualSpecialPayment) {
+      specialPayment = maxAnnualSpecialPayment - totalSpecialPaymentsPerYear;
+      if (specialPayment < 0) specialPayment = 0;
+    }
+
+    totalSpecialPaymentsPerYear += specialPayment;
+
+    double interestRebate = 0;
+    double depreciation = 0;
     if (month > 12 && (month - 6) % 12 == 0) {
       interestRebate = calculateInterestRebate(
-          totalInterestPaidLastYear, topTaxRate, rentalShare);
+          interestPayment * 12, topTaxRate, rentalShare);
       depreciation = calculateDepreciation(
           purchasePrice, annualDepreciationRate, topTaxRate);
     }
 
-    double specialPayment = monthlySpecialPayment;
-
-    // Limit special payments to the specified percentage of the initial loan amount per year
-    double totalExtraPayments = specialPayment + interestRebate + depreciation;
-    if (totalSpecialPaymentsPerYear + totalExtraPayments >
-        maxAnnualSpecialPayment) {
-      double remainingAllowedPayment =
-          maxAnnualSpecialPayment - totalSpecialPaymentsPerYear;
-      if (remainingAllowedPayment > 0) {
-        specialPayment = min(specialPayment, remainingAllowedPayment);
-        remainingAllowedPayment -= specialPayment;
-        interestRebate = min(interestRebate, remainingAllowedPayment);
-        remainingAllowedPayment -= interestRebate;
-        depreciation = min(depreciation, remainingAllowedPayment);
-      } else {
-        specialPayment = 0;
-        interestRebate = 0;
-        depreciation = 0;
-      }
-    }
-
-    totalSpecialPaymentsPerYear +=
-        (specialPayment + interestRebate + depreciation);
-
-    final double interestPayment = remainingBalance * monthlyInterestRate;
-    final double totalPayment = initialPayment + specialPayment;
-    final double principalPayment =
-        min(totalPayment - interestPayment, remainingBalance);
-    remainingBalance -= principalPayment;
-
-    if (month > 12 && (month - 6) % 12 == 0) {
-      remainingBalance -= (interestRebate + depreciation);
-    }
-
+    remainingBalance -=
+        (principalPayment + specialPayment + interestRebate + depreciation);
     if (remainingBalance < 0) remainingBalance = 0;
-
-    totalInterestPaidLastYear += interestPayment;
-
-    double remainingSpecialPayment =
-        maxAnnualSpecialPayment - totalSpecialPaymentsPerYear;
 
     payments.add(Payment(
       month: month,
@@ -265,26 +240,19 @@ CalculationResult calculateMortgagePaymentsFunction({
       interestPayment: interestPayment,
       remainingBalance: remainingBalance,
       specialPayment: specialPayment,
-      remainingSpecialPayment: remainingSpecialPayment,
+      remainingSpecialPayment:
+          maxAnnualSpecialPayment - totalSpecialPaymentsPerYear,
       interestRebate: interestRebate,
       depreciation: depreciation,
     ));
 
-    totalSum += principalPayment +
-        interestPayment +
-        specialPayment +
-        interestRebate +
-        depreciation;
-
+    totalSum += principalPayment + interestPayment + specialPayment;
     totalTaxRepayment += interestRebate + depreciation;
 
     month++;
 
-    // Reset interest rebate and depreciation after application
-    if (month > 18 && (month - 6) % 12 == 1) {
-      interestRebate = 0;
-      depreciation = 0;
-    }
+    // Beenden Sie die Schleife, wenn die Restschuld sehr klein ist
+    if (remainingBalance < 0.01) break;
   }
 
   return CalculationResult(
