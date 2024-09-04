@@ -4,6 +4,7 @@ import 'factors_page.dart';
 import 'values_page.dart';
 import 'summary_page.dart';
 import 'annual_values_page.dart';
+import 'monthly_values_page.dart'; // Neuer Import
 import 'calculations/annuität.dart';
 
 class HomePage extends StatelessWidget {
@@ -79,6 +80,23 @@ class HomePage extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                       builder: (context) => AnnualValuesPage(
+                          calculationResult: calculationResult)),
+                );
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.calendar_view_month),
+              title: Text('Monatliche Werte'),
+              onTap: () {
+                final mortgageProvider =
+                    Provider.of<MortgageCalculatorProvider>(context,
+                        listen: false);
+                final calculationResult =
+                    mortgageProvider.calculateMortgagePayments();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => MonthlyValuesPage(
                           calculationResult: calculationResult)),
                 );
               },
