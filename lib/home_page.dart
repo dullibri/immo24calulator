@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'factors_page.dart';
 import 'values_page.dart';
 import 'summary_page.dart';
 import 'annual_values_page.dart';
+import 'calculations/annuität.dart';
 
 class HomePage extends StatelessWidget {
   @override
@@ -51,9 +53,16 @@ class HomePage extends StatelessWidget {
               leading: Icon(Icons.summarize),
               title: Text('Zusammenfassung'),
               onTap: () {
+                final mortgageProvider =
+                    Provider.of<MortgageCalculatorProvider>(context,
+                        listen: false);
+                final calculationResult =
+                    mortgageProvider.calculateMortgagePayments();
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => SummaryPage()),
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          SummaryPage(calculationResult: calculationResult)),
                 );
               },
             ),
@@ -61,9 +70,16 @@ class HomePage extends StatelessWidget {
               leading: Icon(Icons.calendar_today),
               title: Text('Jährliche Werte'),
               onTap: () {
+                final mortgageProvider =
+                    Provider.of<MortgageCalculatorProvider>(context,
+                        listen: false);
+                final calculationResult =
+                    mortgageProvider.calculateMortgagePayments();
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => AnnualValuesPage()),
+                  MaterialPageRoute(
+                      builder: (context) => AnnualValuesPage(
+                          calculationResult: calculationResult)),
                 );
               },
             ),

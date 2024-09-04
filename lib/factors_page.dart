@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:immo_credit/calculations/annuit%C3%A4t.dart';
 import 'package:immo_credit/calculations/house.dart';
 import 'package:provider/provider.dart';
+import 'summary_page.dart';
 
 class FactorsPage extends StatelessWidget {
   @override
@@ -50,14 +51,6 @@ class FactorsPage extends StatelessWidget {
               mortgageProvider.annualInterestRate.toString(),
               (value) => handleTextFieldChange(
                   context, value, mortgageProvider.updateAnnualInterestRate),
-              true,
-            ),
-            buildInputField(
-              context,
-              'Anfängliche Zahlung',
-              mortgageProvider.initialPayment.toString(),
-              (value) => handleTextFieldChange(
-                  context, value, mortgageProvider.updateInitialPayment),
               true,
             ),
             buildInputField(
@@ -130,8 +123,25 @@ class FactorsPage extends StatelessWidget {
   void calculateAndNavigate(BuildContext context) {
     final mortgageProvider =
         Provider.of<MortgageCalculatorProvider>(context, listen: false);
+    final housePriceProvider =
+        Provider.of<HousePriceProvider>(context, listen: false);
+
+    // Aktualisieren Sie den Hauptbetrag basierend auf dem aktuellen Kaufpreis und der Anfangszahlung
     mortgageProvider.updatePrincipal(
         mortgageProvider.purchasePrice - mortgageProvider.initialPayment);
+
+    // Berechnen Sie die Hypothekenzahlungen neu, aber speichern Sie das Ergebnis nicht
     final calculationResult = mortgageProvider.calculateMortgagePayments();
+
+    // Aktualisieren Sie den Hauspreis
+    housePriceProvider.calculateTotalHousePrice();
+
+    // Navigieren Sie zur Zusammenfassungsseite und übergeben Sie das Berechnungsergebnis
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) =>
+              SummaryPage(calculationResult: calculationResult)),
+    );
   }
 }

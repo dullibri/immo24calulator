@@ -137,8 +137,16 @@ class HousePriceProvider extends ChangeNotifier {
   final HousePriceInput _housePriceInput;
   HousePriceOutput? _housePriceOutput;
 
-  HousePriceProvider({required HousePriceInput initialInput})
-      : _housePriceInput = initialInput {
+  HousePriceProvider({HousePriceInput? initialInput})
+      : _housePriceInput = initialInput ??
+            HousePriceInput(
+              squareMeters: 100,
+              housePrice: 300000, // Angepasst an den neuen Principal-Wert
+              letSquareMeters: 50, // Die Hälfte der Gesamtfläche
+              notaryFeesRate: 0.015,
+              landRegistryFeesRate: 0.005,
+              brokerCommissionRate: 0.035,
+            ) {
     _housePriceInput.addListener(_onInputChanged);
     calculateTotalHousePrice();
   }

@@ -56,14 +56,19 @@ class MortgageCalculatorProvider extends ChangeNotifier {
     _housePriceProvider.addListener(_onHousePriceChanged);
   }
 
-  double _principal = 500000.0;
-  double _annualInterestRate = 0.0;
-  double _initialPayment = 0.0;
-  double _monthlySpecialPayment = 0.0;
-  double _maxSpecialPaymentPercent = 0.0;
-  double _rentalShare = 0.0;
-  double _topTaxRate = 0.0;
-  double _annualDepreciationRate = 0.0;
+  // Angepasste Startwerte
+  double _principal = 300000.0; // Reduziert von 500000
+  double _annualInterestRate = 2.5; // Realistischer Zinssatz (in Prozent)
+  double _initialPayment = 60000.0; // 20% Anzahlung
+  double _monthlySpecialPayment = 100.0; // Kleine monatliche Sonderzahlung
+  double _maxSpecialPaymentPercent =
+      5.0; // Maximale jährliche Sondertilgung in Prozent
+  double _rentalShare = 0.5; // 50% Mietanteil
+  double _topTaxRate = 0.42; // Beispiel für einen Spitzensteuersatz
+  double _annualDepreciationRate = 0.02; // 2% jährliche Abschreibung
+
+  CalculationResult? _lastCalculationResult;
+  bool _isCalculating = false;
 
   // Getters
   double get principal => _principal;
@@ -78,55 +83,79 @@ class MortgageCalculatorProvider extends ChangeNotifier {
   // Use housePrice from HousePriceProvider
   double get purchasePrice => _housePriceProvider.housePriceInput.housePrice;
 
-  // Setters
+  // Setters with invalidation
   void updatePrincipal(double value) {
-    _principal = value;
-    notifyListeners();
+    if (_principal != value) {
+      _principal = value;
+      invalidateCalculations();
+    }
   }
 
   void updateAnnualInterestRate(double value) {
-    _annualInterestRate = value;
-    notifyListeners();
+    if (_annualInterestRate != value) {
+      _annualInterestRate = value;
+      invalidateCalculations();
+    }
   }
 
   void updateInitialPayment(double value) {
-    _initialPayment = value;
-    notifyListeners();
+    if (_initialPayment != value) {
+      _initialPayment = value;
+      invalidateCalculations();
+    }
   }
 
   void updateMonthlySpecialPayment(double value) {
-    _monthlySpecialPayment = value;
-    notifyListeners();
+    if (_monthlySpecialPayment != value) {
+      _monthlySpecialPayment = value;
+      invalidateCalculations();
+    }
   }
 
   void updateMaxSpecialPaymentPercent(double value) {
-    _maxSpecialPaymentPercent = value;
-    notifyListeners();
+    if (_maxSpecialPaymentPercent != value) {
+      _maxSpecialPaymentPercent = value;
+      invalidateCalculations();
+    }
   }
 
   void updateRentalShare(double value) {
-    _rentalShare = value;
-    notifyListeners();
+    if (_rentalShare != value) {
+      _rentalShare = value;
+      invalidateCalculations();
+    }
   }
 
   void updateTopTaxRate(double value) {
-    _topTaxRate = value;
-    notifyListeners();
+    if (_topTaxRate != value) {
+      _topTaxRate = value;
+      invalidateCalculations();
+    }
   }
 
   void updateAnnualDepreciationRate(double value) {
-    _annualDepreciationRate = value;
-    notifyListeners();
+    if (_annualDepreciationRate != value) {
+      _annualDepreciationRate = value;
+      invalidateCalculations();
+    }
   }
 
   void _onHousePriceChanged() {
-    // Recalculate mortgage when house price changes
+    invalidateCalculations();
+  }
+
+  void invalidateCalculations() {
+    _lastCalculationResult = null;
     notifyListeners();
   }
 
   // Calculate mortgage payments
   CalculationResult calculateMortgagePayments() {
-    return calculateMortgagePaymentsFunction(
+    if (_lastCalculationResult != null) {
+      return _lastCalculationResult!;
+    }
+
+    _lastCalculationResult = calculateMortgagePaymentsFunction(
       principal: _principal,
       annualInterestRate: _annualInterestRate,
       initialPayment: _initialPayment,
@@ -134,10 +163,11 @@ class MortgageCalculatorProvider extends ChangeNotifier {
       maxSpecialPaymentPercent: _maxSpecialPaymentPercent,
       rentalShare: _rentalShare,
       topTaxRate: _topTaxRate,
-      purchasePrice:
-          purchasePrice, // Use the getter that accesses HousePriceProvider
+      purchasePrice: purchasePrice,
       annualDepreciationRate: _annualDepreciationRate,
     );
+
+    return _lastCalculationResult!;
   }
 
   @override
@@ -159,9 +189,6 @@ CalculationResult calculateMortgagePaymentsFunction({
   required double purchasePrice,
   required double annualDepreciationRate,
 }) {
-  // The rest of the function remains the same
-  // ...
-
   final double monthlyInterestRate = annualInterestRate / 12 / 100;
   final double maxAnnualSpecialPayment =
       principal * (maxSpecialPaymentPercent / 100);
