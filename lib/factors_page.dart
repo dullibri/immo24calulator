@@ -36,7 +36,7 @@ class FactorsPage extends StatelessWidget {
             ),
             buildInputField(
               context,
-              'Eigenkapital',
+              'Monatliche Rate',
               mortgageProvider.initialPayment.toString(),
               (value) => handleTextFieldChange(context, value, (newValue) {
                 if (newValue > mortgageProvider.initialPayment) {
