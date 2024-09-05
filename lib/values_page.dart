@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:immo24calculator/app_scaffold.dart';
 import 'package:immo24calculator/calculations/house.dart';
+import 'package:immo24calculator/widgets/german_currency_input.dart';
 import 'package:provider/provider.dart';
 import 'package:immo24calculator/calculations/annuität.dart';
 
@@ -97,14 +98,6 @@ class ValuesPage extends StatelessWidget {
               mortgage.letSquareMeters.toString(),
               (value) => handleTextFieldChange(context, value,
                   (newValue) => mortgage.updateLetSquareMeters(newValue)),
-              true,
-            ),
-            buildInputField(
-              context,
-              'Hauspreis',
-              mortgage.housePrice.toString(),
-              (value) => handleTextFieldChange(context, value,
-                  (newValue) => mortgage.updateHousePrice(newValue)),
               true,
             ),
             SizedBox(height: 20),

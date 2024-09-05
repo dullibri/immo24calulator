@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:immo24calculator/app_scaffold.dart';
 import 'package:immo24calculator/calculations/annuität.dart';
+import 'package:immo24calculator/widgets/german_currency_input.dart';
 import 'package:provider/provider.dart';
 import 'summary_page.dart';
 
@@ -18,29 +19,21 @@ class FactorsPage extends StatelessWidget {
           children: [
             const Text('Hauptfaktoren:',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            buildInputField(
-              context,
-              'Kaufpreis',
-              mortgage.housePrice.toString(),
-              (value) => handleTextFieldChange(
-                  context, value, mortgage.updateHousePrice),
-              true,
+            GermanCurrencyInput(
+              label: 'Kaufpreis',
+              initialValue: mortgage.housePrice.round(),
+              onChanged: (value) => mortgage.updateHousePrice(value.toDouble()),
             ),
-            buildInputField(
-              context,
-              'Eigenkapital',
-              mortgage.equity.toString(),
-              (value) =>
-                  handleTextFieldChange(context, value, mortgage.updateEquity),
-              true,
+            GermanCurrencyInput(
+              label: 'Eigenkapital',
+              initialValue: mortgage.equity.round(),
+              onChanged: (value) => mortgage.updateEquity(value.toDouble()),
             ),
-            buildInputField(
-              context,
-              'Monatliche Rate',
-              mortgage.monthlyPayment.toString(),
-              (value) => handleTextFieldChange(
-                  context, value, mortgage.updateMonthlyPayment),
-              true,
+            GermanCurrencyInput(
+              label: 'Monatliche Rate',
+              initialValue: mortgage.monthlyPayment.round(),
+              onChanged: (value) =>
+                  mortgage.updateMonthlyPayment(value.toDouble()),
             ),
             buildInputField(
               context,
@@ -50,14 +43,10 @@ class FactorsPage extends StatelessWidget {
                   context, value, mortgage.updateAnnualInterestRate),
               true,
             ),
-            buildInputField(
-              context,
-              'Monatliche Sonderzahlung',
-              mortgage.monthlySpecialPayment.toString(),
-              (value) => handleTextFieldChange(
-                  context, value, mortgage.updateMonthlySpecialPayment),
-              true,
-            ),
+            GermanCurrencyInput(
+                label: 'Monatliche Sonderzahlung',
+                initialValue: mortgage.monthlySpecialPayment.round(),
+                onChanged: (value) => value.toDouble()),
             buildInputField(
               context,
               'Max. Sonderzahlung (%)',
