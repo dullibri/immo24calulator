@@ -20,95 +20,81 @@ class FactorsPage extends StatelessWidget {
             const Text('Hauptfaktoren:',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             SizedBox(height: 16),
-            LayoutBuilder(
-              builder: (BuildContext context, BoxConstraints constraints) {
-                return Wrap(
-                  spacing: 16,
-                  runSpacing: 16,
-                  children: [
-                    _buildInputField(
-                      'Kaufpreis',
-                      '€',
-                      mortgage.housePrice,
-                      (value) => mortgage.updateHousePrice(value),
-                      constraints,
-                      decimalPlaces: 0,
-                    ),
-                    _buildInputField(
-                      'Quadratmeter',
-                      'm²',
-                      mortgage.squareMeters,
-                      (value) => mortgage.updateSquareMeters(value),
-                      constraints,
-                      decimalPlaces: 1,
-                    ),
-                    _buildInputField(
-                      'Eigenkapital',
-                      '€',
-                      mortgage.equity,
-                      (value) => mortgage.updateEquity(value),
-                      constraints,
-                      decimalPlaces: 0,
-                    ),
-                    _buildInputField(
-                      'Monatliche Rate',
-                      '€',
-                      mortgage.monthlyPayment,
-                      (value) => mortgage.updateMonthlyPayment(value),
-                      constraints,
-                      decimalPlaces: 0,
-                    ),
-                    _buildInputField(
-                      'Jährlicher Zinssatz',
-                      '%',
-                      mortgage.annualInterestRate,
-                      (value) => mortgage.updateAnnualInterestRate(value),
-                      constraints,
-                      isPercentage: true,
-                    ),
-                    _buildInputField(
-                      'Monatliche Sonderzahlung',
-                      '€',
-                      mortgage.monthlySpecialPayment,
-                      (value) => mortgage.updateMonthlySpecialPayment(value),
-                      constraints,
-                      decimalPlaces: 0,
-                    ),
-                    _buildInputField(
-                      'Max. Sonderzahlung',
-                      '%',
-                      mortgage.maxSpecialPaymentPercent,
-                      (value) => mortgage.updateMaxSpecialPaymentPercent(value),
-                      constraints,
-                      isPercentage: true,
-                    ),
-                    _buildInputField(
-                      'Mietanteil',
-                      '%',
-                      mortgage.rentalShare,
-                      (value) => mortgage.updateRentalShare(value),
-                      constraints,
-                      isPercentage: true,
-                    ),
-                    _buildInputField(
-                      'Spitzensteuersatz',
-                      '%',
-                      mortgage.topTaxRate,
-                      (value) => mortgage.updateTopTaxRate(value),
-                      constraints,
-                      isPercentage: true,
-                    ),
-                    _buildInputField(
-                      'Jährliche Abschreibung',
-                      '%',
-                      mortgage.annualDepreciationRate,
-                      (value) => mortgage.updateAnnualDepreciationRate(value),
-                      constraints,
-                      isPercentage: true,
-                    ),
-                  ],
-                );
-              },
+            Wrap(
+              spacing: 16,
+              runSpacing: 16,
+              children: [
+                CustomInputField(
+                  label: 'Kaufpreis',
+                  suffix: '€',
+                  initialValue: mortgage.housePrice,
+                  onChanged: (value) => mortgage.updateHousePrice(value),
+                ),
+                CustomInputField(
+                  label: 'Quadratmeter',
+                  suffix: 'm²',
+                  initialValue: mortgage.squareMeters,
+                  onChanged: (value) => mortgage.updateSquareMeters(value),
+                  decimalPlaces: 1,
+                ),
+                CustomInputField(
+                  label: 'Eigenkapital',
+                  suffix: '€',
+                  initialValue: mortgage.equity,
+                  onChanged: (value) => mortgage.updateEquity(value),
+                ),
+                CustomInputField(
+                  label: 'Monatliche Rate',
+                  suffix: '€',
+                  initialValue: mortgage.monthlyPayment,
+                  onChanged: (value) => mortgage.updateMonthlyPayment(value),
+                ),
+                CustomInputField(
+                  label: 'Jährlicher Zinssatz',
+                  suffix: '%',
+                  initialValue: mortgage.annualInterestRate,
+                  onChanged: (value) =>
+                      mortgage.updateAnnualInterestRate(value),
+                  isPercentage: true,
+                ),
+                CustomInputField(
+                  label: 'Monatliche Sonderzahlung',
+                  suffix: '€',
+                  initialValue: mortgage.monthlySpecialPayment,
+                  onChanged: (value) =>
+                      mortgage.updateMonthlySpecialPayment(value),
+                ),
+                CustomInputField(
+                  label: 'Max. Sonderzahlung',
+                  suffix: '%',
+                  initialValue: mortgage.maxSpecialPaymentPercent,
+                  onChanged: (value) =>
+                      mortgage.updateMaxSpecialPaymentPercent(value),
+                  isPercentage: true,
+                ),
+                CustomInputField(
+                  label: 'Mietanteil',
+                  suffix: '%',
+                  initialValue: mortgage.rentalShare,
+                  onChanged: (value) => mortgage.updateRentalShare(value),
+                  isPercentage: true,
+                ),
+                CustomInputField(
+                  label: 'Spitzensteuersatz',
+                  suffix: '%',
+                  initialValue: mortgage.topTaxRate,
+                  onChanged: (value) => mortgage.updateTopTaxRate(value),
+                  isPercentage: true,
+                ),
+                CustomInputField(
+                  label: 'Jährliche Abschreibung',
+                  suffix: '%',
+                  initialValue: mortgage.annualDepreciationRate,
+                  onChanged: (value) =>
+                      mortgage.updateAnnualDepreciationRate(value),
+                  isPercentage: true,
+                ),
+              ],
             ),
             SizedBox(height: 16),
             ElevatedButton(
@@ -117,36 +103,6 @@ class FactorsPage extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildInputField(
-    String label,
-    String suffix,
-    double initialValue,
-    ValueChanged<double> onChanged,
-    BoxConstraints constraints, {
-    bool isPercentage = false,
-    int decimalPlaces = 2,
-  }) {
-    double width = constraints.maxWidth;
-    if (width > 600) {
-      width = (width - 16) / 2; // Two columns with 16px spacing
-    }
-    if (width > 400) {
-      width = 400; // Max width for input fields
-    }
-
-    return Container(
-      width: width,
-      child: CustomInputField(
-        label: label,
-        suffix: suffix,
-        initialValue: initialValue,
-        onChanged: onChanged,
-        isPercentage: isPercentage,
-        decimalPlaces: decimalPlaces,
       ),
     );
   }

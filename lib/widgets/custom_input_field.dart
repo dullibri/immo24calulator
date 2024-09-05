@@ -9,6 +9,7 @@ class CustomInputField extends StatefulWidget {
   final ValueChanged<double> onChanged;
   final bool isPercentage;
   final int decimalPlaces;
+  final double maxWidth;
 
   CustomInputField({
     required this.label,
@@ -17,6 +18,7 @@ class CustomInputField extends StatefulWidget {
     required this.onChanged,
     this.isPercentage = false,
     this.decimalPlaces = 2,
+    this.maxWidth = 400,
   });
 
   @override
@@ -47,55 +49,75 @@ class _CustomInputFieldState extends State<CustomInputField> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: TextFormField(
-        controller: _controller,
-        decoration: InputDecoration(
-          labelText: widget.label,
-          suffixText: widget.suffix,
-          border: OutlineInputBorder(),
-        ),
-        keyboardType: TextInputType.numberWithOptions(decimal: true),
-        inputFormatters: [
-          FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-        ],
-        onTap: () {
-          // Selektiere den gesamten Text beim Antippen des Feldes
-          _controller.selection = TextSelection(
-            baseOffset: 0,
-            extentOffset: _controller.text.length,
-          );
-        },
-        onChanged: (value) {
-          if (value.isNotEmpty) {
-            try {
-              String cleanValue =
-                  value.replaceAll('.', '').replaceAll(',', '.');
-              double parsedValue = double.parse(cleanValue);
-              if (widget.isPercentage) {
-                parsedValue /= 100;
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        double width = constraints.maxWidth;
+        if (width > 600) {
+          width = (width - 16) / 2; // Two columns with 16px spacing
+        }
+        if (width > widget.maxWidth) {
+          width = widget.maxWidth;
+        }
+
+        return Container(
+          width: width,
+          child: TextFormField(
+            controller: _controller,
+            decoration: InputDecoration(
+              labelText: widget.label,
+              border: OutlineInputBorder(),
+              contentPadding:
+                  EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+              suffixIcon: Container(
+                padding: EdgeInsets.symmetric(horizontal: 12),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(widget.suffix, style: TextStyle(fontSize: 16)),
+                  ],
+                ),
+              ),
+            ),
+            keyboardType: TextInputType.numberWithOptions(decimal: true),
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
+            ],
+            onTap: () {
+              _controller.selection = TextSelection(
+                baseOffset: 0,
+                extentOffset: _controller.text.length,
+              );
+            },
+            onChanged: (value) {
+              if (value.isNotEmpty) {
+                try {
+                  String cleanValue =
+                      value.replaceAll('.', '').replaceAll(',', '.');
+                  double parsedValue = double.parse(cleanValue);
+                  if (widget.isPercentage) {
+                    parsedValue /= 100;
+                  }
+                  widget.onChanged(parsedValue);
+                } catch (e) {
+                  // Ungültige Eingabe - nichts tun
+                }
               }
-              widget.onChanged(parsedValue);
-            } catch (e) {
-              // Ungültige Eingabe - nichts tun
-            }
-          }
-        },
-        onEditingComplete: () {
-          // Formatiere den Wert neu, wenn die Bearbeitung abgeschlossen ist
-          String cleanValue =
-              _controller.text.replaceAll('.', '').replaceAll(',', '.');
-          double? parsedValue = double.tryParse(cleanValue);
-          if (parsedValue != null) {
-            if (widget.isPercentage) {
-              _controller.text = _formatter.format(parsedValue);
-            } else {
-              _controller.text = _formatter.format(parsedValue);
-            }
-          }
-        },
-      ),
+            },
+            onEditingComplete: () {
+              String cleanValue =
+                  _controller.text.replaceAll('.', '').replaceAll(',', '.');
+              double? parsedValue = double.tryParse(cleanValue);
+              if (parsedValue != null) {
+                if (widget.isPercentage) {
+                  _controller.text = _formatter.format(parsedValue);
+                } else {
+                  _controller.text = _formatter.format(parsedValue);
+                }
+              }
+            },
+          ),
+        );
+      },
     );
   }
 
