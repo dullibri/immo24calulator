@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 import 'package:intl/intl.dart';
 
 class GermanCurrencyInput extends StatefulWidget {
@@ -27,9 +28,12 @@ class _GermanCurrencyInputState extends State<GermanCurrencyInput> {
   @override
   void initState() {
     super.initState();
-    _controller = TextEditingController(
-      text: _currencyFormat.format(widget.initialValue),
-    );
+    _controller = MoneyMaskedTextController(
+        decimalSeparator: '',
+        thousandSeparator: '.',
+        leftSymbol: '€ ',
+        precision: 0,
+        initialValue: widget.initialValue * 1.0);
   }
 
   @override
@@ -38,7 +42,7 @@ class _GermanCurrencyInputState extends State<GermanCurrencyInput> {
       controller: _controller,
       decoration: InputDecoration(
         labelText: widget.label,
-        suffixText: '€',
+        suffixText: '',
       ),
       keyboardType: TextInputType.number,
       inputFormatters: [

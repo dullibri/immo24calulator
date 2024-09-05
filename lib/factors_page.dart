@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:immo24calculator/app_scaffold.dart';
 import 'package:immo24calculator/calculations/annuität.dart';
-import 'package:immo24calculator/widgets/german_currency_input.dart';
-import 'package:immo24calculator/widgets/german_percentage_handler.dart';
+import 'package:immo24calculator/widgets/custom_input_field.dart';
 import 'package:provider/provider.dart';
 import 'summary_page.dart';
 
@@ -20,79 +19,134 @@ class FactorsPage extends StatelessWidget {
           children: [
             const Text('Hauptfaktoren:',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            GermanCurrencyInput(
-              label: 'Kaufpreis',
-              initialValue: mortgage.housePrice.round(),
-              onChanged: (value) => mortgage.updateHousePrice(value.toDouble()),
-            ),
-            GermanCurrencyInput(
-              label: 'Eigenkapital',
-              initialValue: mortgage.equity.round(),
-              onChanged: (value) => mortgage.updateEquity(value.toDouble()),
-            ),
-            GermanCurrencyInput(
-              label: 'Monatliche Rate',
-              initialValue: mortgage.monthlyPayment.round(),
-              onChanged: (value) =>
-                  mortgage.updateMonthlyPayment(value.toDouble()),
-            ),
-            GermanPercentageInput(
-                label: 'Jährlicher Zinssatz',
-                initialValue: mortgage.annualInterestRate,
-                onChanged: (value) {
-                  if (value != null) {
-                    mortgage.updateAnnualInterestRate(value);
-                  }
-                }),
-            GermanCurrencyInput(
-              label: 'Monatliche Sonderzahlung',
-              initialValue: mortgage.monthlySpecialPayment.round(),
-              onChanged: (value) =>
-                  mortgage.updateMonthlySpecialPayment(value.toDouble()),
-            ),
-            GermanPercentageInput(
-              label: 'Max. Sonderzahlung',
-              initialValue: mortgage.maxSpecialPaymentPercent,
-              onChanged: (value) {
-                if (value != null) {
-                  mortgage.updateMaxSpecialPaymentPercent(value);
-                }
+            SizedBox(height: 16),
+            LayoutBuilder(
+              builder: (BuildContext context, BoxConstraints constraints) {
+                return Wrap(
+                  spacing: 16,
+                  runSpacing: 16,
+                  children: [
+                    _buildInputField(
+                      'Kaufpreis',
+                      '€',
+                      mortgage.housePrice,
+                      (value) => mortgage.updateHousePrice(value),
+                      constraints,
+                      decimalPlaces: 0,
+                    ),
+                    _buildInputField(
+                      'Quadratmeter',
+                      'm²',
+                      mortgage.squareMeters,
+                      (value) => mortgage.updateSquareMeters(value),
+                      constraints,
+                      decimalPlaces: 1,
+                    ),
+                    _buildInputField(
+                      'Eigenkapital',
+                      '€',
+                      mortgage.equity,
+                      (value) => mortgage.updateEquity(value),
+                      constraints,
+                      decimalPlaces: 0,
+                    ),
+                    _buildInputField(
+                      'Monatliche Rate',
+                      '€',
+                      mortgage.monthlyPayment,
+                      (value) => mortgage.updateMonthlyPayment(value),
+                      constraints,
+                      decimalPlaces: 0,
+                    ),
+                    _buildInputField(
+                      'Jährlicher Zinssatz',
+                      '%',
+                      mortgage.annualInterestRate,
+                      (value) => mortgage.updateAnnualInterestRate(value),
+                      constraints,
+                      isPercentage: true,
+                    ),
+                    _buildInputField(
+                      'Monatliche Sonderzahlung',
+                      '€',
+                      mortgage.monthlySpecialPayment,
+                      (value) => mortgage.updateMonthlySpecialPayment(value),
+                      constraints,
+                      decimalPlaces: 0,
+                    ),
+                    _buildInputField(
+                      'Max. Sonderzahlung',
+                      '%',
+                      mortgage.maxSpecialPaymentPercent,
+                      (value) => mortgage.updateMaxSpecialPaymentPercent(value),
+                      constraints,
+                      isPercentage: true,
+                    ),
+                    _buildInputField(
+                      'Mietanteil',
+                      '%',
+                      mortgage.rentalShare,
+                      (value) => mortgage.updateRentalShare(value),
+                      constraints,
+                      isPercentage: true,
+                    ),
+                    _buildInputField(
+                      'Spitzensteuersatz',
+                      '%',
+                      mortgage.topTaxRate,
+                      (value) => mortgage.updateTopTaxRate(value),
+                      constraints,
+                      isPercentage: true,
+                    ),
+                    _buildInputField(
+                      'Jährliche Abschreibung',
+                      '%',
+                      mortgage.annualDepreciationRate,
+                      (value) => mortgage.updateAnnualDepreciationRate(value),
+                      constraints,
+                      isPercentage: true,
+                    ),
+                  ],
+                );
               },
             ),
-            GermanPercentageInput(
-              label: 'Mietanteil',
-              initialValue: mortgage.rentalShare,
-              onChanged: (value) {
-                if (value != null) {
-                  mortgage.updateRentalShare(value);
-                }
-              },
-            ),
-            GermanPercentageInput(
-              label: 'Spitzensteuersatz',
-              initialValue: mortgage.topTaxRate,
-              onChanged: (value) {
-                if (value != null) {
-                  mortgage.updateTopTaxRate(value);
-                }
-              },
-            ),
-            GermanPercentageInput(
-              label: 'Jährliche Abschreibung',
-              initialValue: mortgage.annualDepreciationRate,
-              onChanged: (value) {
-                if (value != null) {
-                  mortgage.updateAnnualDepreciationRate(value);
-                }
-              },
-            ),
-            const SizedBox(height: 16.0),
+            SizedBox(height: 16),
             ElevatedButton(
               onPressed: () => calculateAndNavigate(context),
               child: const Text('Berechnen'),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildInputField(
+    String label,
+    String suffix,
+    double initialValue,
+    ValueChanged<double> onChanged,
+    BoxConstraints constraints, {
+    bool isPercentage = false,
+    int decimalPlaces = 2,
+  }) {
+    double width = constraints.maxWidth;
+    if (width > 600) {
+      width = (width - 16) / 2; // Two columns with 16px spacing
+    }
+    if (width > 400) {
+      width = 400; // Max width for input fields
+    }
+
+    return Container(
+      width: width,
+      child: CustomInputField(
+        label: label,
+        suffix: suffix,
+        initialValue: initialValue,
+        onChanged: onChanged,
+        isPercentage: isPercentage,
+        decimalPlaces: decimalPlaces,
       ),
     );
   }
