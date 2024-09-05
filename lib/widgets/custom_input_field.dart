@@ -34,6 +34,7 @@ class CustomInputField extends StatefulWidget {
 class _CustomInputFieldState extends State<CustomInputField> {
   late TextEditingController _controller;
   late NumberFormat _formatter;
+  String? _errorText;
 
   @override
   void initState() {
@@ -78,6 +79,7 @@ class _CustomInputFieldState extends State<CustomInputField> {
                 ],
               ),
             ),
+            errorText: _errorText,
             helperText: _getHelperText(),
           ),
           keyboardType: TextInputType.numberWithOptions(decimal: true),
@@ -100,17 +102,25 @@ class _CustomInputFieldState extends State<CustomInputField> {
                   parsedValue /= 100;
                 }
                 if (_isValueInRange(parsedValue)) {
+                  setState(() {
+                    _errorText = null;
+                  });
                   widget.onChanged(parsedValue);
                 } else {
-                  // Zeige eine Fehlermeldung an, wenn der Wert außerhalb des erlaubten Bereichs liegt
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                        content: Text('Wert außerhalb des erlaubten Bereichs')),
-                  );
+                  setState(() {
+                    _errorText =
+                        'Erlaubter Bereich: ${_formatHelperValue(widget.minValue ?? 0)} - ${_formatHelperValue(widget.maxValue ?? double.infinity)} ${widget.suffix}';
+                  });
                 }
               } catch (e) {
-                // Ungültige Eingabe - nichts tun
+                setState(() {
+                  _errorText = 'Ungültige Eingabe';
+                });
               }
+            } else {
+              setState(() {
+                _errorText = null;
+              });
             }
           },
           onEditingComplete: () {
@@ -121,16 +131,13 @@ class _CustomInputFieldState extends State<CustomInputField> {
               if (widget.isPercentage) {
                 parsedValue /= 100;
               }
-              if (_isValueInRange(parsedValue)) {
-                _controller.text = _formatter.format(
-                    widget.isPercentage ? parsedValue * 100 : parsedValue);
-              } else {
-                // Setze den Wert auf den nächstgelegenen gültigen Wert
-                double validValue = _getValidValue(parsedValue);
-                _controller.text = _formatter.format(
-                    widget.isPercentage ? validValue * 100 : validValue);
-                widget.onChanged(validValue);
-              }
+              double validValue = _getValidValue(parsedValue);
+              _controller.text = _formatter
+                  .format(widget.isPercentage ? validValue * 100 : validValue);
+              widget.onChanged(validValue);
+              setState(() {
+                _errorText = null;
+              });
             }
           },
         );

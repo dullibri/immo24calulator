@@ -9,6 +9,9 @@ class FactorsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final mortgage = Provider.of<Mortgage>(context);
+    double calculateMinimumMonthlyPayment(Mortgage mortgage) {
+      return (mortgage.annualInterestRate * mortgage.principal / 12) + 1;
+    }
 
     return AppScaffold(
       title: 'Hauptfaktoren',
@@ -29,6 +32,7 @@ class FactorsPage extends StatelessWidget {
                   suffix: '€',
                   initialValue: mortgage.housePrice,
                   onChanged: (value) => mortgage.updateHousePrice(value),
+                  decimalPlaces: 0,
                   minValue: 10000,
                   maxValue: 10000000,
                   tooltip: 'Der Gesamtkaufpreis der Immobilie',
@@ -48,6 +52,7 @@ class FactorsPage extends StatelessWidget {
                   suffix: '€',
                   initialValue: mortgage.equity,
                   onChanged: (value) => mortgage.updateEquity(value),
+                  decimalPlaces: 0,
                   minValue: 0,
                   maxValue: mortgage.housePrice,
                   tooltip: 'Das eingesetzte Eigenkapital',
@@ -57,8 +62,9 @@ class FactorsPage extends StatelessWidget {
                   suffix: '€',
                   initialValue: mortgage.monthlyPayment,
                   onChanged: (value) => mortgage.updateMonthlyPayment(value),
-                  minValue: 100,
-                  maxValue: 10000,
+                  decimalPlaces: 0,
+                  minValue: calculateMinimumMonthlyPayment(mortgage),
+                  maxValue: mortgage.principal / 12,
                   tooltip: 'Die monatliche Kreditrate',
                 ),
                 CustomInputField(
@@ -68,8 +74,8 @@ class FactorsPage extends StatelessWidget {
                   onChanged: (value) =>
                       mortgage.updateAnnualInterestRate(value),
                   isPercentage: true,
-                  minValue: 0.5,
-                  maxValue: 10,
+                  minValue: 0.001,
+                  maxValue: 0.20,
                   tooltip: 'Der jährliche Zinssatz des Kredits',
                 ),
                 CustomInputField(
@@ -78,6 +84,7 @@ class FactorsPage extends StatelessWidget {
                   initialValue: mortgage.monthlySpecialPayment,
                   onChanged: (value) =>
                       mortgage.updateMonthlySpecialPayment(value),
+                  decimalPlaces: 0,
                   minValue: 0,
                   maxValue: 5000,
                   tooltip: 'Zusätzliche monatliche Sondertilgung',
