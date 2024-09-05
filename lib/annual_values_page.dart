@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:immo_credit/calculations/annuität.dart';
+import 'package:immo24calculator/calculations/annuität.dart';
 
 class AnnualValuesPage extends StatelessWidget {
   final CalculationResult calculationResult;

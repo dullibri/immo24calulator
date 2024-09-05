@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:immo_credit/app_scaffold.dart';
-import 'package:immo_credit/calculations/annuität.dart';
+import 'package:immo24calculator/app_scaffold.dart';
+import 'package:immo24calculator/calculations/annuität.dart';
+import 'package:immo24calculator/widgets/custom_input_field.dart';
 import 'package:provider/provider.dart';
 import 'summary_page.dart';
 
@@ -8,6 +9,9 @@ class FactorsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final mortgage = Provider.of<Mortgage>(context);
+    double calculateMinimumMonthlyPayment(Mortgage mortgage) {
+      return (mortgage.annualInterestRate * mortgage.principal / 12) + 1;
+    }
 
     return AppScaffold(
       title: 'Hauptfaktoren',
@@ -18,79 +22,119 @@ class FactorsPage extends StatelessWidget {
           children: [
             const Text('Hauptfaktoren:',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            buildInputField(
-              context,
-              'Kaufpreis',
-              mortgage.housePrice.toString(),
-              (value) => handleTextFieldChange(
-                  context, value, mortgage.updateHousePrice),
-              true,
+            SizedBox(height: 16),
+            Wrap(
+              spacing: 16,
+              runSpacing: 16,
+              children: [
+                CustomInputField(
+                  label: 'Kaufpreis',
+                  suffix: '€',
+                  initialValue: mortgage.housePrice,
+                  onChanged: (value) => mortgage.updateHousePrice(value),
+                  decimalPlaces: 0,
+                  minValue: 10000,
+                  maxValue: 10000000,
+                  tooltip: 'Der Gesamtkaufpreis der Immobilie',
+                ),
+                CustomInputField(
+                  label: 'Quadratmeter',
+                  suffix: 'm²',
+                  initialValue: mortgage.squareMeters,
+                  onChanged: (value) => mortgage.updateSquareMeters(value),
+                  decimalPlaces: 1,
+                  minValue: 20,
+                  maxValue: 1000,
+                  tooltip: 'Die Wohnfläche der Immobilie',
+                ),
+                CustomInputField(
+                  label: 'Eigenkapital',
+                  suffix: '€',
+                  initialValue: mortgage.equity,
+                  onChanged: (value) => mortgage.updateEquity(value),
+                  decimalPlaces: 0,
+                  minValue: 0,
+                  maxValue: mortgage.housePrice,
+                  tooltip: 'Das eingesetzte Eigenkapital',
+                ),
+                CustomInputField(
+                  label: 'Monatliche Rate',
+                  suffix: '€',
+                  initialValue: mortgage.monthlyPayment,
+                  onChanged: (value) => mortgage.updateMonthlyPayment(value),
+                  decimalPlaces: 0,
+                  minValue: calculateMinimumMonthlyPayment(mortgage),
+                  maxValue: mortgage.principal / 12,
+                  tooltip: 'Die monatliche Kreditrate',
+                ),
+                CustomInputField(
+                  label: 'Jährlicher Zinssatz',
+                  suffix: '%',
+                  initialValue: mortgage.annualInterestRate,
+                  onChanged: (value) =>
+                      mortgage.updateAnnualInterestRate(value),
+                  isPercentage: true,
+                  minValue: 0.001,
+                  maxValue: 0.20,
+                  tooltip: 'Der jährliche Zinssatz des Kredits',
+                ),
+                CustomInputField(
+                  label: 'Monatliche Sonderzahlung',
+                  suffix: '€',
+                  initialValue: mortgage.monthlySpecialPayment,
+                  onChanged: (value) =>
+                      mortgage.updateMonthlySpecialPayment(value),
+                  decimalPlaces: 0,
+                  minValue: 0,
+                  maxValue: 5000,
+                  tooltip: 'Zusätzliche monatliche Sondertilgung',
+                ),
+                CustomInputField(
+                  label: 'Max. Sonderzahlung',
+                  suffix: '%',
+                  initialValue: mortgage.maxSpecialPaymentPercent,
+                  onChanged: (value) =>
+                      mortgage.updateMaxSpecialPaymentPercent(value),
+                  isPercentage: true,
+                  minValue: 0,
+                  maxValue: 0.2,
+                  tooltip:
+                      'Maximaler Prozentsatz für jährliche Sondertilgungen',
+                ),
+                CustomInputField(
+                  label: 'Mietanteil',
+                  suffix: '%',
+                  initialValue: mortgage.rentalShare,
+                  onChanged: (value) => mortgage.updateRentalShare(value),
+                  isPercentage: true,
+                  minValue: 0,
+                  maxValue: 1,
+                  tooltip: 'Anteil der vermieteten Fläche',
+                ),
+                CustomInputField(
+                  label: 'Spitzensteuersatz',
+                  suffix: '%',
+                  initialValue: mortgage.topTaxRate,
+                  onChanged: (value) => mortgage.updateTopTaxRate(value),
+                  isPercentage: true,
+                  minValue: 0,
+                  maxValue: 0.45,
+                  tooltip: 'Ihr persönlicher Spitzensteuersatz',
+                ),
+                CustomInputField(
+                  label: 'Jährliche Abschreibung',
+                  suffix: '%',
+                  initialValue: mortgage.annualDepreciationRate,
+                  onChanged: (value) =>
+                      mortgage.updateAnnualDepreciationRate(value),
+                  isPercentage: true,
+                  minValue: 0,
+                  maxValue: 0.05,
+                  tooltip: 'Jährliche Abschreibungsrate für die Immobilie',
+                ),
+              ],
             ),
-            buildInputField(
-              context,
-              'Eigenkapital',
-              mortgage.equity.toString(),
-              (value) =>
-                  handleTextFieldChange(context, value, mortgage.updateEquity),
-              true,
-            ),
-            buildInputField(
-              context,
-              'Monatliche Rate',
-              mortgage.monthlyPayment.toString(),
-              (value) => handleTextFieldChange(
-                  context, value, mortgage.updateMonthlyPayment),
-              true,
-            ),
-            buildInputField(
-              context,
-              'Jährlicher Zinssatz (%)',
-              mortgage.annualInterestRate.toString(),
-              (value) => handleTextFieldChange(
-                  context, value, mortgage.updateAnnualInterestRate),
-              true,
-            ),
-            buildInputField(
-              context,
-              'Monatliche Sonderzahlung',
-              mortgage.monthlySpecialPayment.toString(),
-              (value) => handleTextFieldChange(
-                  context, value, mortgage.updateMonthlySpecialPayment),
-              true,
-            ),
-            buildInputField(
-              context,
-              'Max. Sonderzahlung (%)',
-              mortgage.maxSpecialPaymentPercent.toString(),
-              (value) => handleTextFieldChange(
-                  context, value, mortgage.updateMaxSpecialPaymentPercent),
-              true,
-            ),
-            buildInputField(
-              context,
-              'Mietanteil',
-              mortgage.rentalShare.toString(),
-              (value) => handleTextFieldChange(
-                  context, value, mortgage.updateRentalShare),
-              false,
-            ),
-            buildInputField(
-              context,
-              'Spitzensteuersatz',
-              mortgage.topTaxRate.toString(),
-              (value) => handleTextFieldChange(
-                  context, value, mortgage.updateTopTaxRate),
-              false,
-            ),
-            buildInputField(
-              context,
-              'Jährliche Abschreibung (%)',
-              mortgage.annualDepreciationRate.toString(),
-              (value) => handleTextFieldChange(
-                  context, value, mortgage.updateAnnualDepreciationRate),
-              true,
-            ),
-            const SizedBox(height: 16.0),
+            SizedBox(height: 16),
             ElevatedButton(
               onPressed: () => calculateAndNavigate(context),
               child: const Text('Berechnen'),
@@ -101,48 +145,10 @@ class FactorsPage extends StatelessWidget {
     );
   }
 
-  Widget buildInputField(BuildContext context, String label,
-      String initialValue, Function(String)? onChanged, bool positiveOnly) {
-    return TextFormField(
-      decoration: InputDecoration(
-        labelText: label,
-        hintText: initialValue,
-      ),
-      keyboardType: TextInputType.number,
-      initialValue: initialValue,
-      onChanged: onChanged != null
-          ? (value) {
-              if (positiveOnly &&
-                  double.tryParse(value) != null &&
-                  double.parse(value) < 0) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Wert darf nicht negativ sein')),
-                );
-              } else {
-                onChanged(value);
-              }
-            }
-          : null,
-    );
-  }
-
-  void handleTextFieldChange(
-      BuildContext context, String value, Function(double) updateFunction) {
-    if (double.tryParse(value) != null) {
-      updateFunction(double.parse(value));
-    }
-  }
-
   void calculateAndNavigate(BuildContext context) {
     final mortgage = Provider.of<Mortgage>(context, listen: false);
-
-    // Calculate mortgage payments
     final calculationResult = mortgage.calculateMortgagePayments();
-
-    // Update house price
     mortgage.calculateTotalHousePrice();
-
-    // Navigate to the summary page with the calculation result
     Navigator.push(
       context,
       MaterialPageRoute(

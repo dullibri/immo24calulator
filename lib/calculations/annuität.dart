@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'dart:math';
 
-import 'package:immo_credit/calculations/house.dart';
+import 'package:immo24calculator/calculations/house.dart';
 
 class Payment {
   final int month;
@@ -86,17 +86,17 @@ class Mortgage with ChangeNotifier {
 
   Mortgage({
     double squareMeters = 291,
-    double housePrice = 695000,
+    double housePrice = 490800,
     double letSquareMeters = 155.5,
     double notaryFeesRate = 0.015,
     double landRegistryFeesRate = 0.065,
     double brokerCommissionRate = 0.0,
-    double equity = 194000,
-    double annualInterestRate = 3.65,
-    double monthlyPayment = 2617,
+    double equity = 0,
+    double annualInterestRate = 0.0365,
+    double monthlyPayment = 2495,
     double monthlySpecialPayment = 1185,
-    double maxSpecialPaymentPercent = 5.0,
-    double rentalShare = 0.95,
+    double maxSpecialPaymentPercent = 0.05,
+    double rentalShare = 1.0,
     double topTaxRate = 0.42,
     double annualDepreciationRate = 0.03,
   })  : _squareMeters = squareMeters,
@@ -312,9 +312,8 @@ CalculationResult calculateMortgagePaymentsFunction({
   required double topTaxRate,
   required double annualDepreciationRate,
 }) {
-  final double monthlyInterestRate = annualInterestRate / 12 / 100;
-  final double maxAnnualSpecialPayment =
-      principal * (maxSpecialPaymentPercent / 100);
+  final double monthlyInterestRate = annualInterestRate / 12;
+  final double maxAnnualSpecialPayment = principal * (maxSpecialPaymentPercent);
 
   List<Payment> payments = [];
   double remainingBalance = principal;
