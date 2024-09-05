@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:immo_credit/app_scaffold.dart';
-import 'package:immo_credit/calculations/house.dart';
+import 'package:immo24calculator/app_scaffold.dart';
+import 'package:immo24calculator/calculations/house.dart';
 import 'package:provider/provider.dart';
 import 'calculations/annuität.dart';
 

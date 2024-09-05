@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:immo_credit/calculations/annuität.dart';
-import 'package:immo_credit/calculations/house.dart';
-import 'package:immo_credit/welcome_page.dart';
+import 'package:immo24calculator/calculations/annuität.dart';
+import 'package:immo24calculator/calculations/house.dart';
+import 'package:immo24calculator/welcome_page.dart';
 import 'package:provider/provider.dart';
 
 import 'home_page.dart';

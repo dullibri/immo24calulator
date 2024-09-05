@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'dart:math';
 
-import 'package:immo_credit/calculations/house.dart';
+import 'package:immo24calculator/calculations/house.dart';
 
 class Payment {
   final int month;

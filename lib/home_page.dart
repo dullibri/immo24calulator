@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:immo_credit/payment_history_page.dart';
+import 'package:immo24calculator/payment_history_page.dart';
 import 'package:provider/provider.dart';
 import 'factors_page.dart';
 import 'values_page.dart';
