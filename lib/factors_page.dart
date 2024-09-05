@@ -37,14 +37,13 @@ class FactorsPage extends StatelessWidget {
                   mortgage.updateMonthlyPayment(value.toDouble()),
             ),
             GermanPercentageInput(
-              label: 'Jährlicher Zinssatz',
-              initialValue: mortgage.annualInterestRate,
-              onChanged: (value) {
-                if (value != null) {
-                  mortgage.updateAnnualInterestRate(value);
-                }
-              },
-            ),
+                label: 'Jährlicher Zinssatz',
+                initialValue: mortgage.annualInterestRate,
+                onChanged: (value) {
+                  if (value != null) {
+                    mortgage.updateAnnualInterestRate(value);
+                  }
+                }),
             GermanCurrencyInput(
               label: 'Monatliche Sonderzahlung',
               initialValue: mortgage.monthlySpecialPayment.round(),
@@ -52,37 +51,41 @@ class FactorsPage extends StatelessWidget {
                   mortgage.updateMonthlySpecialPayment(value.toDouble()),
             ),
             GermanPercentageInput(
-                label: 'Max. Sonderzahlung',
-                initialValue: mortgage.maxSpecialPaymentPercent,
-                onChanged: (value) => {
-                      if (value != null)
-                        {
-                          mortgage.updateMaxSpecialPaymentPercent(value),
-                        }
-                    }),
+              label: 'Max. Sonderzahlung',
+              initialValue: mortgage.maxSpecialPaymentPercent,
+              onChanged: (value) {
+                if (value != null) {
+                  mortgage.updateMaxSpecialPaymentPercent(value);
+                }
+              },
+            ),
             GermanPercentageInput(
-                label: 'Mietanteil',
-                initialValue: mortgage.rentalShare,
-                onChanged: (value) => {
-                      if (value != null)
-                        {
-                          mortgage.updateRentalShare(value),
-                        }
-                    }),
+              label: 'Mietanteil',
+              initialValue: mortgage.rentalShare,
+              onChanged: (value) {
+                if (value != null) {
+                  mortgage.updateRentalShare(value);
+                }
+              },
+            ),
             GermanPercentageInput(
               label: 'Spitzensteuersatz',
               initialValue: mortgage.topTaxRate,
-              onChanged: (value) => mortgage.updateTopTaxRate(value!),
+              onChanged: (value) {
+                if (value != null) {
+                  mortgage.updateTopTaxRate(value);
+                }
+              },
             ),
             GermanPercentageInput(
-                label: 'Jährliche Abschreibung',
-                initialValue: mortgage.annualDepreciationRate / 100,
-                onChanged: (value) => {
-                      if (value != null)
-                        {
-                          mortgage.updateAnnualDepreciationRate(value * 100),
-                        }
-                    }),
+              label: 'Jährliche Abschreibung',
+              initialValue: mortgage.annualDepreciationRate,
+              onChanged: (value) {
+                if (value != null) {
+                  mortgage.updateAnnualDepreciationRate(value);
+                }
+              },
+            ),
             const SizedBox(height: 16.0),
             ElevatedButton(
               onPressed: () => calculateAndNavigate(context),
@@ -96,14 +99,8 @@ class FactorsPage extends StatelessWidget {
 
   void calculateAndNavigate(BuildContext context) {
     final mortgage = Provider.of<Mortgage>(context, listen: false);
-
-    // Calculate mortgage payments
     final calculationResult = mortgage.calculateMortgagePayments();
-
-    // Update house price
     mortgage.calculateTotalHousePrice();
-
-    // Navigate to the summary page with the calculation result
     Navigator.push(
       context,
       MaterialPageRoute(

@@ -9,15 +9,17 @@ class GermanPercentageHandler {
   static String format(double value, {int decimalPlaces = 2}) {
     _percentFormat.minimumFractionDigits = decimalPlaces;
     _percentFormat.maximumFractionDigits = decimalPlaces;
-    return _percentFormat.format(value /
-        100); // Teilen durch 100, da der Wert bereits als Prozent vorliegt
+    return _percentFormat
+        .format(value); // Multipliziere mit 100 für die Prozentdarstellung
   }
 
   static double? parse(String value) {
     if (value.isEmpty) return null;
     String cleanValue = value.replaceAll('%', '').trim().replaceAll(',', '.');
-    return double.tryParse(
-        cleanValue); // Nicht durch 100 teilen, da wir den Prozentwert direkt wollen
+    double? parsed = double.tryParse(cleanValue);
+    return parsed != null
+        ? parsed / 100
+        : null; // Teile durch 100 für den Dezimalwert
   }
 
   static TextInputFormatter getInputFormatter() {
@@ -44,8 +46,8 @@ class _PercentageInputFormatter extends TextInputFormatter {
     List<String> parts = cleanValue.split(',');
     if (parts.length > 1 && parts[1].length > 2) {
       parts[1] = parts[1].substring(0, 2);
-      cleanValue = parts.join(',');
     }
+    cleanValue = parts.join(',');
 
     return TextEditingValue(
       text: cleanValue,

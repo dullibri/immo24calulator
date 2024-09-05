@@ -48,7 +48,7 @@ class SummaryPage extends StatelessWidget {
         Text(
             'Gesamtsumme über alle Zahlungen: ${GermanCurrencyFormatter.format(calculationResult.totalSum)}'),
         Text(
-            'Jährlicher Zinssatz: ${GermanPercentageHandler.format(mortgage.annualInterestRate / 100)}'),
+            'Jährlicher Zinssatz: ${GermanPercentageHandler.format(mortgage.annualInterestRate)}'),
         const SizedBox(height: 16.0),
         const Text('Zusätzliche Kosten:',
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),

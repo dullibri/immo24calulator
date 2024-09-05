@@ -23,19 +23,19 @@ class ValuesPage extends StatelessWidget {
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             GermanPercentageInput(
               label: 'Notargebührenrate',
-              initialValue: mortgage.notaryFeesRate * 100,
+              initialValue: mortgage.notaryFeesRate,
               onChanged: (value) {
                 if (value != null) {
-                  mortgage.updateNotaryFeesRate(value / 100);
+                  mortgage.updateNotaryFeesRate(value);
                 }
               },
             ),
             GermanPercentageInput(
               label: 'Grundbuchgebührenrate',
-              initialValue: mortgage.landRegistryFeesRate * 100,
+              initialValue: mortgage.landRegistryFeesRate,
               onChanged: (value) {
                 if (value != null) {
-                  mortgage.updateLandRegistryFeesRate(value / 100);
+                  mortgage.updateLandRegistryFeesRate(value);
                 }
               },
             ),
@@ -59,28 +59,28 @@ class ValuesPage extends StatelessWidget {
             ),
             GermanPercentageInput(
               label: 'Mietanteil',
-              initialValue: mortgage.rentalShare * 100,
+              initialValue: mortgage.rentalShare,
               onChanged: (value) {
                 if (value != null) {
-                  mortgage.updateRentalShare(value / 100);
+                  mortgage.updateRentalShare(value);
                 }
               },
             ),
             GermanPercentageInput(
               label: 'Spitzensteuersatz',
-              initialValue: mortgage.topTaxRate * 100,
+              initialValue: mortgage.topTaxRate,
               onChanged: (value) {
                 if (value != null) {
-                  mortgage.updateTopTaxRate(value / 100);
+                  mortgage.updateTopTaxRate(value);
                 }
               },
             ),
             GermanPercentageInput(
               label: 'Jährliche Abschreibung',
-              initialValue: mortgage.annualDepreciationRate * 100,
+              initialValue: mortgage.annualDepreciationRate,
               onChanged: (value) {
                 if (value != null) {
-                  mortgage.updateAnnualDepreciationRate(value / 100);
+                  mortgage.updateAnnualDepreciationRate(value);
                 }
               },
             ),
