@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:immo24calculator/app_scaffold.dart';
 import 'package:immo24calculator/calculations/house.dart';
 import 'package:immo24calculator/widgets/german_currency_converter.dart';
-import 'package:immo24calculator/widgets/german_currency_input.dart';
-import 'package:immo24calculator/widgets/german_percentage_handler.dart';
+import 'package:immo24calculator/widgets/custom_input_field.dart';
 import 'package:provider/provider.dart';
 import 'package:immo24calculator/calculations/annuität.dart';
 
@@ -21,80 +20,107 @@ class ValuesPage extends StatelessWidget {
           children: [
             const Text('Voreingestellte Rahmenwerte:',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            GermanPercentageInput(
-              label: 'Notargebührenrate',
-              initialValue: mortgage.notaryFeesRate,
-              onChanged: (value) {
-                if (value != null) {
-                  mortgage.updateNotaryFeesRate(value);
-                }
-              },
-            ),
-            GermanPercentageInput(
-              label: 'Grundbuchgebührenrate',
-              initialValue: mortgage.landRegistryFeesRate,
-              onChanged: (value) {
-                if (value != null) {
-                  mortgage.updateLandRegistryFeesRate(value);
-                }
-              },
-            ),
-            GermanPercentageInput(
-              label: 'Maklerprovisionrate',
-              initialValue: mortgage.brokerCommissionRate * 100,
-              onChanged: (value) {
-                if (value != null) {
-                  mortgage.updateBrokerCommissionRate(value / 100);
-                }
-              },
-            ),
-            GermanPercentageInput(
-              label: 'Max. Sonderzahlungsprozentsatz',
-              initialValue: mortgage.maxSpecialPaymentPercent,
-              onChanged: (value) {
-                if (value != null) {
-                  mortgage.updateMaxSpecialPaymentPercent(value);
-                }
-              },
-            ),
-            GermanPercentageInput(
-              label: 'Mietanteil',
-              initialValue: mortgage.rentalShare,
-              onChanged: (value) {
-                if (value != null) {
-                  mortgage.updateRentalShare(value);
-                }
-              },
-            ),
-            GermanPercentageInput(
-              label: 'Spitzensteuersatz',
-              initialValue: mortgage.topTaxRate,
-              onChanged: (value) {
-                if (value != null) {
-                  mortgage.updateTopTaxRate(value);
-                }
-              },
-            ),
-            GermanPercentageInput(
-              label: 'Jährliche Abschreibung',
-              initialValue: mortgage.annualDepreciationRate,
-              onChanged: (value) {
-                if (value != null) {
-                  mortgage.updateAnnualDepreciationRate(value);
-                }
-              },
-            ),
-            GermanCurrencyInput(
-              label: 'Quadratmeter',
-              initialValue: mortgage.squareMeters.round(),
-              onChanged: (value) =>
-                  mortgage.updateSquareMeters(value.toDouble()),
-            ),
-            GermanCurrencyInput(
-              label: 'Vermietete Quadratmeter',
-              initialValue: mortgage.letSquareMeters.round(),
-              onChanged: (value) =>
-                  mortgage.updateLetSquareMeters(value.toDouble()),
+            SizedBox(height: 16),
+            Wrap(
+              spacing: 16,
+              runSpacing: 16,
+              children: [
+                CustomInputField(
+                  label: 'Notargebührenrate',
+                  suffix: '%',
+                  initialValue: mortgage.notaryFeesRate,
+                  onChanged: (value) => mortgage.updateNotaryFeesRate(value),
+                  isPercentage: true,
+                  minValue: 0,
+                  maxValue: 0.05,
+                  tooltip: 'Prozentsatz der Notargebühren',
+                ),
+                CustomInputField(
+                  label: 'Grundbuchgebührenrate',
+                  suffix: '%',
+                  initialValue: mortgage.landRegistryFeesRate,
+                  onChanged: (value) =>
+                      mortgage.updateLandRegistryFeesRate(value),
+                  isPercentage: true,
+                  minValue: 0,
+                  maxValue: 0.1,
+                  tooltip: 'Prozentsatz der Grundbuchgebühren',
+                ),
+                CustomInputField(
+                  label: 'Maklerprovisionrate',
+                  suffix: '%',
+                  initialValue: mortgage.brokerCommissionRate,
+                  onChanged: (value) =>
+                      mortgage.updateBrokerCommissionRate(value),
+                  isPercentage: true,
+                  minValue: 0,
+                  maxValue: 0.1,
+                  tooltip: 'Prozentsatz der Maklerprovision',
+                ),
+                CustomInputField(
+                  label: 'Max. Sonderzahlungsprozentsatz',
+                  suffix: '%',
+                  initialValue: mortgage.maxSpecialPaymentPercent,
+                  onChanged: (value) =>
+                      mortgage.updateMaxSpecialPaymentPercent(value),
+                  isPercentage: true,
+                  minValue: 0,
+                  maxValue: 0.2,
+                  tooltip:
+                      'Maximaler Prozentsatz für jährliche Sondertilgungen',
+                ),
+                CustomInputField(
+                  label: 'Mietanteil',
+                  suffix: '%',
+                  initialValue: mortgage.rentalShare,
+                  onChanged: (value) => mortgage.updateRentalShare(value),
+                  isPercentage: true,
+                  minValue: 0,
+                  maxValue: 1,
+                  tooltip: 'Anteil der vermieteten Fläche',
+                ),
+                CustomInputField(
+                  label: 'Spitzensteuersatz',
+                  suffix: '%',
+                  initialValue: mortgage.topTaxRate,
+                  onChanged: (value) => mortgage.updateTopTaxRate(value),
+                  isPercentage: true,
+                  minValue: 0,
+                  maxValue: 0.45,
+                  tooltip: 'Ihr persönlicher Spitzensteuersatz',
+                ),
+                CustomInputField(
+                  label: 'Jährliche Abschreibung',
+                  suffix: '%',
+                  initialValue: mortgage.annualDepreciationRate,
+                  onChanged: (value) =>
+                      mortgage.updateAnnualDepreciationRate(value),
+                  isPercentage: true,
+                  minValue: 0,
+                  maxValue: 0.05,
+                  tooltip: 'Jährliche Abschreibungsrate für die Immobilie',
+                ),
+                CustomInputField(
+                  label: 'Quadratmeter',
+                  suffix: 'm²',
+                  initialValue: mortgage.squareMeters,
+                  onChanged: (value) => mortgage.updateSquareMeters(value),
+                  decimalPlaces: 1,
+                  minValue: 20,
+                  maxValue: 1000,
+                  tooltip: 'Gesamte Wohnfläche der Immobilie',
+                ),
+                CustomInputField(
+                  label: 'Vermietete Quadratmeter',
+                  suffix: 'm²',
+                  initialValue: mortgage.letSquareMeters,
+                  onChanged: (value) => mortgage.updateLetSquareMeters(value),
+                  decimalPlaces: 1,
+                  minValue: 0,
+                  maxValue: mortgage.squareMeters,
+                  tooltip: 'Vermietete Wohnfläche der Immobilie',
+                ),
+              ],
             ),
             SizedBox(height: 20),
             Text(
