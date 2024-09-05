@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:immo24calculator/payment_history_page.dart';
+import 'package:immo24calculator/welcome_page.dart';
 import 'package:provider/provider.dart';
 import 'factors_page.dart';
 import 'values_page.dart';
@@ -34,12 +35,7 @@ class HomePage extends StatelessWidget {
             ListTile(
               leading: Icon(Icons.home),
               title: Text('Hauptfaktoren'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => FactorsPage()),
-                );
-              },
+              onTap: () {},
             ),
             ListTile(
               leading: Icon(Icons.settings),
@@ -86,7 +82,7 @@ class HomePage extends StatelessWidget {
           ],
         ),
       ),
-      body: FactorsPage(), // Startseite
+      body: WelcomePage(), // Startseite
     );
   }
 }

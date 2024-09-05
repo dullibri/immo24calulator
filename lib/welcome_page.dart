@@ -34,12 +34,7 @@ class WelcomePage extends StatelessWidget {
             Center(
               child: ElevatedButton(
                 child: Text('Starten'),
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => FactorsPage()),
-                  );
-                },
+                onPressed: () {},
               ),
             ),
           ],

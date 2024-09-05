@@ -60,7 +60,20 @@ class AppDrawer extends StatelessWidget {
             onTap: () {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => FactorsPage()),
+// Hinweis: Hier zu ändern
+                MaterialPageRoute(
+                  builder: (context) => FactorsPage(
+                    onCalculate: (calculationResult) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              SummaryPage(calculationResult: calculationResult),
+                        ),
+                      );
+                    },
+                  ),
+                ),
               );
             },
           ),
