@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:immo24calculator/app_scaffold.dart';
 import 'package:immo24calculator/calculations/house.dart';
+import 'package:immo24calculator/widgets/german_currency_converter.dart';
 import 'package:immo24calculator/widgets/german_currency_input.dart';
 import 'package:provider/provider.dart';
 import 'package:immo24calculator/calculations/annuität.dart';
@@ -102,13 +103,13 @@ class ValuesPage extends StatelessWidget {
             ),
             SizedBox(height: 20),
             Text(
-                'Gesamthauspreis: ${mortgage.housePriceOutput?.totalHousePrice.toStringAsFixed(2) ?? 'N/A'}'),
+                'Gesamthauspreis: ${GermanCurrencyFormatter.format(mortgage.housePriceOutput.totalHousePrice as num)}'),
             Text(
-                'Notargebühren: ${mortgage.housePriceOutput?.notaryFees.toStringAsFixed(2) ?? 'N/A'}'),
+                'Notargebühren: ${GermanCurrencyFormatter.format(mortgage.housePriceOutput.notaryFees as num)}'),
             Text(
-                'Grundbuchgebühren: ${mortgage.housePriceOutput?.landRegistryFees.toStringAsFixed(2) ?? 'N/A'}'),
+                'Grundbuchgebühren: ${GermanCurrencyFormatter.format(mortgage.housePriceOutput.landRegistryFees as num)}'),
             Text(
-                'Maklerprovision: ${mortgage.housePriceOutput?.brokerCommission.toStringAsFixed(2) ?? 'N/A'}'),
+                'Maklerprovision: ${GermanCurrencyFormatter.format(mortgage.housePriceOutput.brokerCommission as num)}'),
           ],
         ),
       ),
