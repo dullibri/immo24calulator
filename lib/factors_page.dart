@@ -29,6 +29,9 @@ class FactorsPage extends StatelessWidget {
                   suffix: '€',
                   initialValue: mortgage.housePrice,
                   onChanged: (value) => mortgage.updateHousePrice(value),
+                  minValue: 10000,
+                  maxValue: 10000000,
+                  tooltip: 'Der Gesamtkaufpreis der Immobilie',
                 ),
                 CustomInputField(
                   label: 'Quadratmeter',
@@ -36,18 +39,27 @@ class FactorsPage extends StatelessWidget {
                   initialValue: mortgage.squareMeters,
                   onChanged: (value) => mortgage.updateSquareMeters(value),
                   decimalPlaces: 1,
+                  minValue: 20,
+                  maxValue: 1000,
+                  tooltip: 'Die Wohnfläche der Immobilie',
                 ),
                 CustomInputField(
                   label: 'Eigenkapital',
                   suffix: '€',
                   initialValue: mortgage.equity,
                   onChanged: (value) => mortgage.updateEquity(value),
+                  minValue: 0,
+                  maxValue: mortgage.housePrice,
+                  tooltip: 'Das eingesetzte Eigenkapital',
                 ),
                 CustomInputField(
                   label: 'Monatliche Rate',
                   suffix: '€',
                   initialValue: mortgage.monthlyPayment,
                   onChanged: (value) => mortgage.updateMonthlyPayment(value),
+                  minValue: 100,
+                  maxValue: 10000,
+                  tooltip: 'Die monatliche Kreditrate',
                 ),
                 CustomInputField(
                   label: 'Jährlicher Zinssatz',
@@ -56,6 +68,9 @@ class FactorsPage extends StatelessWidget {
                   onChanged: (value) =>
                       mortgage.updateAnnualInterestRate(value),
                   isPercentage: true,
+                  minValue: 0.5,
+                  maxValue: 10,
+                  tooltip: 'Der jährliche Zinssatz des Kredits',
                 ),
                 CustomInputField(
                   label: 'Monatliche Sonderzahlung',
@@ -63,6 +78,9 @@ class FactorsPage extends StatelessWidget {
                   initialValue: mortgage.monthlySpecialPayment,
                   onChanged: (value) =>
                       mortgage.updateMonthlySpecialPayment(value),
+                  minValue: 0,
+                  maxValue: 5000,
+                  tooltip: 'Zusätzliche monatliche Sondertilgung',
                 ),
                 CustomInputField(
                   label: 'Max. Sonderzahlung',
@@ -71,6 +89,10 @@ class FactorsPage extends StatelessWidget {
                   onChanged: (value) =>
                       mortgage.updateMaxSpecialPaymentPercent(value),
                   isPercentage: true,
+                  minValue: 0,
+                  maxValue: 0.2,
+                  tooltip:
+                      'Maximaler Prozentsatz für jährliche Sondertilgungen',
                 ),
                 CustomInputField(
                   label: 'Mietanteil',
@@ -78,6 +100,9 @@ class FactorsPage extends StatelessWidget {
                   initialValue: mortgage.rentalShare,
                   onChanged: (value) => mortgage.updateRentalShare(value),
                   isPercentage: true,
+                  minValue: 0,
+                  maxValue: 1,
+                  tooltip: 'Anteil der vermieteten Fläche',
                 ),
                 CustomInputField(
                   label: 'Spitzensteuersatz',
@@ -85,6 +110,9 @@ class FactorsPage extends StatelessWidget {
                   initialValue: mortgage.topTaxRate,
                   onChanged: (value) => mortgage.updateTopTaxRate(value),
                   isPercentage: true,
+                  minValue: 0,
+                  maxValue: 0.45,
+                  tooltip: 'Ihr persönlicher Spitzensteuersatz',
                 ),
                 CustomInputField(
                   label: 'Jährliche Abschreibung',
@@ -93,6 +121,9 @@ class FactorsPage extends StatelessWidget {
                   onChanged: (value) =>
                       mortgage.updateAnnualDepreciationRate(value),
                   isPercentage: true,
+                  minValue: 0,
+                  maxValue: 0.05,
+                  tooltip: 'Jährliche Abschreibungsrate für die Immobilie',
                 ),
               ],
             ),

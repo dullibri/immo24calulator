@@ -10,6 +10,9 @@ class CustomInputField extends StatefulWidget {
   final bool isPercentage;
   final int decimalPlaces;
   final double maxWidth;
+  final double? minValue;
+  final double? maxValue;
+  final String? tooltip;
 
   CustomInputField({
     required this.label,
@@ -19,6 +22,9 @@ class CustomInputField extends StatefulWidget {
     this.isPercentage = false,
     this.decimalPlaces = 2,
     this.maxWidth = 400,
+    this.minValue,
+    this.maxValue,
+    this.tooltip,
   });
 
   @override
@@ -36,15 +42,13 @@ class _CustomInputFieldState extends State<CustomInputField> {
     _formatter.minimumFractionDigits = widget.decimalPlaces;
     _formatter.maximumFractionDigits = widget.decimalPlaces;
 
+    double initialValue = widget.initialValue;
     if (widget.isPercentage) {
-      _controller = TextEditingController(
-        text: _formatter.format(widget.initialValue * 100),
-      );
-    } else {
-      _controller = TextEditingController(
-        text: _formatter.format(widget.initialValue),
-      );
+      initialValue *= 100;
     }
+    _controller = TextEditingController(
+      text: _formatter.format(initialValue),
+    );
   }
 
   @override
@@ -59,66 +63,129 @@ class _CustomInputFieldState extends State<CustomInputField> {
           width = widget.maxWidth;
         }
 
-        return Container(
-          width: width,
-          child: TextFormField(
-            controller: _controller,
-            decoration: InputDecoration(
-              labelText: widget.label,
-              border: OutlineInputBorder(),
-              contentPadding:
-                  EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-              suffixIcon: Container(
-                padding: EdgeInsets.symmetric(horizontal: 12),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(widget.suffix, style: TextStyle(fontSize: 16)),
-                  ],
-                ),
+        Widget inputField = TextFormField(
+          controller: _controller,
+          decoration: InputDecoration(
+            labelText: widget.label,
+            border: OutlineInputBorder(),
+            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+            suffixIcon: Container(
+              padding: EdgeInsets.symmetric(horizontal: 12),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(widget.suffix, style: TextStyle(fontSize: 16)),
+                ],
               ),
             ),
-            keyboardType: TextInputType.numberWithOptions(decimal: true),
-            inputFormatters: [
-              FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-            ],
-            onTap: () {
-              _controller.selection = TextSelection(
-                baseOffset: 0,
-                extentOffset: _controller.text.length,
-              );
-            },
-            onChanged: (value) {
-              if (value.isNotEmpty) {
-                try {
-                  String cleanValue =
-                      value.replaceAll('.', '').replaceAll(',', '.');
-                  double parsedValue = double.parse(cleanValue);
-                  if (widget.isPercentage) {
-                    parsedValue /= 100;
-                  }
-                  widget.onChanged(parsedValue);
-                } catch (e) {
-                  // Ungültige Eingabe - nichts tun
-                }
-              }
-            },
-            onEditingComplete: () {
-              String cleanValue =
-                  _controller.text.replaceAll('.', '').replaceAll(',', '.');
-              double? parsedValue = double.tryParse(cleanValue);
-              if (parsedValue != null) {
-                if (widget.isPercentage) {
-                  _controller.text = _formatter.format(parsedValue);
-                } else {
-                  _controller.text = _formatter.format(parsedValue);
-                }
-              }
-            },
+            helperText: _getHelperText(),
           ),
+          keyboardType: TextInputType.numberWithOptions(decimal: true),
+          inputFormatters: [
+            FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
+          ],
+          onTap: () {
+            _controller.selection = TextSelection(
+              baseOffset: 0,
+              extentOffset: _controller.text.length,
+            );
+          },
+          onChanged: (value) {
+            if (value.isNotEmpty) {
+              try {
+                String cleanValue =
+                    value.replaceAll('.', '').replaceAll(',', '.');
+                double parsedValue = double.parse(cleanValue);
+                if (widget.isPercentage) {
+                  parsedValue /= 100;
+                }
+                if (_isValueInRange(parsedValue)) {
+                  widget.onChanged(parsedValue);
+                } else {
+                  // Zeige eine Fehlermeldung an, wenn der Wert außerhalb des erlaubten Bereichs liegt
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                        content: Text('Wert außerhalb des erlaubten Bereichs')),
+                  );
+                }
+              } catch (e) {
+                // Ungültige Eingabe - nichts tun
+              }
+            }
+          },
+          onEditingComplete: () {
+            String cleanValue =
+                _controller.text.replaceAll('.', '').replaceAll(',', '.');
+            double? parsedValue = double.tryParse(cleanValue);
+            if (parsedValue != null) {
+              if (widget.isPercentage) {
+                parsedValue /= 100;
+              }
+              if (_isValueInRange(parsedValue)) {
+                _controller.text = _formatter.format(
+                    widget.isPercentage ? parsedValue * 100 : parsedValue);
+              } else {
+                // Setze den Wert auf den nächstgelegenen gültigen Wert
+                double validValue = _getValidValue(parsedValue);
+                _controller.text = _formatter.format(
+                    widget.isPercentage ? validValue * 100 : validValue);
+                widget.onChanged(validValue);
+              }
+            }
+          },
+        );
+
+        if (widget.tooltip != null) {
+          inputField = Tooltip(
+            message: widget.tooltip!,
+            child: inputField,
+          );
+        }
+
+        return Container(
+          width: width,
+          child: inputField,
         );
       },
     );
+  }
+
+  bool _isValueInRange(double value) {
+    if (widget.minValue != null && value < widget.minValue!) {
+      return false;
+    }
+    if (widget.maxValue != null && value > widget.maxValue!) {
+      return false;
+    }
+    return true;
+  }
+
+  double _getValidValue(double value) {
+    if (widget.minValue != null && value < widget.minValue!) {
+      return widget.minValue!;
+    }
+    if (widget.maxValue != null && value > widget.maxValue!) {
+      return widget.maxValue!;
+    }
+    return value;
+  }
+
+  String? _getHelperText() {
+    if (widget.minValue != null && widget.maxValue != null) {
+      return 'Von ${_formatHelperValue(widget.minValue!)} bis ${_formatHelperValue(widget.maxValue!)} ${widget.suffix}';
+    } else if (widget.minValue != null) {
+      return 'Min: ${_formatHelperValue(widget.minValue!)} ${widget.suffix}';
+    } else if (widget.maxValue != null) {
+      return 'Max: ${_formatHelperValue(widget.maxValue!)} ${widget.suffix}';
+    }
+    return null;
+  }
+
+  String _formatHelperValue(double value) {
+    if (widget.isPercentage) {
+      value *= 100;
+    }
+    return _formatter.format(value);
   }
 
   @override
