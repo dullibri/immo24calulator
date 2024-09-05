@@ -43,7 +43,7 @@ class ValuesPage extends StatelessWidget {
                       mortgage.updateLandRegistryFeesRate(value),
                   isPercentage: true,
                   minValue: 0,
-                  maxValue: 0.1,
+                  maxValue: 0.3,
                   tooltip: 'Prozentsatz der Grundbuchgebühren',
                 ),
                 CustomInputField(
@@ -54,7 +54,7 @@ class ValuesPage extends StatelessWidget {
                       mortgage.updateBrokerCommissionRate(value),
                   isPercentage: true,
                   minValue: 0,
-                  maxValue: 0.1,
+                  maxValue: 0.3,
                   tooltip: 'Prozentsatz der Maklerprovision',
                 ),
                 CustomInputField(
@@ -65,7 +65,7 @@ class ValuesPage extends StatelessWidget {
                       mortgage.updateMaxSpecialPaymentPercent(value),
                   isPercentage: true,
                   minValue: 0,
-                  maxValue: 0.2,
+                  maxValue: 0.5,
                   tooltip:
                       'Maximaler Prozentsatz für jährliche Sondertilgungen',
                 ),
@@ -97,7 +97,7 @@ class ValuesPage extends StatelessWidget {
                       mortgage.updateAnnualDepreciationRate(value),
                   isPercentage: true,
                   minValue: 0,
-                  maxValue: 0.05,
+                  maxValue: 0.03,
                   tooltip: 'Jährliche Abschreibungsrate für die Immobilie',
                 ),
                 CustomInputField(
@@ -106,7 +106,7 @@ class ValuesPage extends StatelessWidget {
                   initialValue: mortgage.squareMeters,
                   onChanged: (value) => mortgage.updateSquareMeters(value),
                   decimalPlaces: 1,
-                  minValue: 20,
+                  minValue: 0,
                   maxValue: 1000,
                   tooltip: 'Gesamte Wohnfläche der Immobilie',
                 ),
