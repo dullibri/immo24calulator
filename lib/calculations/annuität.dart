@@ -92,10 +92,10 @@ class Mortgage with ChangeNotifier {
     double landRegistryFeesRate = 0.065,
     double brokerCommissionRate = 0.0,
     double equity = 0,
-    double annualInterestRate = 3.65,
+    double annualInterestRate = 0.0365,
     double monthlyPayment = 2495,
     double monthlySpecialPayment = 1185,
-    double maxSpecialPaymentPercent = 5.0,
+    double maxSpecialPaymentPercent = 0.05,
     double rentalShare = 1.0,
     double topTaxRate = 0.42,
     double annualDepreciationRate = 0.03,
@@ -312,9 +312,8 @@ CalculationResult calculateMortgagePaymentsFunction({
   required double topTaxRate,
   required double annualDepreciationRate,
 }) {
-  final double monthlyInterestRate = annualInterestRate / 12 / 100;
-  final double maxAnnualSpecialPayment =
-      principal * (maxSpecialPaymentPercent / 100);
+  final double monthlyInterestRate = annualInterestRate / 12;
+  final double maxAnnualSpecialPayment = principal * (maxSpecialPaymentPercent);
 
   List<Payment> payments = [];
   double remainingBalance = principal;
