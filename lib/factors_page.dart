@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:immo24calculator/app_scaffold.dart';
 import 'package:immo24calculator/calculations/annuität.dart';
 import 'package:immo24calculator/widgets/german_currency_input.dart';
+import 'package:immo24calculator/widgets/german_percentage_handler.dart';
 import 'package:provider/provider.dart';
 import 'summary_page.dart';
 
@@ -35,50 +36,53 @@ class FactorsPage extends StatelessWidget {
               onChanged: (value) =>
                   mortgage.updateMonthlyPayment(value.toDouble()),
             ),
-            buildInputField(
-              context,
-              'Jährlicher Zinssatz (%)',
-              mortgage.annualInterestRate.toString(),
-              (value) => handleTextFieldChange(
-                  context, value, mortgage.updateAnnualInterestRate),
-              true,
+            GermanPercentageInput(
+              label: 'Jährlicher Zinssatz',
+              initialValue: mortgage.annualInterestRate,
+              onChanged: (value) {
+                if (value != null) {
+                  mortgage.updateAnnualInterestRate(value);
+                }
+              },
             ),
             GermanCurrencyInput(
-                label: 'Monatliche Sonderzahlung',
-                initialValue: mortgage.monthlySpecialPayment.round(),
-                onChanged: (value) => value.toDouble()),
-            buildInputField(
-              context,
-              'Max. Sonderzahlung (%)',
-              mortgage.maxSpecialPaymentPercent.toString(),
-              (value) => handleTextFieldChange(
-                  context, value, mortgage.updateMaxSpecialPaymentPercent),
-              true,
+              label: 'Monatliche Sonderzahlung',
+              initialValue: mortgage.monthlySpecialPayment.round(),
+              onChanged: (value) =>
+                  mortgage.updateMonthlySpecialPayment(value.toDouble()),
             ),
-            buildInputField(
-              context,
-              'Mietanteil',
-              mortgage.rentalShare.toString(),
-              (value) => handleTextFieldChange(
-                  context, value, mortgage.updateRentalShare),
-              false,
+            GermanPercentageInput(
+                label: 'Max. Sonderzahlung',
+                initialValue: mortgage.maxSpecialPaymentPercent,
+                onChanged: (value) => {
+                      if (value != null)
+                        {
+                          mortgage.updateMaxSpecialPaymentPercent(value),
+                        }
+                    }),
+            GermanPercentageInput(
+                label: 'Mietanteil',
+                initialValue: mortgage.rentalShare,
+                onChanged: (value) => {
+                      if (value != null)
+                        {
+                          mortgage.updateRentalShare(value),
+                        }
+                    }),
+            GermanPercentageInput(
+              label: 'Spitzensteuersatz',
+              initialValue: mortgage.topTaxRate,
+              onChanged: (value) => mortgage.updateTopTaxRate(value!),
             ),
-            buildInputField(
-              context,
-              'Spitzensteuersatz',
-              mortgage.topTaxRate.toString(),
-              (value) => handleTextFieldChange(
-                  context, value, mortgage.updateTopTaxRate),
-              false,
-            ),
-            buildInputField(
-              context,
-              'Jährliche Abschreibung (%)',
-              mortgage.annualDepreciationRate.toString(),
-              (value) => handleTextFieldChange(
-                  context, value, mortgage.updateAnnualDepreciationRate),
-              true,
-            ),
+            GermanPercentageInput(
+                label: 'Jährliche Abschreibung',
+                initialValue: mortgage.annualDepreciationRate / 100,
+                onChanged: (value) => {
+                      if (value != null)
+                        {
+                          mortgage.updateAnnualDepreciationRate(value * 100),
+                        }
+                    }),
             const SizedBox(height: 16.0),
             ElevatedButton(
               onPressed: () => calculateAndNavigate(context),
@@ -88,38 +92,6 @@ class FactorsPage extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Widget buildInputField(BuildContext context, String label,
-      String initialValue, Function(String)? onChanged, bool positiveOnly) {
-    return TextFormField(
-      decoration: InputDecoration(
-        labelText: label,
-        hintText: initialValue,
-      ),
-      keyboardType: TextInputType.number,
-      initialValue: initialValue,
-      onChanged: onChanged != null
-          ? (value) {
-              if (positiveOnly &&
-                  double.tryParse(value) != null &&
-                  double.parse(value) < 0) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Wert darf nicht negativ sein')),
-                );
-              } else {
-                onChanged(value);
-              }
-            }
-          : null,
-    );
-  }
-
-  void handleTextFieldChange(
-      BuildContext context, String value, Function(double) updateFunction) {
-    if (double.tryParse(value) != null) {
-      updateFunction(double.parse(value));
-    }
   }
 
   void calculateAndNavigate(BuildContext context) {

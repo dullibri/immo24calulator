@@ -3,6 +3,7 @@ import 'package:immo24calculator/app_scaffold.dart';
 import 'package:immo24calculator/calculations/house.dart';
 import 'package:immo24calculator/widgets/german_currency_converter.dart';
 import 'package:immo24calculator/widgets/german_currency_input.dart';
+import 'package:immo24calculator/widgets/german_percentage_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:immo24calculator/calculations/annuität.dart';
 
@@ -20,86 +21,80 @@ class ValuesPage extends StatelessWidget {
           children: [
             const Text('Voreingestellte Rahmenwerte:',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            buildInputField(
-              context,
-              'Notargebührenrate (%)',
-              (mortgage.notaryFeesRate * 100).toString(),
-              (value) {
-                handleTextFieldChange(context, value, (newValue) {
-                  mortgage.updateNotaryFeesRate(newValue / 100);
-                });
+            GermanPercentageInput(
+              label: 'Notargebührenrate',
+              initialValue: mortgage.notaryFeesRate * 100,
+              onChanged: (value) {
+                if (value != null) {
+                  mortgage.updateNotaryFeesRate(value / 100);
+                }
               },
-              true,
             ),
-            buildInputField(
-              context,
-              'Grundbuchgebührenrate (%)',
-              (mortgage.landRegistryFeesRate * 100).toString(),
-              (value) {
-                handleTextFieldChange(context, value, (newValue) {
-                  mortgage.updateLandRegistryFeesRate(newValue / 100);
-                });
+            GermanPercentageInput(
+              label: 'Grundbuchgebührenrate',
+              initialValue: mortgage.landRegistryFeesRate * 100,
+              onChanged: (value) {
+                if (value != null) {
+                  mortgage.updateLandRegistryFeesRate(value / 100);
+                }
               },
-              true,
             ),
-            buildInputField(
-              context,
-              'Maklerprovisionrate (%)',
-              (mortgage.brokerCommissionRate * 100).toString(),
-              (value) {
-                handleTextFieldChange(context, value, (newValue) {
-                  mortgage.updateBrokerCommissionRate(newValue / 100);
-                });
+            GermanPercentageInput(
+              label: 'Maklerprovisionrate',
+              initialValue: mortgage.brokerCommissionRate * 100,
+              onChanged: (value) {
+                if (value != null) {
+                  mortgage.updateBrokerCommissionRate(value / 100);
+                }
               },
-              true,
             ),
-            buildInputField(
-              context,
-              'Max. Sonderzahlungsprozentsatz (%)',
-              mortgage.maxSpecialPaymentPercent.toString(),
-              (value) => handleTextFieldChange(
-                  context, value, mortgage.updateMaxSpecialPaymentPercent),
-              true,
+            GermanPercentageInput(
+              label: 'Max. Sonderzahlungsprozentsatz',
+              initialValue: mortgage.maxSpecialPaymentPercent,
+              onChanged: (value) {
+                if (value != null) {
+                  mortgage.updateMaxSpecialPaymentPercent(value);
+                }
+              },
             ),
-            buildInputField(
-              context,
-              'Mietanteil',
-              mortgage.rentalShare.toString(),
-              (value) => handleTextFieldChange(
-                  context, value, mortgage.updateRentalShare),
-              false,
+            GermanPercentageInput(
+              label: 'Mietanteil',
+              initialValue: mortgage.rentalShare * 100,
+              onChanged: (value) {
+                if (value != null) {
+                  mortgage.updateRentalShare(value / 100);
+                }
+              },
             ),
-            buildInputField(
-              context,
-              'Spitzensteuersatz',
-              mortgage.topTaxRate.toString(),
-              (value) => handleTextFieldChange(
-                  context, value, mortgage.updateTopTaxRate),
-              false,
+            GermanPercentageInput(
+              label: 'Spitzensteuersatz',
+              initialValue: mortgage.topTaxRate * 100,
+              onChanged: (value) {
+                if (value != null) {
+                  mortgage.updateTopTaxRate(value / 100);
+                }
+              },
             ),
-            buildInputField(
-              context,
-              'Jährliche Abschreibung',
-              mortgage.annualDepreciationRate.toString(),
-              (value) => handleTextFieldChange(
-                  context, value, mortgage.updateAnnualDepreciationRate),
-              false,
+            GermanPercentageInput(
+              label: 'Jährliche Abschreibung',
+              initialValue: mortgage.annualDepreciationRate * 100,
+              onChanged: (value) {
+                if (value != null) {
+                  mortgage.updateAnnualDepreciationRate(value / 100);
+                }
+              },
             ),
-            buildInputField(
-              context,
-              'Quadratmeter',
-              mortgage.squareMeters.toString(),
-              (value) => handleTextFieldChange(context, value,
-                  (newValue) => mortgage.updateSquareMeters(newValue)),
-              true,
+            GermanCurrencyInput(
+              label: 'Quadratmeter',
+              initialValue: mortgage.squareMeters.round(),
+              onChanged: (value) =>
+                  mortgage.updateSquareMeters(value.toDouble()),
             ),
-            buildInputField(
-              context,
-              'Vermietete Quadratmeter',
-              mortgage.letSquareMeters.toString(),
-              (value) => handleTextFieldChange(context, value,
-                  (newValue) => mortgage.updateLetSquareMeters(newValue)),
-              true,
+            GermanCurrencyInput(
+              label: 'Vermietete Quadratmeter',
+              initialValue: mortgage.letSquareMeters.round(),
+              onChanged: (value) =>
+                  mortgage.updateLetSquareMeters(value.toDouble()),
             ),
             SizedBox(height: 20),
             Text(
@@ -114,37 +109,5 @@ class ValuesPage extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Widget buildInputField(BuildContext context, String label,
-      String initialValue, Function(String)? onChanged, bool positiveOnly) {
-    return TextFormField(
-      decoration: InputDecoration(
-        labelText: label,
-        hintText: initialValue,
-      ),
-      keyboardType: TextInputType.number,
-      initialValue: initialValue,
-      onChanged: onChanged != null
-          ? (value) {
-              if (positiveOnly &&
-                  double.tryParse(value) != null &&
-                  double.parse(value) < 0) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Wert darf nicht negativ sein')),
-                );
-              } else {
-                onChanged(value);
-              }
-            }
-          : null,
-    );
-  }
-
-  void handleTextFieldChange(
-      BuildContext context, String value, Function(double) updateFunction) {
-    if (double.tryParse(value) != null) {
-      updateFunction(double.parse(value));
-    }
   }
 }
