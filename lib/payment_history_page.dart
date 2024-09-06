@@ -16,9 +16,6 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Zahlungsverlauf'),
-      ),
       body: Column(
         children: [
           _buildViewToggle(),

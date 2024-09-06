@@ -30,18 +30,6 @@ class WelcomePage extends StatelessWidget {
                 'Sehen Sie detaillierte Berechnungen Ihrer Hypothek.'),
             _buildFeatureItem(context, 'Zahlungsverlauf anzeigen',
                 'Überblicken Sie den gesamten Verlauf Ihrer Hypothekenzahlungen.'),
-            SizedBox(height: 30),
-            Center(
-              child: ElevatedButton(
-                child: Text('Starten'),
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => FactorsPage()),
-                  );
-                },
-              ),
-            ),
           ],
         ),
       ),

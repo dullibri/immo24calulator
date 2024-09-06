@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:immo24calculator/calculations/annuität.dart';
-import 'package:immo24calculator/calculations/house.dart';
-import 'package:immo24calculator/welcome_page.dart';
+import 'package:immo24calculator/widgets/bottom_navigation.dart';
 import 'package:provider/provider.dart';
-
-import 'home_page.dart';
 
 void main() {
   runApp(
@@ -24,7 +21,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: WelcomePage(),
+      home: BottomNavigation(),
     );
   }
 }
