@@ -34,13 +34,19 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
     return Container(
       padding: EdgeInsets.all(16),
       color: Colors.grey[200],
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          _buildToggleButton('Monatlich', 'monthly'),
-          _buildToggleButton('Jährlich', 'yearly'),
-          _buildToggleButton('Gesamtzusammenfassung', 'summary'),
-        ],
+      child: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _buildToggleButton('Monatlich', 'monthly'),
+              SizedBox(width: 16),
+              _buildToggleButton('Jährlich', 'yearly'),
+              SizedBox(width: 16),
+              _buildToggleButton('Gesamtzusammenfassung', 'summary'),
+            ],
+          );
+        },
       ),
     );
   }
@@ -61,35 +67,46 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
   }
 
   Widget _buildSelectedView() {
-    switch (_selectedView) {
-      case 'monthly':
-        return _buildDataTable(widget.calculationResult.payments);
-      case 'yearly':
-        return _buildDataTable(
-            groupPaymentsByYear(widget.calculationResult.payments));
-      case 'summary':
-        return _buildSummary(widget.calculationResult);
-      default:
-        return Container();
-    }
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        switch (_selectedView) {
+          case 'monthly':
+            return _buildDataTable(
+                widget.calculationResult.payments, constraints);
+          case 'yearly':
+            return _buildDataTable(
+                groupPaymentsByYear(widget.calculationResult.payments),
+                constraints);
+          case 'summary':
+            return _buildSummary(widget.calculationResult);
+          default:
+            return Container();
+        }
+      },
+    );
   }
 
-  Widget _buildDataTable(List<Payment> payments) {
+  Widget _buildDataTable(List<Payment> payments, BoxConstraints constraints) {
     return SingleChildScrollView(
       scrollDirection: Axis.vertical,
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: DataTable(
+          columnSpacing: constraints.maxWidth > 1000 ? 24 : 16,
           columns: [
             DataColumn(
                 label: Text(_selectedView == 'yearly' ? 'Jahr' : 'Monat')),
             DataColumn(label: Text('Restschuld')),
             DataColumn(label: Text('Tilgung')),
             DataColumn(label: Text('Zinsen')),
-            DataColumn(label: Text('Sonderzahlung')),
-            DataColumn(label: Text('Verbleibende Sonderzahlung')),
-            DataColumn(label: Text('Zinsvorteil')),
-            DataColumn(label: Text('Abschreibung')),
+            if (constraints.maxWidth > 800)
+              DataColumn(label: Text('Sonderzahlung')),
+            if (constraints.maxWidth > 1000)
+              DataColumn(label: Text('Verbl. Sonderzahlung')),
+            if (constraints.maxWidth > 1200)
+              DataColumn(label: Text('Zinsvorteil')),
+            if (constraints.maxWidth > 1400)
+              DataColumn(label: Text('Abschreibung')),
           ],
           rows: payments.map((payment) {
             return DataRow(cells: [
@@ -100,14 +117,18 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
                   GermanCurrencyFormatter.format(payment.principalPayment))),
               DataCell(Text(
                   GermanCurrencyFormatter.format(payment.interestPayment))),
-              DataCell(
-                  Text(GermanCurrencyFormatter.format(payment.specialPayment))),
-              DataCell(Text(GermanCurrencyFormatter.format(
-                  payment.remainingSpecialPayment))),
-              DataCell(
-                  Text(GermanCurrencyFormatter.format(payment.interestRebate))),
-              DataCell(
-                  Text(GermanCurrencyFormatter.format(payment.depreciation))),
+              if (constraints.maxWidth > 800)
+                DataCell(Text(
+                    GermanCurrencyFormatter.format(payment.specialPayment))),
+              if (constraints.maxWidth > 1000)
+                DataCell(Text(GermanCurrencyFormatter.format(
+                    payment.remainingSpecialPayment))),
+              if (constraints.maxWidth > 1200)
+                DataCell(Text(
+                    GermanCurrencyFormatter.format(payment.interestRebate))),
+              if (constraints.maxWidth > 1400)
+                DataCell(
+                    Text(GermanCurrencyFormatter.format(payment.depreciation))),
             ]);
           }).toList(),
         ),
