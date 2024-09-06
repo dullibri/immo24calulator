@@ -18,13 +18,10 @@ class SummaryPage extends StatelessWidget {
     final housePriceOutput = mortgage.housePriceOutput;
     final principal = mortgage.principal;
 
-    return AppScaffold(
-      title: 'Zusammenfassung',
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: buildSummary(
-            calculationResult, housePriceOutput, principal, mortgage),
-      ),
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16.0),
+      child: buildSummary(
+          calculationResult, housePriceOutput, principal, mortgage),
     );
   }
 
