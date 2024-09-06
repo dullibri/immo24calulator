@@ -19,13 +19,23 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
   Widget build(BuildContext context) {
     return AppScaffold(
       title: 'Zahlungsverlauf',
-      body: Column(
-        children: [
-          _buildViewToggle(),
-          Expanded(
-            child: _buildSelectedView(),
-          ),
-        ],
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            child: Center(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: 1200),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _buildViewToggle(),
+                    _buildSelectedView(constraints),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -34,19 +44,15 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
     return Container(
       padding: EdgeInsets.all(16),
       color: Colors.grey[200],
-      child: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-          return Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _buildToggleButton('Monatlich', 'monthly'),
-              SizedBox(width: 16),
-              _buildToggleButton('Jährlich', 'yearly'),
-              SizedBox(width: 16),
-              _buildToggleButton('Gesamtzusammenfassung', 'summary'),
-            ],
-          );
-        },
+      child: Wrap(
+        alignment: WrapAlignment.center,
+        spacing: 16,
+        runSpacing: 16,
+        children: [
+          _buildToggleButton('Monatlich', 'monthly'),
+          _buildToggleButton('Jährlich', 'yearly'),
+          _buildToggleButton('Gesamtzusammenfassung', 'summary'),
+        ],
       ),
     );
   }
@@ -66,106 +72,87 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
     );
   }
 
-  Widget _buildSelectedView() {
-    return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-        switch (_selectedView) {
-          case 'monthly':
-            return _buildDataTable(
-                widget.calculationResult.payments, constraints);
-          case 'yearly':
-            return _buildDataTable(
-                groupPaymentsByYear(widget.calculationResult.payments),
-                constraints);
-          case 'summary':
-            return _buildSummary(widget.calculationResult);
-          default:
-            return Container();
-        }
-      },
-    );
+  Widget _buildSelectedView(BoxConstraints constraints) {
+    switch (_selectedView) {
+      case 'monthly':
+        return _buildDataTable(widget.calculationResult.payments, constraints);
+      case 'yearly':
+        return _buildDataTable(
+            groupPaymentsByYear(widget.calculationResult.payments),
+            constraints);
+      case 'summary':
+        return _buildSummary(widget.calculationResult);
+      default:
+        return Container();
+    }
   }
 
   Widget _buildDataTable(List<Payment> payments, BoxConstraints constraints) {
     return SingleChildScrollView(
-      scrollDirection: Axis.vertical,
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: DataTable(
-          columnSpacing: constraints.maxWidth > 1000 ? 24 : 16,
-          columns: [
-            DataColumn(
-                label: Text(_selectedView == 'yearly' ? 'Jahr' : 'Monat')),
-            DataColumn(label: Text('Restschuld')),
-            DataColumn(label: Text('Tilgung')),
-            DataColumn(label: Text('Zinsen')),
-            if (constraints.maxWidth > 800)
-              DataColumn(label: Text('Sonderzahlung')),
-            if (constraints.maxWidth > 1000)
-              DataColumn(label: Text('Verbl. Sonderzahlung')),
-            if (constraints.maxWidth > 1200)
-              DataColumn(label: Text('Zinsvorteil')),
-            if (constraints.maxWidth > 1400)
-              DataColumn(label: Text('Abschreibung')),
-          ],
-          rows: payments.map((payment) {
-            return DataRow(cells: [
-              DataCell(Text(payment.month.toString())),
-              DataCell(Text(
-                  GermanCurrencyFormatter.format(payment.remainingBalance))),
-              DataCell(Text(
-                  GermanCurrencyFormatter.format(payment.principalPayment))),
-              DataCell(Text(
-                  GermanCurrencyFormatter.format(payment.interestPayment))),
-              if (constraints.maxWidth > 800)
-                DataCell(Text(
-                    GermanCurrencyFormatter.format(payment.specialPayment))),
-              if (constraints.maxWidth > 1000)
-                DataCell(Text(GermanCurrencyFormatter.format(
-                    payment.remainingSpecialPayment))),
-              if (constraints.maxWidth > 1200)
-                DataCell(Text(
-                    GermanCurrencyFormatter.format(payment.interestRebate))),
-              if (constraints.maxWidth > 1400)
-                DataCell(
-                    Text(GermanCurrencyFormatter.format(payment.depreciation))),
-            ]);
-          }).toList(),
-        ),
+      scrollDirection: Axis.horizontal,
+      child: DataTable(
+        columnSpacing: 24,
+        columns: [
+          DataColumn(label: Text(_selectedView == 'yearly' ? 'Jahr' : 'Monat')),
+          DataColumn(label: Text('Restschuld')),
+          DataColumn(label: Text('Tilgung')),
+          DataColumn(label: Text('Zinsen')),
+          DataColumn(label: Text('Sonderzahlung')),
+          DataColumn(label: Text('Verbl. Sonderzahlung')),
+          DataColumn(label: Text('Zinsvorteil')),
+          DataColumn(label: Text('Abschreibung')),
+        ],
+        rows: payments.map((payment) {
+          return DataRow(cells: [
+            DataCell(Text(payment.month.toString())),
+            DataCell(
+                Text(GermanCurrencyFormatter.format(payment.remainingBalance))),
+            DataCell(
+                Text(GermanCurrencyFormatter.format(payment.principalPayment))),
+            DataCell(
+                Text(GermanCurrencyFormatter.format(payment.interestPayment))),
+            DataCell(
+                Text(GermanCurrencyFormatter.format(payment.specialPayment))),
+            DataCell(Text(GermanCurrencyFormatter.format(
+                payment.remainingSpecialPayment))),
+            DataCell(
+                Text(GermanCurrencyFormatter.format(payment.interestRebate))),
+            DataCell(
+                Text(GermanCurrencyFormatter.format(payment.depreciation))),
+          ]);
+        }).toList(),
       ),
     );
   }
 
   Widget _buildSummary(CalculationResult result) {
-    return SingleChildScrollView(
-      child: Card(
-        margin: EdgeInsets.all(16),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Gesamtzusammenfassung:',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              SizedBox(height: 16),
-              _buildSummaryRow(
-                  'Gesamtlaufzeit', '${result.totalMonths} Monate', null),
-              _buildSummaryRowWithPercentage(
-                  'Tilgung', result.totalPrincipalPayment, result.totalSum),
-              _buildSummaryRowWithPercentage('Zinszahlungen',
-                  result.totalInterestPayment, result.totalSum),
-              _buildSummaryRowWithPercentage('Sonderzahlungen',
-                  result.totalSpecialPayment, result.totalSum),
-              _buildSummaryRowWithPercentage(
-                  'Zinsvorteil', result.totalInterestRebate, result.totalSum),
-              _buildSummaryRowWithPercentage(
-                  'Abschreibung', result.totalDepreciation, result.totalSum),
-              Divider(),
-              _buildSummaryRow('Summe aller Zahlungen', result.totalSum, null),
-              _buildSummaryRowWithPercentage('Gesamte Steuerrückzahlung',
-                  result.totalTaxRepayment, result.totalSum),
-            ],
-          ),
+    return Card(
+      margin: EdgeInsets.all(16),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Gesamtzusammenfassung:',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            SizedBox(height: 16),
+            _buildSummaryRow(
+                'Gesamtlaufzeit', '${result.totalMonths} Monate', null),
+            _buildSummaryRowWithPercentage(
+                'Tilgung', result.totalPrincipalPayment, result.totalSum),
+            _buildSummaryRowWithPercentage(
+                'Zinszahlungen', result.totalInterestPayment, result.totalSum),
+            _buildSummaryRowWithPercentage(
+                'Sonderzahlungen', result.totalSpecialPayment, result.totalSum),
+            _buildSummaryRowWithPercentage(
+                'Zinsvorteil', result.totalInterestRebate, result.totalSum),
+            _buildSummaryRowWithPercentage(
+                'Abschreibung', result.totalDepreciation, result.totalSum),
+            Divider(),
+            _buildSummaryRow('Summe aller Zahlungen', result.totalSum, null),
+            _buildSummaryRowWithPercentage('Gesamte Steuerrückzahlung',
+                result.totalTaxRepayment, result.totalSum),
+          ],
         ),
       ),
     );

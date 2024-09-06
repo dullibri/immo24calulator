@@ -20,7 +20,6 @@ class _BottomNavigationState extends State<BottomNavigation> {
     WelcomePage(),
     FactorsPage(),
     ValuesPage(),
-    _SummaryPageWrapper(),
     _PaymentHistoryPageWrapper(),
   ];
 
@@ -28,8 +27,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
     'Willkommen',
     'Hauptfaktoren',
     'Rahmenwerte',
-    'Zusammenfassung',
-    'Zahlungsverlauf',
+    'Ergebnis',
   ];
 
   void _onItemTapped(int index) {
@@ -61,12 +59,8 @@ class _BottomNavigationState extends State<BottomNavigation> {
             label: 'Rahmenwerte',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.summarize),
-            label: 'Zusammenfassung',
-          ),
-          BottomNavigationBarItem(
             icon: Icon(Icons.history),
-            label: 'Zahlungsverlauf',
+            label: 'Ergebnis',
           ),
         ],
         currentIndex: _selectedIndex,
