@@ -134,11 +134,6 @@ class FactorsPage extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () => calculateAndNavigate(context),
-              child: const Text('Berechnen'),
-            ),
           ],
         ),
       ),
