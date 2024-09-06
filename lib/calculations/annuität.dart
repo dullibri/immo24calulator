@@ -117,6 +117,11 @@ class Mortgage with ChangeNotifier {
     calculateTotalHousePrice();
     _updatePrincipal();
   }
+  bool _isCalculationValid = false;
+  bool _isCalculationUpdated = false;
+
+  bool get isCalculationValid => _isCalculationValid;
+  bool get isCalculationUpdated => _isCalculationUpdated;
 
   // Getters for all properties
   double get squareMeters => _squareMeters;
@@ -144,7 +149,7 @@ class Mortgage with ChangeNotifier {
     if (_equity != value) {
       _equity = value;
       _updatePrincipal();
-      notifyListeners();
+      _updateCalculations();
     }
   }
 
@@ -154,11 +159,34 @@ class Mortgage with ChangeNotifier {
     invalidateCalculations();
   }
 
+  void _updateCalculations() {
+    _lastCalculationResult = calculateMortgagePayments();
+    _isCalculationValid = _validateCalculation();
+    _isCalculationUpdated = true;
+    notifyListeners();
+
+    // Reset the update flag after a delay
+    Future.delayed(Duration(seconds: 5), () {
+      _isCalculationUpdated = false;
+      notifyListeners();
+    });
+  }
+
+  bool _validateCalculation() {
+    // Implement your validation logic here
+    // For example:
+    return _housePrice > 0 &&
+        _equity >= 0 &&
+        _equity < _housePrice &&
+        _monthlyPayment > 0 &&
+        _annualInterestRate > 0;
+  }
+
   void updateNotaryFeesRate(double value) {
     if (_notaryFeesRate != value) {
       _notaryFeesRate = value;
       calculateTotalHousePrice();
-      notifyListeners();
+      _updateCalculations();
     }
   }
 
@@ -166,7 +194,7 @@ class Mortgage with ChangeNotifier {
     if (_landRegistryFeesRate != value) {
       _landRegistryFeesRate = value;
       calculateTotalHousePrice();
-      notifyListeners();
+      _updateCalculations();
     }
   }
 
@@ -174,7 +202,7 @@ class Mortgage with ChangeNotifier {
     if (_brokerCommissionRate != value) {
       _brokerCommissionRate = value;
       calculateTotalHousePrice();
-      notifyListeners();
+      _updateCalculations();
     }
   }
 
@@ -182,7 +210,7 @@ class Mortgage with ChangeNotifier {
     if (_maxSpecialPaymentPercent != value) {
       _maxSpecialPaymentPercent = value;
       invalidateCalculations();
-      notifyListeners();
+      _updateCalculations();
     }
   }
 
@@ -190,7 +218,7 @@ class Mortgage with ChangeNotifier {
     if (_rentalShare != value) {
       _rentalShare = value;
       invalidateCalculations();
-      notifyListeners();
+      _updateCalculations();
     }
   }
 
@@ -198,7 +226,7 @@ class Mortgage with ChangeNotifier {
     if (_topTaxRate != value) {
       _topTaxRate = value;
       invalidateCalculations();
-      notifyListeners();
+      _updateCalculations();
     }
   }
 
@@ -206,21 +234,21 @@ class Mortgage with ChangeNotifier {
     if (_annualDepreciationRate != value) {
       _annualDepreciationRate = value;
       invalidateCalculations();
-      notifyListeners();
+      _updateCalculations();
     }
   }
 
   void updateSquareMeters(double value) {
     if (_squareMeters != value) {
       _squareMeters = value;
-      notifyListeners();
+      _updateCalculations();
     }
   }
 
   void updateLetSquareMeters(double value) {
     if (_letSquareMeters != value) {
       _letSquareMeters = value;
-      notifyListeners();
+      _updateCalculations();
     }
   }
 
@@ -228,7 +256,7 @@ class Mortgage with ChangeNotifier {
     if (_housePrice != value) {
       _housePrice = value;
       calculateTotalHousePrice();
-      notifyListeners();
+      _updateCalculations();
     }
   }
 
@@ -236,7 +264,7 @@ class Mortgage with ChangeNotifier {
     if (_monthlyPayment != value) {
       _monthlyPayment = value;
       invalidateCalculations();
-      notifyListeners();
+      _updateCalculations();
     }
   }
 
@@ -244,7 +272,7 @@ class Mortgage with ChangeNotifier {
     if (_annualInterestRate != value) {
       _annualInterestRate = value;
       invalidateCalculations();
-      notifyListeners();
+      _updateCalculations();
     }
   }
 
@@ -252,7 +280,7 @@ class Mortgage with ChangeNotifier {
     if (_monthlySpecialPayment != value) {
       _monthlySpecialPayment = value;
       invalidateCalculations();
-      notifyListeners();
+      _updateCalculations();
     }
   }
 

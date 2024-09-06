@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:immo24calculator/calculations/annuität.dart';
 import 'package:immo24calculator/factors_page.dart';
 import 'package:immo24calculator/payment_history_page.dart';
@@ -26,6 +27,8 @@ class _NavigationPagesState extends State<NavigationPages> {
 
   @override
   Widget build(BuildContext context) {
+    final mortgage = Provider.of<Mortgage>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(_pageNames[_currentPageIndex]),
@@ -48,10 +51,6 @@ class _NavigationPagesState extends State<NavigationPages> {
                     setState(() {
                       _calculationResult = result;
                     });
-                    _pageController.nextPage(
-                      duration: Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                    );
                   },
                 ),
                 if (_calculationResult != null)
@@ -69,13 +68,13 @@ class _NavigationPagesState extends State<NavigationPages> {
               ],
             ),
           ),
-          _buildNavigationButtons(),
+          _buildNavigationButtons(mortgage),
         ],
       ),
     );
   }
 
-  Widget _buildNavigationButtons() {
+  Widget _buildNavigationButtons(Mortgage mortgage) {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 20, horizontal: 16),
       child: Row(
@@ -100,11 +99,11 @@ class _NavigationPagesState extends State<NavigationPages> {
               label: Text(_pageNames[_currentPageIndex + 1],
                   style: TextStyle(color: Colors.white)),
               onPressed: () {
-                if (_currentPageIndex == 2 && _calculationResult == null) {
+                if (_currentPageIndex == 2 && !mortgage.isCalculationValid) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                         content: Text(
-                            'Bitte führen Sie zuerst eine Berechnung durch.')),
+                            'Bitte geben Sie gültige Werte ein, um fortzufahren.')),
                   );
                   return;
                 }

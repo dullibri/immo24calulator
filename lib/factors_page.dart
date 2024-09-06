@@ -24,7 +24,11 @@ class FactorsPage extends StatelessWidget {
             label: 'Kaufpreis',
             suffix: '€',
             initialValue: mortgage.housePrice,
-            onChanged: (value) => mortgage.updateHousePrice(value),
+            onChanged: (value) {
+              mortgage.updateHousePrice(value);
+              _showUpdateNotification(context);
+              _checkAndTriggerCalculation(context, mortgage);
+            },
             decimalPlaces: 0,
             minValue: 10000,
             maxValue: 10000000,
@@ -35,7 +39,11 @@ class FactorsPage extends StatelessWidget {
             label: 'Eigenkapital',
             suffix: '€',
             initialValue: mortgage.equity,
-            onChanged: (value) => mortgage.updateEquity(value),
+            onChanged: (value) {
+              mortgage.updateEquity(value);
+              _showUpdateNotification(context);
+              _checkAndTriggerCalculation(context, mortgage);
+            },
             decimalPlaces: 0,
             minValue: 0,
             maxValue: mortgage.housePrice,
@@ -46,7 +54,11 @@ class FactorsPage extends StatelessWidget {
             label: 'Monatliche Rate',
             suffix: '€',
             initialValue: mortgage.monthlyPayment,
-            onChanged: (value) => mortgage.updateMonthlyPayment(value),
+            onChanged: (value) {
+              mortgage.updateMonthlyPayment(value);
+              _showUpdateNotification(context);
+              _checkAndTriggerCalculation(context, mortgage);
+            },
             decimalPlaces: 0,
             minValue: 1,
             maxValue: mortgage.principal / 12,
@@ -56,26 +68,41 @@ class FactorsPage extends StatelessWidget {
           CustomInputField(
             label: 'Jährlicher Zinssatz',
             suffix: '%',
-            initialValue:
-                mortgage.annualInterestRate * 100, // Umrechnung in Prozent
-            onChanged: (value) => mortgage.updateAnnualInterestRate(
-                value / 100), // Umrechnung in Dezimalzahl
+            initialValue: mortgage.annualInterestRate * 100,
+            onChanged: (value) {
+              mortgage.updateAnnualInterestRate(value / 100);
+              _showUpdateNotification(context);
+              _checkAndTriggerCalculation(context, mortgage);
+            },
             isPercentage: true,
             minValue: 0.1,
             maxValue: 20,
             tooltip: 'Der jährliche Zinssatz des Kredits',
           ),
+
           SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: () {
-              final calculationResult = mortgage.calculateMortgagePayments();
-              mortgage.calculateTotalHousePrice();
-              onCalculate(calculationResult);
-            },
-            child: const Text('Berechnen'),
-          ),
+          if (!mortgage.isCalculationValid)
+            Text(
+              'Bitte geben Sie gültige Werte ein, um die Berechnung zu ermöglichen.',
+              style: TextStyle(color: Colors.red),
+            ),
+          // Der "Berechnen" Button wurde entfernt, da die Berechnung jetzt automatisch erfolgt
         ],
       ),
     );
+  }
+
+  void _showUpdateNotification(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Berechnungen wurden aktualisiert'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _checkAndTriggerCalculation(BuildContext context, Mortgage mortgage) {
+    final calculationResult = mortgage.calculateMortgagePayments();
+    onCalculate(calculationResult);
   }
 }

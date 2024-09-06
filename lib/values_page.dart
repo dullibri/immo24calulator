@@ -27,7 +27,10 @@ class ValuesPage extends StatelessWidget {
                 label: 'Notargebührenrate',
                 suffix: '%',
                 initialValue: mortgage.notaryFeesRate,
-                onChanged: (value) => mortgage.updateNotaryFeesRate(value),
+                onChanged: (value) {
+                  mortgage.updateNotaryFeesRate(value);
+                  _showUpdateNotification(context);
+                },
                 isPercentage: true,
                 minValue: 0,
                 maxValue: 0.05,
@@ -70,7 +73,10 @@ class ValuesPage extends StatelessWidget {
                 label: 'Mietanteil',
                 suffix: '%',
                 initialValue: mortgage.rentalShare,
-                onChanged: (value) => mortgage.updateRentalShare(value),
+                onChanged: (value) {
+                  mortgage.updateRentalShare(value);
+                  _showUpdateNotification(context);
+                },
                 isPercentage: true,
                 minValue: 0,
                 maxValue: 1,
@@ -80,7 +86,10 @@ class ValuesPage extends StatelessWidget {
                 label: 'Spitzensteuersatz',
                 suffix: '%',
                 initialValue: mortgage.topTaxRate,
-                onChanged: (value) => mortgage.updateTopTaxRate(value),
+                onChanged: (value) {
+                  mortgage.updateTopTaxRate(value);
+                  _showUpdateNotification(context);
+                },
                 isPercentage: true,
                 minValue: 0,
                 maxValue: 0.45,
@@ -101,7 +110,10 @@ class ValuesPage extends StatelessWidget {
                 label: 'Quadratmeter',
                 suffix: 'm²',
                 initialValue: mortgage.squareMeters,
-                onChanged: (value) => mortgage.updateSquareMeters(value),
+                onChanged: (value) {
+                  mortgage.updateSquareMeters(value);
+                  _showUpdateNotification(context);
+                },
                 decimalPlaces: 1,
                 minValue: 0,
                 maxValue: 1000,
@@ -111,7 +123,10 @@ class ValuesPage extends StatelessWidget {
                 label: 'Vermietete Quadratmeter',
                 suffix: 'm²',
                 initialValue: mortgage.letSquareMeters,
-                onChanged: (value) => mortgage.updateLetSquareMeters(value),
+                onChanged: (value) {
+                  mortgage.updateLetSquareMeters(value);
+                  _showUpdateNotification(context);
+                },
                 decimalPlaces: 1,
                 minValue: 0,
                 maxValue: mortgage.squareMeters,
@@ -132,4 +147,13 @@ class ValuesPage extends StatelessWidget {
       ),
     );
   }
+}
+
+void _showUpdateNotification(BuildContext context) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text('Rahmenwerte wurden aktualisiert'),
+      duration: Duration(seconds: 2),
+    ),
+  );
 }
