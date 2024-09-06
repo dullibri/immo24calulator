@@ -1,3 +1,5 @@
+// File: custom_input_field.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -6,7 +8,7 @@ class CustomInputField extends StatefulWidget {
   final String label;
   final String suffix;
   final double initialValue;
-  final ValueChanged<double> onChanged;
+  final ValueChanged<double> onSubmitted;
   final bool isPercentage;
   final int decimalPlaces;
   final double maxWidth;
@@ -18,7 +20,7 @@ class CustomInputField extends StatefulWidget {
     required this.label,
     required this.suffix,
     required this.initialValue,
-    required this.onChanged,
+    required this.onSubmitted,
     this.isPercentage = false,
     this.decimalPlaces = 2,
     this.maxWidth = 400,
@@ -86,46 +88,8 @@ class _CustomInputFieldState extends State<CustomInputField> {
           inputFormatters: [
             FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
           ],
-          onTap: () {
-            _controller.selection = TextSelection(
-              baseOffset: 0,
-              extentOffset: _controller.text.length,
-            );
-          },
-          onChanged: (value) {
-            if (value.isNotEmpty) {
-              try {
-                String cleanValue =
-                    value.replaceAll('.', '').replaceAll(',', '.');
-                double parsedValue = double.parse(cleanValue);
-                if (widget.isPercentage) {
-                  parsedValue /= 100;
-                }
-                if (_isValueInRange(parsedValue)) {
-                  setState(() {
-                    _errorText = null;
-                  });
-                  widget.onChanged(parsedValue);
-                } else {
-                  setState(() {
-                    _errorText =
-                        'Erlaubter Bereich: ${_formatHelperValue(widget.minValue ?? 0)} - ${_formatHelperValue(widget.maxValue ?? double.infinity)} ${widget.suffix}';
-                  });
-                }
-              } catch (e) {
-                setState(() {
-                  _errorText = 'Ungültige Eingabe';
-                });
-              }
-            } else {
-              setState(() {
-                _errorText = null;
-              });
-            }
-          },
-          onEditingComplete: () {
-            String cleanValue =
-                _controller.text.replaceAll('.', '').replaceAll(',', '.');
+          onFieldSubmitted: (value) {
+            String cleanValue = value.replaceAll('.', '').replaceAll(',', '.');
             double? parsedValue = double.tryParse(cleanValue);
             if (parsedValue != null) {
               if (widget.isPercentage) {
@@ -134,9 +98,13 @@ class _CustomInputFieldState extends State<CustomInputField> {
               double validValue = _getValidValue(parsedValue);
               _controller.text = _formatter
                   .format(widget.isPercentage ? validValue * 100 : validValue);
-              widget.onChanged(validValue);
               setState(() {
                 _errorText = null;
+              });
+              widget.onSubmitted(validValue);
+            } else {
+              setState(() {
+                _errorText = 'Ungültige Eingabe';
               });
             }
           },
@@ -155,16 +123,6 @@ class _CustomInputFieldState extends State<CustomInputField> {
         );
       },
     );
-  }
-
-  bool _isValueInRange(double value) {
-    if (widget.minValue != null && value < widget.minValue!) {
-      return false;
-    }
-    if (widget.maxValue != null && value > widget.maxValue!) {
-      return false;
-    }
-    return true;
   }
 
   double _getValidValue(double value) {
@@ -189,9 +147,6 @@ class _CustomInputFieldState extends State<CustomInputField> {
   }
 
   String _formatHelperValue(double value) {
-    if (widget.isPercentage) {
-      value *= 100;
-    }
     return _formatter.format(value);
   }
 

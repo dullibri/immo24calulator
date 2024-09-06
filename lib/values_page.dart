@@ -27,8 +27,8 @@ class ValuesPage extends StatelessWidget {
                 label: 'Notargebührenrate',
                 suffix: '%',
                 initialValue: mortgage.notaryFeesRate,
-                onChanged: (value) {
-                  mortgage.updateNotaryFeesRate(value);
+                onSubmitted: (value) {
+                  mortgage.updateNotaryFeesRate(value / 100);
                   _showUpdateNotification(context);
                 },
                 isPercentage: true,
@@ -40,8 +40,10 @@ class ValuesPage extends StatelessWidget {
                 label: 'Grundbuchgebührenrate',
                 suffix: '%',
                 initialValue: mortgage.landRegistryFeesRate,
-                onChanged: (value) =>
-                    mortgage.updateLandRegistryFeesRate(value),
+                onSubmitted: (value) {
+                  mortgage.updateLandRegistryFeesRate(value / 100);
+                  _showUpdateNotification(context);
+                },
                 isPercentage: true,
                 minValue: 0,
                 maxValue: 0.3,
@@ -51,30 +53,34 @@ class ValuesPage extends StatelessWidget {
                 label: 'Maklerprovisionrate',
                 suffix: '%',
                 initialValue: mortgage.brokerCommissionRate,
-                onChanged: (value) =>
-                    mortgage.updateBrokerCommissionRate(value),
+                onSubmitted: (value) {
+                  mortgage.updateBrokerCommissionRate(value / 100);
+                  _showUpdateNotification(context);
+                },
                 isPercentage: true,
                 minValue: 0,
-                maxValue: 0.3,
+                maxValue: 0.30,
                 tooltip: 'Prozentsatz der Maklerprovision',
               ),
               CustomInputField(
                 label: 'Max. Sonderzahlungsprozentsatz',
                 suffix: '%',
                 initialValue: mortgage.maxSpecialPaymentPercent,
-                onChanged: (value) =>
-                    mortgage.updateMaxSpecialPaymentPercent(value),
+                onSubmitted: (value) {
+                  mortgage.updateMaxSpecialPaymentPercent(value / 100);
+                  _showUpdateNotification(context);
+                },
                 isPercentage: true,
                 minValue: 0,
-                maxValue: 0.5,
+                maxValue: 0.05,
                 tooltip: 'Maximaler Prozentsatz für jährliche Sondertilgungen',
               ),
               CustomInputField(
                 label: 'Mietanteil',
                 suffix: '%',
                 initialValue: mortgage.rentalShare,
-                onChanged: (value) {
-                  mortgage.updateRentalShare(value);
+                onSubmitted: (value) {
+                  mortgage.updateRentalShare(value / 100);
                   _showUpdateNotification(context);
                 },
                 isPercentage: true,
@@ -86,8 +92,8 @@ class ValuesPage extends StatelessWidget {
                 label: 'Spitzensteuersatz',
                 suffix: '%',
                 initialValue: mortgage.topTaxRate,
-                onChanged: (value) {
-                  mortgage.updateTopTaxRate(value);
+                onSubmitted: (value) {
+                  mortgage.updateTopTaxRate(value / 100);
                   _showUpdateNotification(context);
                 },
                 isPercentage: true,
@@ -99,8 +105,10 @@ class ValuesPage extends StatelessWidget {
                 label: 'Jährliche Abschreibung',
                 suffix: '%',
                 initialValue: mortgage.annualDepreciationRate,
-                onChanged: (value) =>
-                    mortgage.updateAnnualDepreciationRate(value),
+                onSubmitted: (value) {
+                  mortgage.updateAnnualDepreciationRate(value / 100);
+                  _showUpdateNotification(context);
+                },
                 isPercentage: true,
                 minValue: 0,
                 maxValue: 0.03,
@@ -110,7 +118,7 @@ class ValuesPage extends StatelessWidget {
                 label: 'Quadratmeter',
                 suffix: 'm²',
                 initialValue: mortgage.squareMeters,
-                onChanged: (value) {
+                onSubmitted: (value) {
                   mortgage.updateSquareMeters(value);
                   _showUpdateNotification(context);
                 },
@@ -123,7 +131,7 @@ class ValuesPage extends StatelessWidget {
                 label: 'Vermietete Quadratmeter',
                 suffix: 'm²',
                 initialValue: mortgage.letSquareMeters,
-                onChanged: (value) {
+                onSubmitted: (value) {
                   mortgage.updateLetSquareMeters(value);
                   _showUpdateNotification(context);
                 },
@@ -147,13 +155,13 @@ class ValuesPage extends StatelessWidget {
       ),
     );
   }
-}
 
-void _showUpdateNotification(BuildContext context) {
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: Text('Rahmenwerte wurden aktualisiert'),
-      duration: Duration(seconds: 2),
-    ),
-  );
+  void _showUpdateNotification(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Rahmenwerte wurden aktualisiert'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
 }
