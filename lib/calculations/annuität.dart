@@ -117,11 +117,14 @@ class Mortgage with ChangeNotifier {
     calculateTotalHousePrice();
     _updatePrincipal();
   }
-  bool _isCalculationValid = false;
+  bool _isCalculationValid = true;
   bool _isCalculationUpdated = false;
 
   bool get isCalculationValid => _isCalculationValid;
   bool get isCalculationUpdated => _isCalculationUpdated;
+
+  bool _isFactorsPageVisited = false;
+  bool get isFactorsPageVisited => _isFactorsPageVisited;
 
   // Getters for all properties
   double get squareMeters => _squareMeters;
@@ -144,6 +147,10 @@ class Mortgage with ChangeNotifier {
   HousePriceOutput get housePriceOutput => _housePriceOutput;
 
   // Methods to update properties
+  void setFactorsPageVisited() {
+    _isFactorsPageVisited = true;
+    notifyListeners();
+  }
 
   void updateEquity(double value) {
     if (_equity != value) {

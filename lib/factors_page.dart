@@ -3,10 +3,43 @@ import 'package:provider/provider.dart';
 import 'package:immo24calculator/calculations/annuität.dart';
 import 'package:immo24calculator/widgets/custom_input_field.dart';
 
-class FactorsPage extends StatelessWidget {
+class FactorsPage extends StatefulWidget {
   final Function(CalculationResult) onCalculate;
 
   FactorsPage({required this.onCalculate});
+
+  @override
+  _FactorsPageState createState() => _FactorsPageState();
+}
+
+class _FactorsPageState extends State<FactorsPage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final mortgage = Provider.of<Mortgage>(context, listen: false);
+      if (!mortgage.isFactorsPageVisited) {
+        _performInitialCalculation(mortgage);
+        _showInitialMessage();
+        mortgage.setFactorsPageVisited();
+      }
+    });
+  }
+
+  void _performInitialCalculation(Mortgage mortgage) {
+    final calculationResult = mortgage.calculateMortgagePayments();
+    widget.onCalculate(calculationResult);
+  }
+
+  void _showInitialMessage() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+            'Die Berechnung wird automatisch aktualisiert, wenn Sie Werte ändern.'),
+        duration: Duration(seconds: 5),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +59,8 @@ class FactorsPage extends StatelessWidget {
             initialValue: mortgage.housePrice,
             onSubmitted: (value) {
               mortgage.updateHousePrice(value);
-              _checkAndTriggerCalculation(context, mortgage);
+              _triggerCalculation(mortgage);
+              _showUpdateNotification();
             },
             decimalPlaces: 0,
             minValue: 10000,
@@ -40,7 +74,8 @@ class FactorsPage extends StatelessWidget {
             initialValue: mortgage.equity,
             onSubmitted: (value) {
               mortgage.updateEquity(value);
-              _checkAndTriggerCalculation(context, mortgage);
+              _triggerCalculation(mortgage);
+              _showUpdateNotification();
             },
             decimalPlaces: 0,
             minValue: 0,
@@ -54,7 +89,8 @@ class FactorsPage extends StatelessWidget {
             initialValue: mortgage.monthlyPayment,
             onSubmitted: (value) {
               mortgage.updateMonthlyPayment(value);
-              _checkAndTriggerCalculation(context, mortgage);
+              _triggerCalculation(mortgage);
+              _showUpdateNotification();
             },
             decimalPlaces: 0,
             minValue: 1,
@@ -65,37 +101,40 @@ class FactorsPage extends StatelessWidget {
           CustomInputField(
             label: 'Jährlicher Zinssatz',
             suffix: '%',
-            initialValue:
-                mortgage.annualInterestRate, // Korrekte Umwandlung in Prozent
+            initialValue: mortgage.annualInterestRate,
             onSubmitted: (value) {
-              mortgage.updateAnnualInterestRate(
-                  value / 100); // Umwandlung zurück in Dezimalzahl
-              _checkAndTriggerCalculation(context, mortgage);
+              mortgage.updateAnnualInterestRate(value);
+              _triggerCalculation(mortgage);
+              _showUpdateNotification();
             },
             isPercentage: true,
             decimalPlaces: 2,
-            minValue: 0.0,
-
+            minValue: 0.01,
+            maxValue: 20.0,
             tooltip: 'Der jährliche Zinssatz des Kredits',
           ),
           SizedBox(height: 16),
           if (!mortgage.isCalculationValid)
             Text(
               'Bitte geben Sie gültige Werte ein, um die Berechnung zu ermöglichen.',
-              style: TextStyle(color: const Color.fromARGB(255, 134, 111, 110)),
+              style: TextStyle(color: Colors.red),
             ),
         ],
       ),
     );
   }
 
-  void _checkAndTriggerCalculation(BuildContext context, Mortgage mortgage) {
-    final calculationResult = mortgage.calculateMortgagePayments();
-    onCalculate(calculationResult);
-    _showUpdateNotification(context);
+  void _triggerCalculation(Mortgage mortgage) {
+    if (mortgage.isCalculationValid) {
+      final calculationResult = mortgage.calculateMortgagePayments();
+      widget.onCalculate(calculationResult);
+    } else {
+      setState(
+          () {}); // Aktualisiere UI, um mögliche Fehlermeldungen anzuzeigen
+    }
   }
 
-  void _showUpdateNotification(BuildContext context) {
+  void _showUpdateNotification() {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Berechnungen wurden aktualisiert'),
