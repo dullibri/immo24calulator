@@ -26,7 +26,7 @@ class WelcomePage extends StatelessWidget {
                 'Geben Sie wichtige Details wie Kaufpreis, Eigenkapital und Zinssatz ein.'),
             _buildFeatureItem(context, 'Rahmenwerte anpassen',
                 'Passen Sie zusätzliche Faktoren wie Notargebühren und Grundbuchkosten an.'),
-            _buildFeatureItem(context, 'Berechnungen durchführen',
+            _buildFeatureItem(context, 'Zusammenfassung ansehen',
                 'Sehen Sie detaillierte Berechnungen Ihrer Hypothek.'),
             _buildFeatureItem(context, 'Zahlungsverlauf anzeigen',
                 'Überblicken Sie den gesamten Verlauf Ihrer Hypothekenzahlungen.'),

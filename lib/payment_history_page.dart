@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:immo24calculator/calculations/annuität.dart';
+import 'package:immo24calculator/widgets/german_currency_converter.dart';
 
 class PaymentHistoryPage extends StatefulWidget {
   final CalculationResult calculationResult;
@@ -74,13 +75,19 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
       rows: payments.map((payment) {
         return DataRow(cells: [
           DataCell(Text(payment.month.toString())),
-          DataCell(Text(payment.remainingBalance.toStringAsFixed(2))),
-          DataCell(Text(payment.principalPayment.toStringAsFixed(2))),
-          DataCell(Text(payment.interestPayment.toStringAsFixed(2))),
-          DataCell(Text(payment.specialPayment.toStringAsFixed(2))),
-          DataCell(Text(payment.remainingSpecialPayment.toStringAsFixed(2))),
-          DataCell(Text(payment.interestRebate.toStringAsFixed(2))),
-          DataCell(Text(payment.depreciation.toStringAsFixed(2))),
+          DataCell(
+              Text(GermanCurrencyFormatter.format(payment.remainingBalance))),
+          DataCell(
+              Text(GermanCurrencyFormatter.format(payment.principalPayment))),
+          DataCell(
+              Text(GermanCurrencyFormatter.format(payment.interestPayment))),
+          DataCell(
+              Text(GermanCurrencyFormatter.format(payment.specialPayment))),
+          DataCell(Text(
+              GermanCurrencyFormatter.format(payment.remainingSpecialPayment))),
+          DataCell(
+              Text(GermanCurrencyFormatter.format(payment.interestRebate))),
+          DataCell(Text(GermanCurrencyFormatter.format(payment.depreciation))),
         ]);
       }).toList(),
     );
@@ -96,15 +103,12 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
             Text('Gesamtzusammenfassung:',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             SizedBox(height: 8),
-            _buildSummaryRow('Gesamte Tilgung', result.totalPrincipalPayment),
-            _buildSummaryRow(
-                'Gesamte Zinszahlungen', result.totalInterestPayment),
-            _buildSummaryRow(
-                'Gesamte Sonderzahlungen', result.totalSpecialPayment),
-            _buildSummaryRow(
-                'Gesamter Zinsvorteil', result.totalInterestRebate),
-            _buildSummaryRow('Gesamte Abschreibung', result.totalDepreciation),
-            _buildSummaryRow('Gesamtsumme aller Zahlungen', result.totalSum),
+            _buildSummaryRow('Tilgung', result.totalPrincipalPayment),
+            _buildSummaryRow('Zinszahlungen', result.totalInterestPayment),
+            _buildSummaryRow('Sonderzahlungen', result.totalSpecialPayment),
+            _buildSummaryRow('Zinsvorteil', result.totalInterestRebate),
+            _buildSummaryRow('Abschreibung', result.totalDepreciation),
+            _buildSummaryRow('Summe aller Zahlungen', result.totalSum),
           ],
         ),
       ),
@@ -112,6 +116,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
   }
 
   Widget _buildSummaryRow(String label, double? value) {
-    return Text('$label: ${value?.toStringAsFixed(2) ?? 'N/A'} €');
+    return Text(
+        '$label: ${GermanCurrencyFormatter.format(value as num) ?? 'N/A'}');
   }
 }
