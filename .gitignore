@@ -49,3 +49,4 @@ terraform.log
 # Personal files
 playgroung.dart
 .DS_Store
+lib/firebase_options.dart
