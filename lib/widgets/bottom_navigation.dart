@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:immo24calculator/auth_service.dart';
 import 'package:immo24calculator/welcome_page.dart';
 import 'package:immo24calculator/factors_page.dart';
 import 'package:immo24calculator/values_page.dart';
@@ -38,10 +39,19 @@ class _BottomNavigationState extends State<BottomNavigation> {
 
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(_pageTitles[_selectedIndex]),
-        automaticallyImplyLeading: false,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.logout),
+            onPressed: () async {
+              await authService.signOut();
+            },
+          ),
+        ],
       ),
       body: _pageWidgets[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
@@ -70,15 +80,6 @@ class _BottomNavigationState extends State<BottomNavigation> {
         type: BottomNavigationBarType.fixed,
       ),
     );
-  }
-}
-
-class _SummaryPageWrapper extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final mortgage = Provider.of<Mortgage>(context);
-    final calculationResult = mortgage.calculateMortgagePayments();
-    return SummaryPage(calculationResult: calculationResult);
   }
 }
 
