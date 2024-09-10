@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'dart:math';
 
 import 'package:immo24calculator/calculations/house.dart';
+import 'package:immo24calculator/firestore_service.dart';
 
 class Payment {
   final int month;
@@ -297,6 +298,21 @@ class Mortgage with ChangeNotifier {
     );
 
     return _lastCalculationResult!;
+  }
+
+  final FirestoreService _firestoreService = FirestoreService();
+
+  Future<void> save() async {
+    try {
+      await _firestoreService.saveMortgage(this);
+    } catch (e) {
+      print('Error saving mortgage: $e');
+      rethrow;
+    }
+  }
+
+  static Stream<List<Mortgage>> getAll() {
+    return FirestoreService().getMortgages();
   }
 }
 
