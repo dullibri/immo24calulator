@@ -257,6 +257,28 @@ class Mortgage with ChangeNotifier {
     }
   }
 
+  void updateFromMortgage(Mortgage other) {
+    _squareMeters = other._squareMeters;
+    _housePrice = other._housePrice;
+    _letSquareMeters = other._letSquareMeters;
+    _notaryFeesRate = other._notaryFeesRate;
+    _landRegistryFeesRate = other._landRegistryFeesRate;
+    _brokerCommissionRate = other._brokerCommissionRate;
+    _equity = other._equity;
+    _principal = other._principal;
+    _annualInterestRate = other._annualInterestRate;
+    _monthlyPayment = other._monthlyPayment;
+    _monthlySpecialPayment = other._monthlySpecialPayment;
+    _maxSpecialPaymentPercent = other._maxSpecialPaymentPercent;
+    _rentalShare = other._rentalShare;
+    _topTaxRate = other._topTaxRate;
+    _annualDepreciationRate = other._annualDepreciationRate;
+
+    calculateTotalHousePrice();
+    _updatePrincipal();
+    notifyListeners();
+  }
+
   void calculateTotalHousePrice() {
     double notaryFees = _notaryFeesRate * _housePrice;
     double landRegistryFees = _landRegistryFeesRate * _housePrice;
