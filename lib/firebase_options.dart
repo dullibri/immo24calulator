@@ -13,8 +13,8 @@ class DefaultFirebaseOptions {
     );
   }
 
-  static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyBAI_ZjJRdUqUxihQiiNcST0YU6wSa3O8o',
+  static final FirebaseOptions web = FirebaseOptions(
+    apiKey: const String.fromEnvironment('FIREBASE_API_KEY'),
     appId: '1:873895420737:web:76c571751411b9c459b7c0',
     messagingSenderId: '873895420737',
     projectId: 'immo24calculator',

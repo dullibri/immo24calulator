@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:immo24calculator/app_scaffold.dart';
 import 'package:immo24calculator/calculations/house.dart';
+import 'package:immo24calculator/firestore_service.dart';
 import 'package:immo24calculator/widgets/german_currency_converter.dart';
 import 'package:immo24calculator/widgets/custom_input_field.dart';
 import 'package:provider/provider.dart';
 import 'package:immo24calculator/calculations/annuität.dart';
-import 'package:immo24calculator/services/firestore_service.dart';
 
 class ValuesPage extends StatelessWidget {
   @override
