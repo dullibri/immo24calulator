@@ -31,8 +31,15 @@ class FirestoreService {
           'rentalShare': mortgage.rentalShare,
           'topTaxRate': mortgage.topTaxRate,
           'annualDepreciationRate': mortgage.annualDepreciationRate,
+          'squareMeters': mortgage.squareMeters,
+          'letSquareMeters': mortgage.letSquareMeters,
+          'notaryFeesRate': mortgage.notaryFeesRate,
+          'landRegistryFeesRate': mortgage.landRegistryFeesRate,
+          'brokerCommissionRate': mortgage.brokerCommissionRate,
           'createdAt': FieldValue.serverTimestamp(),
         });
+      } else {
+        throw Exception('User not authenticated');
       }
     } catch (e) {
       print('Error saving mortgage: $e');
@@ -61,6 +68,11 @@ class FirestoreService {
                   rentalShare: data['rentalShare'] ?? 0,
                   topTaxRate: data['topTaxRate'] ?? 0,
                   annualDepreciationRate: data['annualDepreciationRate'] ?? 0,
+                  squareMeters: data['squareMeters'] ?? 0,
+                  letSquareMeters: data['letSquareMeters'] ?? 0,
+                  notaryFeesRate: data['notaryFeesRate'] ?? 0,
+                  landRegistryFeesRate: data['landRegistryFeesRate'] ?? 0,
+                  brokerCommissionRate: data['brokerCommissionRate'] ?? 0,
                 );
               }).toList());
     }
