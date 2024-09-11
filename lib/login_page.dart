@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:immo24calculator/reset_password_page.dart';
 import 'package:provider/provider.dart';
 import 'auth_service.dart';
 import 'register_page.dart';
@@ -68,8 +69,6 @@ class _LoginPageState extends State<LoginPage> {
                               _errorMessage = result;
                             });
                           } else {
-                            // If successful, the AuthWrapper will automatically
-                            // navigate to the main app screen
                             print('Login successful');
                           }
                         }
@@ -82,6 +81,16 @@ class _LoginPageState extends State<LoginPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => RegisterPage()),
+                  );
+                },
+              ),
+              TextButton(
+                child: Text('Passwort vergessen?'),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ResetPasswordPage()),
                   );
                 },
               ),
