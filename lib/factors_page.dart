@@ -4,8 +4,6 @@ import 'package:immo24calculator/calculations/annuität.dart';
 import 'package:immo24calculator/firestore_service.dart';
 import 'package:immo24calculator/widgets/custom_input_field.dart';
 import 'package:provider/provider.dart';
-import 'package:immo24calculator/firestore_service.dart';
-import 'summary_page.dart';
 
 class FactorsPage extends StatelessWidget {
   @override
@@ -13,6 +11,7 @@ class FactorsPage extends StatelessWidget {
     final mortgage = Provider.of<Mortgage>(context);
     final firestoreService =
         Provider.of<FirestoreService>(context, listen: false);
+
     double calculateMinimumMonthlyPayment(Mortgage mortgage) {
       return (mortgage.annualInterestRate * mortgage.principal / 12) + 1;
     }

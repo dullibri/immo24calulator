@@ -7,6 +7,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'auth_service.dart';
 import 'login_page.dart';
+import 'firestore_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,6 +19,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => Mortgage()),
         ChangeNotifierProvider(create: (_) => AuthService()),
+        Provider<FirestoreService>(create: (_) => FirestoreService()),
       ],
       child: MyApp(),
     ),
