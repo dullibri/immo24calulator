@@ -10,10 +10,27 @@ class AuthService with ChangeNotifier {
   // sign in with email & password
   Future<String?> signIn(String email, String password) async {
     try {
+      print('Attempting to sign in with email: $email');
       await _auth.signInWithEmailAndPassword(email: email, password: password);
+      print('Sign in successful');
       return null;
     } on FirebaseAuthException catch (e) {
-      return e.message;
+      print('FirebaseAuthException: ${e.code} - ${e.message}');
+      switch (e.code) {
+        case 'user-not-found':
+          return 'No user found for that email.';
+        case 'wrong-password':
+          return 'Wrong password provided for that user.';
+        case 'invalid-email':
+          return 'The email address is badly formatted.';
+        case 'user-disabled':
+          return 'This user account has been disabled.';
+        default:
+          return e.message ?? 'An unknown error occurred.';
+      }
+    } catch (e) {
+      print('Unexpected error during sign in: $e');
+      return 'An unexpected error occurred. Please try again.';
     }
   }
 
@@ -24,6 +41,7 @@ class AuthService with ChangeNotifier {
           email: email, password: password);
       return null;
     } on FirebaseAuthException catch (e) {
+      print('Registration error: ${e.code} - ${e.message}');
       return e.message;
     }
   }
