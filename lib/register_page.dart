@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'auth_service.dart';
-import 'register_page.dart';
 
-class LoginPage extends StatefulWidget {
+class RegisterPage extends StatefulWidget {
   @override
-  _LoginPageState createState() => _LoginPageState();
+  _RegisterPageState createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
   String _email = '';
   String _password = '';
@@ -20,7 +19,7 @@ class _LoginPageState extends State<LoginPage> {
     final authService = Provider.of<AuthService>(context);
 
     return Scaffold(
-      appBar: AppBar(title: Text('Login')),
+      appBar: AppBar(title: Text('Register')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -51,7 +50,7 @@ class _LoginPageState extends State<LoginPage> {
               ElevatedButton(
                 child: _isLoading
                     ? CircularProgressIndicator(color: Colors.white)
-                    : Text('Sign In'),
+                    : Text('Register'),
                 onPressed: _isLoading
                     ? null
                     : () async {
@@ -61,29 +60,18 @@ class _LoginPageState extends State<LoginPage> {
                             _errorMessage = null;
                           });
                           String? result =
-                              await authService.signIn(_email, _password);
+                              await authService.register(_email, _password);
                           if (result != null) {
                             setState(() {
                               _isLoading = false;
                               _errorMessage = result;
                             });
                           } else {
-                            // If successful, the AuthWrapper will automatically
-                            // navigate to the main app screen
-                            print('Login successful');
+                            // Registration successful, navigate back to login page
+                            Navigator.pop(context);
                           }
                         }
                       },
-              ),
-              SizedBox(height: 16),
-              TextButton(
-                child: Text('Noch kein Konto? Hier registrieren'),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => RegisterPage()),
-                  );
-                },
               ),
             ],
           ),
