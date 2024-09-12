@@ -9,10 +9,17 @@ import 'package:immo24calculator/calculations/annuität.dart';
 class ValuesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final mortgage = Provider.of<Mortgage>(context);
+    return Consumer<Mortgage>(
+      builder: (context, mortgage, child) {
+        print('Rebuilding FactorsPage with housePrice: ${mortgage.housePrice}');
+        return _buildContent(context, mortgage);
+      },
+    );
+  }
+
+  Widget _buildContent(context, mortgage) {
     final firestoreService =
         Provider.of<FirestoreService>(context, listen: false);
-
     return AppScaffold(
       title: 'Rahmenwerte',
       body: SingleChildScrollView(
