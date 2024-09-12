@@ -258,24 +258,25 @@ class Mortgage with ChangeNotifier {
   }
 
   void updateFromMortgage(Mortgage other) {
-    _squareMeters = other._squareMeters;
-    _housePrice = other._housePrice;
-    _letSquareMeters = other._letSquareMeters;
-    _notaryFeesRate = other._notaryFeesRate;
-    _landRegistryFeesRate = other._landRegistryFeesRate;
-    _brokerCommissionRate = other._brokerCommissionRate;
-    _equity = other._equity;
-    _principal = other._principal;
-    _annualInterestRate = other._annualInterestRate;
-    _monthlyPayment = other._monthlyPayment;
-    _monthlySpecialPayment = other._monthlySpecialPayment;
-    _maxSpecialPaymentPercent = other._maxSpecialPaymentPercent;
-    _rentalShare = other._rentalShare;
-    _topTaxRate = other._topTaxRate;
-    _annualDepreciationRate = other._annualDepreciationRate;
+    print('updateFromMortgage called with housePrice: ${other.housePrice}');
+    _housePrice = other.housePrice;
+    _equity = other.equity;
+    _annualInterestRate = other.annualInterestRate;
+    _monthlyPayment = other.monthlyPayment;
+    _monthlySpecialPayment = other.monthlySpecialPayment;
+    _maxSpecialPaymentPercent = other.maxSpecialPaymentPercent;
+    _rentalShare = other.rentalShare;
+    _topTaxRate = other.topTaxRate;
+    _annualDepreciationRate = other.annualDepreciationRate;
+    _squareMeters = other.squareMeters;
+    _letSquareMeters = other.letSquareMeters;
+    _notaryFeesRate = other.notaryFeesRate;
+    _landRegistryFeesRate = other.landRegistryFeesRate;
+    _brokerCommissionRate = other.brokerCommissionRate;
 
     calculateTotalHousePrice();
     _updatePrincipal();
+    print('After update, current housePrice: $_housePrice');
     notifyListeners();
   }
 

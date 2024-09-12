@@ -8,7 +8,15 @@ import 'package:provider/provider.dart';
 class FactorsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final mortgage = Provider.of<Mortgage>(context);
+    return Consumer<Mortgage>(
+      builder: (context, mortgage, child) {
+        print('Rebuilding FactorsPage with housePrice: ${mortgage.housePrice}');
+        return _buildContent(context, mortgage);
+      },
+    );
+  }
+
+  Widget _buildContent(BuildContext context, Mortgage mortgage) {
     final firestoreService =
         Provider.of<FirestoreService>(context, listen: false);
 
@@ -46,6 +54,7 @@ class FactorsPage extends StatelessWidget {
                 final mortgages = snapshot.data!;
                 return DropdownButton<Mortgage>(
                   hint: Text('Gespeicherte Hypotheken'),
+                  value: null,
                   items: mortgages.map((m) {
                     return DropdownMenuItem<Mortgage>(
                       value: m,
@@ -54,8 +63,12 @@ class FactorsPage extends StatelessWidget {
                   }).toList(),
                   onChanged: (selectedMortgage) {
                     if (selectedMortgage != null) {
+                      print(
+                          'Selected mortgage with housePrice: ${selectedMortgage.housePrice}');
                       Provider.of<Mortgage>(context, listen: false)
                           .updateFromMortgage(selectedMortgage);
+                      print(
+                          'After update, current mortgage housePrice: ${mortgage.housePrice}');
                     }
                   },
                 );
