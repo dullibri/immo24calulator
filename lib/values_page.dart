@@ -3,6 +3,7 @@ import 'package:immo24calculator/app_scaffold.dart';
 import 'package:immo24calculator/firestore_service.dart';
 import 'package:immo24calculator/widgets/german_currency_converter.dart';
 import 'package:immo24calculator/widgets/custom_input_field.dart';
+import 'package:immo24calculator/widgets/mortgage_dropdown.dart';
 import 'package:provider/provider.dart';
 import 'package:immo24calculator/calculations/annuität.dart';
 
@@ -11,7 +12,6 @@ class ValuesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<Mortgage>(
       builder: (context, mortgage, child) {
-        print('Rebuilding FactorsPage with housePrice: ${mortgage.housePrice}');
         return _buildContent(context, mortgage);
       },
     );
@@ -43,28 +43,8 @@ class ValuesPage extends StatelessWidget {
               },
             ),
             SizedBox(height: 16),
-            StreamBuilder<List<Mortgage>>(
-              stream: firestoreService.getMortgages(),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) return CircularProgressIndicator();
-                final mortgages = snapshot.data!;
-                return DropdownButton<Mortgage>(
-                  hint: Text('Gespeicherte Hypotheken'),
-                  items: mortgages.map((m) {
-                    return DropdownMenuItem<Mortgage>(
-                      value: m,
-                      child: Text('Hypothek ${m.housePrice}€'),
-                    );
-                  }).toList(),
-                  onChanged: (selectedMortgage) {
-                    if (selectedMortgage != null) {
-                      Provider.of<Mortgage>(context, listen: false)
-                          .updateFromMortgage(selectedMortgage);
-                    }
-                  },
-                );
-              },
-            ),
+            MortgageDropdown(),
+            SizedBox(height: 16),
             SizedBox(height: 16),
             const Text('Voreingestellte Rahmenwerte:',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
