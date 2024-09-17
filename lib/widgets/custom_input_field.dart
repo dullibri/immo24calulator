@@ -9,6 +9,7 @@ class CustomInputField extends StatefulWidget {
   final ValueChanged<double> onChanged;
   final bool isPercentage;
   final int decimalPlaces;
+  final double maxWidth;
   final double? minValue;
   final double? maxValue;
   final String? tooltip;
@@ -22,6 +23,7 @@ class CustomInputField extends StatefulWidget {
     required this.onChanged,
     this.isPercentage = false,
     this.decimalPlaces = 2,
+    this.maxWidth = 400,
     this.minValue,
     this.maxValue,
     this.tooltip,
@@ -35,7 +37,11 @@ class CustomInputField extends StatefulWidget {
 class _CustomInputFieldState extends State<CustomInputField> {
   late TextEditingController _controller;
   late NumberFormat _formatter;
+<<<<<<< HEAD
   String _errorText = ' ';
+=======
+  String? _errorText;
+>>>>>>> 7586ef7 (fixed customInputField)
 
   @override
   void initState() {
@@ -43,23 +49,14 @@ class _CustomInputFieldState extends State<CustomInputField> {
     _formatter = NumberFormat.decimalPattern('de_DE');
     _formatter.minimumFractionDigits = widget.decimalPlaces;
     _formatter.maximumFractionDigits = widget.decimalPlaces;
-    _controller =
-        TextEditingController(text: _formatValue(widget.initialValue));
-  }
 
-  @override
-  void didUpdateWidget(CustomInputField oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.initialValue != oldWidget.initialValue) {
-      _controller.text = _formatValue(widget.initialValue);
-    }
-  }
-
-  String _formatValue(double value) {
+    double initialValue = widget.initialValue;
     if (widget.isPercentage) {
-      return _formatter.format(value * 100);
+      initialValue *= 100;
     }
-    return _formatter.format(value);
+    _controller = TextEditingController(
+      text: _formatter.format(initialValue),
+    );
   }
 
   double _getValidValue(double value) {
