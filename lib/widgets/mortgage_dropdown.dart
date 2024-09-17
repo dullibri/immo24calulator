@@ -9,28 +9,27 @@ class MortgageDropdown extends StatelessWidget {
     final firestoreService =
         Provider.of<FirestoreService>(context, listen: false);
 
-    return StreamBuilder<List<Mortgage>>(
-      stream: firestoreService.getMortgages(),
+    return StreamBuilder<List<MortgageWithId>>(
+      stream: firestoreService.mortgagesStream,
       builder: (context, snapshot) {
         if (!snapshot.hasData) return CircularProgressIndicator();
         final mortgages = snapshot.data!;
 
-        return DropdownButton<Mortgage>(
+        return DropdownButton<MortgageWithId>(
           hint: Text('Gespeicherte Hypotheken'),
           value: null,
           items: mortgages.map((m) {
-            return DropdownMenuItem<Mortgage>(
+            return DropdownMenuItem<MortgageWithId>(
               value: m,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Hypothek ${m.housePrice.toStringAsFixed(0)}€'),
+                  Text(m.mortgage.mortgageName), // Display the mortgage name
                   IconButton(
                     icon: Icon(Icons.delete),
                     onPressed: () async {
                       try {
-                        // Note: This will need to be implemented in FirestoreService
-                        await firestoreService.deleteMortgage(m);
+                        await firestoreService.deleteMortgage(m.id);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text('Hypothek gelöscht')),
                         );
@@ -48,7 +47,7 @@ class MortgageDropdown extends StatelessWidget {
           onChanged: (selectedMortgage) {
             if (selectedMortgage != null) {
               Provider.of<Mortgage>(context, listen: false)
-                  .updateFromMortgage(selectedMortgage);
+                  .updateFromMortgage(selectedMortgage.mortgage);
             }
           },
         );
