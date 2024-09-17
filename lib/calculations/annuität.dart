@@ -63,7 +63,6 @@ double calculateDepreciation(
 }
 
 class Mortgage with ChangeNotifier {
-  String _mortgageName;
   // House price related properties
   double _squareMeters;
   double _housePrice;
@@ -87,7 +86,6 @@ class Mortgage with ChangeNotifier {
   CalculationResult? _lastCalculationResult;
 
   Mortgage({
-    String mortgageName = 'Initial examplary mortgage',
     double squareMeters = 291,
     double housePrice = 490800,
     double letSquareMeters = 155.5,
@@ -102,8 +100,7 @@ class Mortgage with ChangeNotifier {
     double rentalShare = 1.0,
     double topTaxRate = 0.42,
     double annualDepreciationRate = 0.03,
-  })  : _mortgageName = mortgageName,
-        _squareMeters = squareMeters,
+  })  : _squareMeters = squareMeters,
         _housePrice = housePrice,
         _letSquareMeters = letSquareMeters,
         _notaryFeesRate = notaryFeesRate,
@@ -123,7 +120,6 @@ class Mortgage with ChangeNotifier {
   }
 
   // Getters for all properties
-  String get mortgageName => _mortgageName;
   double get squareMeters => _squareMeters;
   double get housePrice => _housePrice;
   double get letSquareMeters => _letSquareMeters;
@@ -144,13 +140,6 @@ class Mortgage with ChangeNotifier {
   HousePriceOutput get housePriceOutput => _housePriceOutput;
 
   // Methods to update properties
-
-  void updateMortgageName(String value) {
-    if (_mortgageName != value) {
-      _mortgageName = value;
-      notifyListeners();
-    }
-  }
 
   void updateEquity(double value) {
     if (_equity != value) {

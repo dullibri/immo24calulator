@@ -72,16 +72,6 @@ class _CustomInputFieldState extends State<CustomInputField> {
     return value;
   }
 
-  double _getValidValue(double value) {
-    if (widget.minValue != null && value < widget.minValue!) {
-      return widget.minValue!;
-    }
-    if (widget.maxValue != null && value > widget.maxValue!) {
-      return widget.maxValue!;
-    }
-    return value;
-  }
-
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(

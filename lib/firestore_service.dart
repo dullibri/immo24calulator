@@ -1,58 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:immo24calculator/calculations/annuität.dart';
-import 'dart:async';
-
-import 'package:immo24calculator/naming.dart';
 
 class FirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final StreamController<List<MortgageWithId>> _mortgagesController =
-      StreamController<List<MortgageWithId>>.broadcast();
-
-  Stream<List<MortgageWithId>> get mortgagesStream =>
-      _mortgagesController.stream;
-
-  FirestoreService() {
-    _initMortgagesStream();
-  }
-
-  void _initMortgagesStream() {
-    final user = _auth.currentUser;
-    if (user != null) {
-      _firestore
-          .collection('users')
-          .doc(user.uid)
-          .collection('mortgages')
-          .snapshots()
-          .listen((snapshot) {
-        final mortgages = snapshot.docs.map((doc) {
-          final data = doc.data();
-          return MortgageWithId(
-            id: doc.id,
-            mortgage: Mortgage(
-              housePrice: data['housePrice'] ?? 0,
-              equity: data['equity'] ?? 0,
-              annualInterestRate: data['annualInterestRate'] ?? 0,
-              monthlyPayment: data['monthlyPayment'] ?? 0,
-              monthlySpecialPayment: data['monthlySpecialPayment'] ?? 0,
-              maxSpecialPaymentPercent: data['maxSpecialPaymentPercent'] ?? 0,
-              rentalShare: data['rentalShare'] ?? 0,
-              topTaxRate: data['topTaxRate'] ?? 0,
-              annualDepreciationRate: data['annualDepreciationRate'] ?? 0,
-              squareMeters: data['squareMeters'] ?? 0,
-              letSquareMeters: data['letSquareMeters'] ?? 0,
-              notaryFeesRate: data['notaryFeesRate'] ?? 0,
-              landRegistryFeesRate: data['landRegistryFeesRate'] ?? 0,
-              brokerCommissionRate: data['brokerCommissionRate'] ?? 0,
-            ),
-          );
-        }).toList();
-        _mortgagesController.add(mortgages);
-      });
-    }
-  }
 
   Future<void> saveMortgage(Mortgage mortgage) async {
     try {
@@ -68,18 +20,8 @@ class FirestoreService {
         if (querySnapshot.size >= 10) {
           throw Exception('Maximum number of mortgages reached');
         }
-        String mortgageName = naming();
-        if (querySnapshot.size > 0) {
-          List<String> mortgageNames = querySnapshot.docs
-              .map<String>((doc) => doc.data()['name'])
-              .toList();
 
-          while (mortgageName.contains(mortgageName)) {
-            mortgageName = naming();
-          }
-        }
         await userMortgages.add({
-          'name': mortgageName,
           'housePrice': mortgage.housePrice,
           'equity': mortgage.equity,
           'annualInterestRate': mortgage.annualInterestRate,
@@ -116,7 +58,6 @@ class FirestoreService {
           .map((snapshot) => snapshot.docs.map((doc) {
                 final data = doc.data();
                 return Mortgage(
-                  mortgageName: data['mortgageName'] ?? 0,
                   housePrice: data['housePrice'] ?? 0,
                   equity: data['equity'] ?? 0,
                   annualInterestRate: data['annualInterestRate'] ?? 0,
@@ -138,16 +79,28 @@ class FirestoreService {
     return Stream.value([]);
   }
 
-  Future<void> deleteMortgage(String mortgageId) async {
+  Future<void> deleteMortgage(Mortgage mortgage) async {
     try {
       final user = _auth.currentUser;
       if (user != null) {
-        await _firestore
+        final userMortgages = _firestore
             .collection('users')
             .doc(user.uid)
-            .collection('mortgages')
-            .doc(mortgageId)
-            .delete();
+            .collection('mortgages');
+
+        // Find the document with matching data and delete it
+        final querySnapshot = await userMortgages
+            .where('housePrice', isEqualTo: mortgage.housePrice)
+            .where('equity', isEqualTo: mortgage.equity)
+            .where('annualInterestRate', isEqualTo: mortgage.annualInterestRate)
+            .limit(1)
+            .get();
+
+        if (querySnapshot.docs.isNotEmpty) {
+          await querySnapshot.docs.first.reference.delete();
+        } else {
+          throw Exception('Mortgage not found');
+        }
       } else {
         throw Exception('User not authenticated');
       }
@@ -156,15 +109,4 @@ class FirestoreService {
       rethrow;
     }
   }
-
-  void dispose() {
-    _mortgagesController.close();
-  }
-}
-
-class MortgageWithId {
-  final String id;
-  final Mortgage mortgage;
-
-  MortgageWithId({required this.id, required this.mortgage});
 }
