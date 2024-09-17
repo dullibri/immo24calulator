@@ -35,7 +35,6 @@ class CustomInputField extends StatefulWidget {
 class _CustomInputFieldState extends State<CustomInputField> {
   late TextEditingController _controller;
   late NumberFormat _formatter;
-
   String _errorText = ' ';
 
   @override
