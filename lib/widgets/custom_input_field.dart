@@ -9,6 +9,7 @@ class CustomInputField extends StatefulWidget {
   final ValueChanged<double> onChanged;
   final bool isPercentage;
   final int decimalPlaces;
+  final double maxWidth;
   final double? minValue;
   final double? maxValue;
   final String? tooltip;
@@ -20,6 +21,7 @@ class CustomInputField extends StatefulWidget {
     required this.onChanged,
     this.isPercentage = false,
     this.decimalPlaces = 2,
+    this.maxWidth = 400,
     this.minValue,
     this.maxValue,
     this.tooltip,
@@ -32,6 +34,7 @@ class CustomInputField extends StatefulWidget {
 class _CustomInputFieldState extends State<CustomInputField> {
   late TextEditingController _controller;
   late NumberFormat _formatter;
+  String? _errorText;
 
   @override
   void initState() {
@@ -39,49 +42,157 @@ class _CustomInputFieldState extends State<CustomInputField> {
     _formatter = NumberFormat.decimalPattern('de_DE');
     _formatter.minimumFractionDigits = widget.decimalPlaces;
     _formatter.maximumFractionDigits = widget.decimalPlaces;
-    _controller =
-        TextEditingController(text: _formatValue(widget.initialValue));
-  }
 
-  @override
-  void didUpdateWidget(CustomInputField oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.initialValue != oldWidget.initialValue) {
-      _controller.text = _formatValue(widget.initialValue);
-    }
-  }
-
-  String _formatValue(double value) {
+    double initialValue = widget.initialValue;
     if (widget.isPercentage) {
-      return _formatter.format(value * 100);
+      initialValue *= 100;
     }
-    return _formatter.format(value);
+    _controller = TextEditingController(
+      text: _formatter.format(initialValue),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      controller: _controller,
-      decoration: InputDecoration(
-        labelText: widget.label,
-        suffixText: widget.suffix,
-        border: OutlineInputBorder(),
-      ),
-      keyboardType: TextInputType.numberWithOptions(decimal: true),
-      inputFormatters: [
-        FilteringTextInputFormatter.allow(RegExp(r'[0-9,]')),
-      ],
-      onChanged: (value) {
-        final cleanValue = value.replaceAll('.', '').replaceAll(',', '.');
-        double? parsedValue = double.tryParse(cleanValue);
-        if (parsedValue != null) {
-          if (widget.isPercentage) {
-            parsedValue /= 100;
-          }
-          widget.onChanged(parsedValue);
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        double width = constraints.maxWidth;
+        if (width > 600) {
+          width = (width - 16) / 2; // Two columns with 16px spacing
         }
+        if (width > widget.maxWidth) {
+          width = widget.maxWidth;
+        }
+
+        Widget inputField = TextFormField(
+          controller: _controller,
+          decoration: InputDecoration(
+            labelText: widget.label,
+            border: OutlineInputBorder(),
+            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+            suffixIcon: Container(
+              padding: EdgeInsets.symmetric(horizontal: 12),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(widget.suffix, style: TextStyle(fontSize: 16)),
+                ],
+              ),
+            ),
+            errorText: _errorText,
+            helperText: _getHelperText(),
+          ),
+          keyboardType: TextInputType.numberWithOptions(decimal: true),
+          inputFormatters: [
+            FilteringTextInputFormatter.allow(RegExp(r'[0-9,.]')),
+          ],
+          onTap: () {
+            _controller.selection = TextSelection(
+              baseOffset: 0,
+              extentOffset: _controller.text.length,
+            );
+          },
+          onChanged: (value) {
+            if (value.isNotEmpty) {
+              try {
+                String cleanValue =
+                    value.replaceAll('.', '').replaceAll(',', '.');
+                double parsedValue = double.parse(cleanValue);
+                if (widget.isPercentage) {
+                  parsedValue /= 100;
+                }
+                if (_isValueInRange(parsedValue)) {
+                  setState(() {
+                    _errorText = null;
+                  });
+                  widget.onChanged(parsedValue);
+                } else {
+                  setState(() {
+                    _errorText =
+                        'Erlaubter Bereich: ${_formatHelperValue(widget.minValue ?? 0)} - ${_formatHelperValue(widget.maxValue ?? double.infinity)} ${widget.suffix}';
+                  });
+                }
+              } catch (e) {
+                setState(() {
+                  _errorText = 'Ungültige Eingabe';
+                });
+              }
+            } else {
+              setState(() {
+                _errorText = null;
+              });
+            }
+          },
+          onEditingComplete: () {
+            String cleanValue =
+                _controller.text.replaceAll('.', '').replaceAll(',', '.');
+            double? parsedValue = double.tryParse(cleanValue);
+            if (parsedValue != null) {
+              if (widget.isPercentage) {
+                parsedValue /= 100;
+              }
+              double validValue = _getValidValue(parsedValue);
+              _controller.text = _formatter
+                  .format(widget.isPercentage ? validValue * 100 : validValue);
+              widget.onChanged(validValue);
+              setState(() {
+                _errorText = null;
+              });
+            }
+          },
+        );
+
+        if (widget.tooltip != null) {
+          inputField = Tooltip(
+            message: widget.tooltip!,
+            child: inputField,
+          );
+        }
+
+        return Container(
+          width: width,
+          child: inputField,
+        );
       },
     );
+  }
+
+  bool _isValueInRange(double value) {
+    if (widget.minValue != null && value < widget.minValue!) {
+      return false;
+    }
+    if (widget.maxValue != null && value > widget.maxValue!) {
+      return false;
+    }
+    return true;
+  }
+
+  double _getValidValue(double value) {
+    if (widget.minValue != null && value < widget.minValue!) {
+      return widget.minValue!;
+    }
+    if (widget.maxValue != null && value > widget.maxValue!) {
+      return widget.maxValue!;
+    }
+    return value;
+  }
+
+  String? _getHelperText() {
+    if (widget.minValue != null && widget.maxValue != null) {
+      return 'Von ${_formatHelperValue(widget.minValue!)} bis ${_formatHelperValue(widget.maxValue!)} ${widget.suffix}';
+    } else if (widget.minValue != null) {
+      return 'Min: ${_formatHelperValue(widget.minValue!)} ${widget.suffix}';
+    } else if (widget.maxValue != null) {
+      return 'Max: ${_formatHelperValue(widget.maxValue!)} ${widget.suffix}';
+    }
+    return null;
+  }
+
+  String _formatHelperValue(double value) {
+    if (widget.isPercentage) {
+      value *= 100;
+    }
+    return _formatter.format(value);
   }
 
   @override
