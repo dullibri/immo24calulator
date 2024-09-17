@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:immo24calculator/calculations/annuität.dart';
 import 'dart:async';
 
+import 'package:immo24calculator/naming.dart';
+
 class FirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -66,8 +68,18 @@ class FirestoreService {
         if (querySnapshot.size >= 10) {
           throw Exception('Maximum number of mortgages reached');
         }
+        String mortgageName = naming();
+        if (querySnapshot.size > 0) {
+          List<String> mortgageNames = querySnapshot.docs
+              .map<String>((doc) => doc.data()['name'])
+              .toList();
 
+          while (mortgageName.contains(mortgageName)) {
+            mortgageName = naming();
+          }
+        }
         await userMortgages.add({
+          'name': mortgageName,
           'housePrice': mortgage.housePrice,
           'equity': mortgage.equity,
           'annualInterestRate': mortgage.annualInterestRate,
@@ -104,6 +116,7 @@ class FirestoreService {
           .map((snapshot) => snapshot.docs.map((doc) {
                 final data = doc.data();
                 return Mortgage(
+                  mortgageName: data['mortgageName'] ?? 0,
                   housePrice: data['housePrice'] ?? 0,
                   equity: data['equity'] ?? 0,
                   annualInterestRate: data['annualInterestRate'] ?? 0,

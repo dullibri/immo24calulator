@@ -24,7 +24,7 @@ class MortgageDropdown extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Hypothek ${m.mortgage.housePrice}€'),
+                  Text('Hypothek ${m.mortgage.mortgageName}'),
                   IconButton(
                     icon: Icon(Icons.delete),
                     onPressed: () async {
