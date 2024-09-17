@@ -1,10 +1,33 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:immo24calculator/calculations/annuität.dart';
+import 'package:immo24calculator/naming.dart';
 
 class FirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  Future<String> generateUniqueMortgageName() async {
+    final user = _auth.currentUser;
+    if (user != null) {
+      final userMortgages =
+          _firestore.collection('users').doc(user.uid).collection('mortgages');
+
+      String newName;
+      bool isUnique = false;
+
+      do {
+        newName = naming();
+        final existingMortgage =
+            await userMortgages.where('mortgageName', isEqualTo: newName).get();
+        isUnique = existingMortgage.docs.isEmpty;
+      } while (!isUnique);
+
+      return newName;
+    } else {
+      throw Exception('User not authenticated');
+    }
+  }
 
   Future<void> saveMortgage(Mortgage mortgage) async {
     try {
@@ -15,10 +38,8 @@ class FirestoreService {
             .doc(user.uid)
             .collection('mortgages');
 
-        // Check if user has less than 10 mortgages
-        final querySnapshot = await userMortgages.get();
-        if (querySnapshot.size >= 10) {
-          throw Exception('Maximum number of mortgages reached');
+        if (mortgage.mortgageName.isEmpty) {
+          mortgage.updateMortgageName(await generateUniqueMortgageName());
         }
 
         await userMortgages.add({
@@ -37,6 +58,7 @@ class FirestoreService {
           'landRegistryFeesRate': mortgage.landRegistryFeesRate,
           'brokerCommissionRate': mortgage.brokerCommissionRate,
           'createdAt': FieldValue.serverTimestamp(),
+          'mortgageName': mortgage.mortgageName,
         });
       } else {
         throw Exception('User not authenticated');
@@ -47,7 +69,7 @@ class FirestoreService {
     }
   }
 
-  Stream<List<Mortgage>> getMortgages() {
+  Stream<List<MortgageWithId>> get mortgagesStream {
     final user = _auth.currentUser;
     if (user != null) {
       return _firestore
@@ -57,50 +79,42 @@ class FirestoreService {
           .snapshots()
           .map((snapshot) => snapshot.docs.map((doc) {
                 final data = doc.data();
-                return Mortgage(
-                  housePrice: data['housePrice'] ?? 0,
-                  equity: data['equity'] ?? 0,
-                  annualInterestRate: data['annualInterestRate'] ?? 0,
-                  monthlyPayment: data['monthlyPayment'] ?? 0,
-                  monthlySpecialPayment: data['monthlySpecialPayment'] ?? 0,
-                  maxSpecialPaymentPercent:
-                      data['maxSpecialPaymentPercent'] ?? 0,
-                  rentalShare: data['rentalShare'] ?? 0,
-                  topTaxRate: data['topTaxRate'] ?? 0,
-                  annualDepreciationRate: data['annualDepreciationRate'] ?? 0,
-                  squareMeters: data['squareMeters'] ?? 0,
-                  letSquareMeters: data['letSquareMeters'] ?? 0,
-                  notaryFeesRate: data['notaryFeesRate'] ?? 0,
-                  landRegistryFeesRate: data['landRegistryFeesRate'] ?? 0,
-                  brokerCommissionRate: data['brokerCommissionRate'] ?? 0,
+                return MortgageWithId(
+                  id: doc.id,
+                  mortgage: Mortgage(
+                    housePrice: data['housePrice'] ?? 0,
+                    equity: data['equity'] ?? 0,
+                    annualInterestRate: data['annualInterestRate'] ?? 0,
+                    monthlyPayment: data['monthlyPayment'] ?? 0,
+                    monthlySpecialPayment: data['monthlySpecialPayment'] ?? 0,
+                    maxSpecialPaymentPercent:
+                        data['maxSpecialPaymentPercent'] ?? 0,
+                    rentalShare: data['rentalShare'] ?? 0,
+                    topTaxRate: data['topTaxRate'] ?? 0,
+                    annualDepreciationRate: data['annualDepreciationRate'] ?? 0,
+                    squareMeters: data['squareMeters'] ?? 0,
+                    letSquareMeters: data['letSquareMeters'] ?? 0,
+                    notaryFeesRate: data['notaryFeesRate'] ?? 0,
+                    landRegistryFeesRate: data['landRegistryFeesRate'] ?? 0,
+                    brokerCommissionRate: data['brokerCommissionRate'] ?? 0,
+                    mortgageName: data['mortgageName'] ?? naming(),
+                  ),
                 );
               }).toList());
     }
     return Stream.value([]);
   }
 
-  Future<void> deleteMortgage(Mortgage mortgage) async {
+  Future<void> deleteMortgage(String id) async {
     try {
       final user = _auth.currentUser;
       if (user != null) {
-        final userMortgages = _firestore
+        await _firestore
             .collection('users')
             .doc(user.uid)
-            .collection('mortgages');
-
-        // Find the document with matching data and delete it
-        final querySnapshot = await userMortgages
-            .where('housePrice', isEqualTo: mortgage.housePrice)
-            .where('equity', isEqualTo: mortgage.equity)
-            .where('annualInterestRate', isEqualTo: mortgage.annualInterestRate)
-            .limit(1)
-            .get();
-
-        if (querySnapshot.docs.isNotEmpty) {
-          await querySnapshot.docs.first.reference.delete();
-        } else {
-          throw Exception('Mortgage not found');
-        }
+            .collection('mortgages')
+            .doc(id)
+            .delete();
       } else {
         throw Exception('User not authenticated');
       }
@@ -109,4 +123,11 @@ class FirestoreService {
       rethrow;
     }
   }
+}
+
+class MortgageWithId {
+  final String id;
+  final Mortgage mortgage;
+
+  MortgageWithId({required this.id, required this.mortgage});
 }
