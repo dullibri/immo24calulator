@@ -47,28 +47,28 @@ class FactorsPage extends StatelessWidget {
               },
             ),
             SizedBox(height: 16),
-            StreamBuilder<List<Mortgage>>(
-              stream: firestoreService.getMortgages(),
+            StreamBuilder<List<MortgageWithId>>(
+              stream: firestoreService.mortgagesStream,
               builder: (context, snapshot) {
                 if (!snapshot.hasData) return CircularProgressIndicator();
                 final mortgages = snapshot.data!;
-                return DropdownButton<Mortgage>(
+                return DropdownButton<MortgageWithId>(
                   hint: Text('Gespeicherte Hypotheken'),
                   value: null,
                   items: mortgages.map((m) {
-                    return DropdownMenuItem<Mortgage>(
+                    return DropdownMenuItem<MortgageWithId>(
                       value: m,
-                      child: Text('Hypothek ${m.housePrice}€'),
+                      child: Text(m.mortgage.mortgageName),
                     );
                   }).toList(),
                   onChanged: (selectedMortgage) {
                     if (selectedMortgage != null) {
                       print(
-                          'Selected mortgage with housePrice: ${selectedMortgage.housePrice}');
+                          'Selected mortgage with name: ${selectedMortgage.mortgage.mortgageName}');
                       Provider.of<Mortgage>(context, listen: false)
-                          .updateFromMortgage(selectedMortgage);
+                          .updateFromMortgage(selectedMortgage.mortgage);
                       print(
-                          'After update, current mortgage housePrice: ${mortgage.housePrice}');
+                          'After update, current mortgage name: ${mortgage.mortgageName}');
                     }
                   },
                 );

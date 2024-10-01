@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import 'package:immo24calculator/calculations/house.dart';
 import 'package:immo24calculator/firestore_service.dart';
+import 'package:immo24calculator/naming.dart';
 
 class Payment {
   final int month;
@@ -82,6 +83,7 @@ class Mortgage with ChangeNotifier {
   double _rentalShare;
   double _topTaxRate;
   double _annualDepreciationRate;
+  String _mortgageName;
 
   late HousePriceOutput _housePriceOutput;
   CalculationResult? _lastCalculationResult;
@@ -101,6 +103,7 @@ class Mortgage with ChangeNotifier {
     double rentalShare = 1.0,
     double topTaxRate = 0.42,
     double annualDepreciationRate = 0.03,
+    String? mortgageName,
   })  : _squareMeters = squareMeters,
         _housePrice = housePrice,
         _letSquareMeters = letSquareMeters,
@@ -117,6 +120,7 @@ class Mortgage with ChangeNotifier {
         _maxSpecialPaymentPercent = maxSpecialPaymentPercent,
         _rentalShare = rentalShare,
         _topTaxRate = topTaxRate,
+        _mortgageName = mortgageName ?? naming(),
         _annualDepreciationRate = annualDepreciationRate {
     calculateTotalHousePrice();
     _updatePrincipal();
@@ -138,6 +142,7 @@ class Mortgage with ChangeNotifier {
   double get rentalShare => _rentalShare;
   double get topTaxRate => _topTaxRate;
   double get annualDepreciationRate => _annualDepreciationRate;
+  String get mortgageName => _mortgageName;
 
   // House price output
   HousePriceOutput get housePriceOutput => _housePriceOutput;
@@ -260,6 +265,13 @@ class Mortgage with ChangeNotifier {
     }
   }
 
+  void updateMortgageName(String newName) {
+    if (_mortgageName != newName) {
+      _mortgageName = newName;
+      notifyListeners();
+    }
+  }
+
   void updateFromMortgage(Mortgage other) {
     print('updateFromMortgage called with housePrice: ${other.housePrice}');
     _housePrice = other.housePrice;
@@ -276,6 +288,7 @@ class Mortgage with ChangeNotifier {
     _notaryFeesRate = other.notaryFeesRate;
     _landRegistryFeesRate = other.landRegistryFeesRate;
     _brokerCommissionRate = other.brokerCommissionRate;
+    _mortgageName = other.mortgageName;
 
     calculateTotalHousePrice();
     _updatePrincipal();
@@ -337,8 +350,8 @@ class Mortgage with ChangeNotifier {
     }
   }
 
-  static Stream<List<Mortgage>> getAll() {
-    return FirestoreService().getMortgages();
+  static Stream<List<MortgageWithId>> getAll() {
+    return FirestoreService().mortgagesStream;
   }
 }
 
