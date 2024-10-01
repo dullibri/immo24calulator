@@ -13,7 +13,9 @@ class Payment {
   final double remainingSpecialPayment;
   final double interestRebate;
   final double depreciation;
-  final double excess; // New field
+  final double excess;
+  final double rentSaved;
+  final double rentalIncome;
 
   Payment({
     required this.month,
@@ -24,7 +26,9 @@ class Payment {
     required this.remainingSpecialPayment,
     required this.interestRebate,
     required this.depreciation,
-    required this.excess, // New field
+    required this.excess,
+    required this.rentSaved,
+    required this.rentalIncome,
   });
 }
 
@@ -38,7 +42,9 @@ class CalculationResult {
   final double totalSpecialPayment;
   final double totalInterestRebate;
   final double totalDepreciation;
-  final double totalExcess; // New field
+  final double totalExcess;
+  final double totalRentSaved;
+  final double totalRentalIncome;
 
   CalculationResult({
     required this.payments,
@@ -50,7 +56,9 @@ class CalculationResult {
     required this.totalSpecialPayment,
     required this.totalInterestRebate,
     required this.totalDepreciation,
-    required this.totalExcess, // New field
+    required this.totalExcess,
+    required this.totalRentSaved,
+    required this.totalRentalIncome,
   });
 }
 
@@ -72,6 +80,8 @@ class Mortgage with ChangeNotifier {
   double _notaryFeesRate;
   double _landRegistryFeesRate;
   double _brokerCommissionRate;
+  double _monthlyRentSaved;
+  double _monthlyRentalIncome;
 
   // Mortgage calculation related properties
   double _equity;
@@ -103,6 +113,8 @@ class Mortgage with ChangeNotifier {
     double rentalShare = 1.0,
     double topTaxRate = 0.42,
     double annualDepreciationRate = 0.03,
+    double monthlyRentSaved = 0,
+    double monthlyRentalIncome = 0,
     String? mortgageName,
   })  : _squareMeters = squareMeters,
         _housePrice = housePrice,
@@ -121,7 +133,9 @@ class Mortgage with ChangeNotifier {
         _rentalShare = rentalShare,
         _topTaxRate = topTaxRate,
         _mortgageName = mortgageName ?? naming(),
-        _annualDepreciationRate = annualDepreciationRate {
+        _annualDepreciationRate = annualDepreciationRate,
+        _monthlyRentSaved = monthlyRentSaved,
+        _monthlyRentalIncome = monthlyRentalIncome {
     calculateTotalHousePrice();
     _updatePrincipal();
   }
@@ -146,6 +160,8 @@ class Mortgage with ChangeNotifier {
 
   // House price output
   HousePriceOutput get housePriceOutput => _housePriceOutput;
+  double get monthlyRentSaved => _monthlyRentSaved;
+  double get monthlyRentalIncome => _monthlyRentalIncome;
 
   // Methods to update properties
 
@@ -265,6 +281,22 @@ class Mortgage with ChangeNotifier {
     }
   }
 
+  void updateMonthlyRentSaved(double value) {
+    if (_monthlyRentSaved != value) {
+      _monthlyRentSaved = value;
+      invalidateCalculations();
+      notifyListeners();
+    }
+  }
+
+  void updateMonthlyRentalIncome(double value) {
+    if (_monthlyRentalIncome != value) {
+      _monthlyRentalIncome = value;
+      invalidateCalculations();
+      notifyListeners();
+    }
+  }
+
   void updateMortgageName(String newName) {
     if (_mortgageName != newName) {
       _mortgageName = newName;
@@ -334,6 +366,8 @@ class Mortgage with ChangeNotifier {
       rentalShare: _rentalShare,
       topTaxRate: _topTaxRate,
       annualDepreciationRate: _annualDepreciationRate,
+      monthlyRentSaved: _monthlyRentSaved,
+      monthlyRentalIncome: _monthlyRentalIncome,
     );
 
     return _lastCalculationResult!;
@@ -366,6 +400,8 @@ CalculationResult calculateMortgagePaymentsFunction({
   required double rentalShare,
   required double topTaxRate,
   required double annualDepreciationRate,
+  required double monthlyRentSaved,
+  required double monthlyRentalIncome,
 }) {
   final double monthlyInterestRate = annualInterestRate / 12;
   final double maxAnnualSpecialPayment = principal * (maxSpecialPaymentPercent);
@@ -383,6 +419,8 @@ CalculationResult calculateMortgagePaymentsFunction({
   double totalInterestRebate = 0;
   double totalDepreciation = 0;
   double totalExcess = 0;
+  double totalRentSaved = 0;
+  double totalRentalIncome = 0;
 
   while (remainingBalance > 0) {
     if ((month - 1) % 12 == 0) {
@@ -425,6 +463,12 @@ CalculationResult calculateMortgagePaymentsFunction({
         (principalPayment + totalSpecialWithRebateAndDepreciation);
     if (remainingBalance < 0) remainingBalance = 0;
 
+    double rentSaved = monthlyRentSaved;
+    double rentalIncome = monthlyRentalIncome;
+
+    totalRentSaved += rentSaved;
+    totalRentalIncome += rentalIncome;
+
     payments.add(Payment(
       month: month,
       principalPayment: principalPayment,
@@ -436,6 +480,8 @@ CalculationResult calculateMortgagePaymentsFunction({
       interestRebate: interestRebate,
       depreciation: depreciation,
       excess: excess,
+      rentSaved: rentSaved,
+      rentalIncome: rentalIncome,
     ));
 
     totalSum += principalPayment + interestPayment + specialPayment;
@@ -463,6 +509,8 @@ CalculationResult calculateMortgagePaymentsFunction({
     totalInterestRebate: totalInterestRebate,
     totalDepreciation: totalDepreciation,
     totalExcess: totalExcess,
+    totalRentSaved: totalRentSaved,
+    totalRentalIncome: totalRentalIncome,
   );
 }
 
@@ -479,6 +527,8 @@ List<Payment> groupPaymentsByYear(List<Payment> payments) {
     double totalInterestRebate = 0;
     double totalDepreciation = 0;
     double totalExcess = 0;
+    double totalRentSaved = 0;
+    double totalRentIncome = 0;
 
     for (int j = i; j < i + 12 && j < payments.length; j++) {
       totalRemainingBalance = payments[j].remainingBalance;
@@ -489,6 +539,8 @@ List<Payment> groupPaymentsByYear(List<Payment> payments) {
       totalInterestRebate += payments[j].interestRebate;
       totalDepreciation += payments[j].depreciation;
       totalExcess += payments[j].excess;
+      totalRentSaved += payments[j].excess;
+      totalRentIncome += payments[j].excess;
     }
 
     annualPayments.add(Payment(
@@ -501,6 +553,8 @@ List<Payment> groupPaymentsByYear(List<Payment> payments) {
       interestRebate: totalInterestRebate,
       depreciation: totalDepreciation,
       excess: totalExcess,
+      rentSaved: totalRentSaved,
+      rentalIncome: totalRentIncome,
     ));
   }
 
