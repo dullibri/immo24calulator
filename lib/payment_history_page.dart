@@ -301,17 +301,9 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(label, style: TextStyle(fontWeight: FontWeight.bold)),
             Row(
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(GermanCurrencyFormatter.format(value)),
-                    Text('${((value / total) * 100).toStringAsFixed(2)}%',
-                        style: TextStyle(fontSize: 12, color: Colors.grey)),
-                  ],
-                ),
+                Text(label, style: TextStyle(fontWeight: FontWeight.bold)),
                 SizedBox(width: 8),
                 InkWell(
                   onTap: () {
@@ -324,6 +316,18 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
                     size: 20,
                     color: Colors.blue,
                   ),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(GermanCurrencyFormatter.format(value)),
+                    Text('${((value / total) * 100).toStringAsFixed(2)}%',
+                        style: TextStyle(fontSize: 12, color: Colors.grey)),
+                  ],
                 ),
               ],
             ),
