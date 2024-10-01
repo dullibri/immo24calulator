@@ -115,17 +115,19 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
   List<DataColumn> _buildColumns() {
     List<DataColumn> columns = [
       DataColumn(
+        label: Text(_selectedView == 'yearly' ? 'Jahr' : 'Monat'),
+      ),
+      DataColumn(label: Text('Restschuld')),
+      DataColumn(label: Text('Zinsen')),
+      DataColumn(
         label: Row(
           children: [
-            Text(_selectedView == 'yearly' ? 'Jahr' : 'Monat'),
+            Text('Gesamttilgung'),
             SizedBox(width: 8),
             _buildExpandButton(),
           ],
         ),
       ),
-      DataColumn(label: Text('Restschuld')),
-      DataColumn(label: Text('Gesamttilgung')),
-      DataColumn(label: Text('Zinsen')),
     ];
 
     if (_isDetailsExpanded) {
