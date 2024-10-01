@@ -15,6 +15,7 @@ class PaymentHistoryPage extends StatefulWidget {
 class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
   String _selectedView = 'summary';
   bool _isDetailsExpanded = false;
+  bool _isRepaymentExpanded = false; // Add this line
 
   @override
   Widget build(BuildContext context) {
@@ -254,6 +255,11 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
 
   Widget _buildSummary(CalculationResult result) {
     final mortgage = Provider.of<Mortgage>(context, listen: false);
+    double totalRepayment = result.totalPrincipalPayment +
+        result.totalSpecialPayment +
+        result.totalInterestRebate +
+        result.totalDepreciation;
+
     return Card(
       margin: EdgeInsets.all(16),
       child: Padding(
@@ -264,24 +270,22 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
             Text('Gesamtzusammenfassung:',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             SizedBox(height: 16),
-            _buildSummaryRow(
-                'Gesamtlaufzeit', '${result.totalMonths} Monate', null),
-            _buildSummaryRowWithPercentage(
-                'Tilgung', result.totalPrincipalPayment, result.totalSum),
+            _buildSummaryRow('Gesamtlaufzeit', '${result.totalMonths} Monate'),
+            _buildExpandableRepaymentRow(
+                'Gesamttilgung', totalRepayment, result.totalSum, [
+              ('Tilgung', result.totalPrincipalPayment),
+              ('Sonderzahlungen', result.totalSpecialPayment),
+              ('Zinsvorteil', result.totalInterestRebate),
+              ('Abschreibung', result.totalDepreciation),
+            ]),
             _buildSummaryRowWithPercentage(
                 'Zinszahlungen', result.totalInterestPayment, result.totalSum),
             _buildSummaryRowWithPercentage(
-                'Sonderzahlungen', result.totalSpecialPayment, result.totalSum),
-            _buildSummaryRowWithPercentage(
-                'Zinsvorteil', result.totalInterestRebate, result.totalSum),
-            _buildSummaryRowWithPercentage(
-                'Abschreibung', result.totalDepreciation, result.totalSum),
-            _buildSummaryRowWithPercentage('Überschuss', result.totalExcess,
-                result.totalSum), // New row for total excess
+                'Überschuss', result.totalExcess, result.totalSum),
             _buildSummaryRowWithPercentage(
                 'Eigenkapital', mortgage.equity, result.totalSum),
             Divider(),
-            _buildSummaryRow('Summe aller Zahlungen', result.totalSum, null),
+            _buildSummaryRow('Summe aller Zahlungen', result.totalSum),
             _buildSummaryRowWithPercentage('Gesamte Steuerrückzahlung',
                 result.totalTaxRepayment, result.totalSum),
           ],
@@ -290,7 +294,76 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
     );
   }
 
-  Widget _buildSummaryRow(String label, dynamic value, double? percentage) {
+  Widget _buildExpandableRepaymentRow(String label, double value, double total,
+      List<(String, double)> details) {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(label, style: TextStyle(fontWeight: FontWeight.bold)),
+            Row(
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(GermanCurrencyFormatter.format(value)),
+                    Text('${((value / total) * 100).toStringAsFixed(2)}%',
+                        style: TextStyle(fontSize: 12, color: Colors.grey)),
+                  ],
+                ),
+                SizedBox(width: 8),
+                InkWell(
+                  onTap: () {
+                    setState(() {
+                      _isRepaymentExpanded = !_isRepaymentExpanded;
+                    });
+                  },
+                  child: Icon(
+                    _isRepaymentExpanded ? Icons.remove : Icons.add,
+                    size: 20,
+                    color: Colors.blue,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        if (_isRepaymentExpanded)
+          Padding(
+            padding: EdgeInsets.only(left: 16, top: 8),
+            child: Column(
+              children: details
+                  .map((detail) => _buildDetailRow(detail.$1, detail.$2, total))
+                  .toList(),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildDetailRow(String label, double value, double total) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: TextStyle(color: Colors.blue[800])),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(GermanCurrencyFormatter.format(value),
+                  style: TextStyle(color: Colors.blue[800])),
+              Text('${((value / total) * 100).toStringAsFixed(2)}%',
+                  style: TextStyle(fontSize: 10, color: Colors.blue[400])),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSummaryRow(String label, dynamic value) {
     String formattedValue = value is double
         ? GermanCurrencyFormatter.format(value)
         : value.toString();
