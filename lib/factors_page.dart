@@ -191,6 +191,26 @@ class FactorsPage extends StatelessWidget {
         maxValue: 0.05,
         tooltip: 'Jährliche Abschreibungsrate für die Immobilie',
       ),
+      CustomInputField(
+        label: 'Monatliche Mietsparung',
+        suffix: '€',
+        initialValue: mortgage.monthlyRentSaved,
+        onChanged: (value) => mortgage.updateMonthlyRentSaved(value),
+        decimalPlaces: 0,
+        minValue: 0,
+        maxValue: 10000,
+        tooltip: 'Monatliche Miete, die durch Eigennutzung gespart wird',
+      ),
+      CustomInputField(
+        label: 'Monatliche Mieteinnahmen',
+        suffix: '€',
+        initialValue: mortgage.monthlyRentalIncome,
+        onChanged: (value) => mortgage.updateMonthlyRentalIncome(value),
+        decimalPlaces: 0,
+        minValue: 0,
+        maxValue: 10000,
+        tooltip: 'Erwartete monatliche Mieteinnahmen bei Vermietung',
+      ),
     ];
   }
 
