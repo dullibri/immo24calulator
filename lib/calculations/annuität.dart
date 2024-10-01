@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'dart:math';
 
 import 'package:immo24calculator/calculations/house.dart';
 import 'package:immo24calculator/firestore_service.dart';
@@ -13,6 +12,7 @@ class Payment {
   final double remainingSpecialPayment;
   final double interestRebate;
   final double depreciation;
+  final double excess; // New field
 
   Payment({
     required this.month,
@@ -23,6 +23,7 @@ class Payment {
     required this.remainingSpecialPayment,
     required this.interestRebate,
     required this.depreciation,
+    required this.excess, // New field
   });
 }
 
@@ -31,13 +32,12 @@ class CalculationResult {
   final int totalMonths;
   final double totalSum;
   final double totalTaxRepayment;
-
-  // Neue Summenfelder
   final double totalPrincipalPayment;
   final double totalInterestPayment;
   final double totalSpecialPayment;
   final double totalInterestRebate;
   final double totalDepreciation;
+  final double totalExcess; // New field
 
   CalculationResult({
     required this.payments,
@@ -49,6 +49,7 @@ class CalculationResult {
     required this.totalSpecialPayment,
     required this.totalInterestRebate,
     required this.totalDepreciation,
+    required this.totalExcess, // New field
   });
 }
 
@@ -107,7 +108,9 @@ class Mortgage with ChangeNotifier {
         _landRegistryFeesRate = landRegistryFeesRate,
         _brokerCommissionRate = brokerCommissionRate,
         _equity = equity,
-        _principal = housePrice - equity,
+        _principal =
+            housePrice * (1 + landRegistryFeesRate + brokerCommissionRate) -
+                equity,
         _annualInterestRate = annualInterestRate,
         _monthlyPayment = monthlyPayment,
         _monthlySpecialPayment = monthlySpecialPayment,
@@ -361,12 +364,12 @@ CalculationResult calculateMortgagePaymentsFunction({
   double totalSum = 0;
   double totalTaxRepayment = 0;
 
-  // Neue Summen-Variablen
   double totalPrincipalPayment = 0;
   double totalInterestPayment = 0;
   double totalSpecialPayment = 0;
   double totalInterestRebate = 0;
   double totalDepreciation = 0;
+  double totalExcess = 0;
 
   while (remainingBalance > 0) {
     if ((month - 1) % 12 == 0) {
@@ -380,15 +383,6 @@ CalculationResult calculateMortgagePaymentsFunction({
       principalPayment = remainingBalance;
     }
 
-    double specialPayment = monthlySpecialPayment;
-    if (totalSpecialPaymentsPerYear + specialPayment >
-        maxAnnualSpecialPayment) {
-      specialPayment = maxAnnualSpecialPayment - totalSpecialPaymentsPerYear;
-      if (specialPayment < 0) specialPayment = 0;
-    }
-
-    totalSpecialPaymentsPerYear += specialPayment;
-
     double interestRebate = 0;
     double depreciation = 0;
     if (month > 12 && (month - 6) % 12 == 0) {
@@ -398,8 +392,24 @@ CalculationResult calculateMortgagePaymentsFunction({
           purchasePrice, annualDepreciationRate, topTaxRate);
     }
 
+    double specialPayment = monthlySpecialPayment;
+    double totalSpecialWithRebateAndDepreciation =
+        specialPayment + interestRebate + depreciation;
+    double excess = 0;
+
+    if (totalSpecialPaymentsPerYear + totalSpecialWithRebateAndDepreciation >
+        maxAnnualSpecialPayment) {
+      excess = totalSpecialPaymentsPerYear +
+          totalSpecialWithRebateAndDepreciation -
+          maxAnnualSpecialPayment;
+      totalSpecialWithRebateAndDepreciation =
+          maxAnnualSpecialPayment - totalSpecialPaymentsPerYear;
+    }
+
+    totalSpecialPaymentsPerYear += totalSpecialWithRebateAndDepreciation;
+
     remainingBalance -=
-        (principalPayment + specialPayment + interestRebate + depreciation);
+        (principalPayment + totalSpecialWithRebateAndDepreciation);
     if (remainingBalance < 0) remainingBalance = 0;
 
     payments.add(Payment(
@@ -412,6 +422,7 @@ CalculationResult calculateMortgagePaymentsFunction({
           maxAnnualSpecialPayment - totalSpecialPaymentsPerYear,
       interestRebate: interestRebate,
       depreciation: depreciation,
+      excess: excess,
     ));
 
     totalSum += principalPayment + interestPayment + specialPayment;
@@ -421,6 +432,7 @@ CalculationResult calculateMortgagePaymentsFunction({
     totalSpecialPayment += specialPayment;
     totalInterestRebate += interestRebate;
     totalDepreciation += depreciation;
+    totalExcess += excess;
 
     month++;
 
@@ -437,6 +449,7 @@ CalculationResult calculateMortgagePaymentsFunction({
     totalSpecialPayment: totalSpecialPayment,
     totalInterestRebate: totalInterestRebate,
     totalDepreciation: totalDepreciation,
+    totalExcess: totalExcess,
   );
 }
 
@@ -452,6 +465,7 @@ List<Payment> groupPaymentsByYear(List<Payment> payments) {
     double totalRemainingSpecialPayment = 0;
     double totalInterestRebate = 0;
     double totalDepreciation = 0;
+    double totalExcess = 0;
 
     for (int j = i; j < i + 12 && j < payments.length; j++) {
       totalRemainingBalance = payments[j].remainingBalance;
@@ -461,6 +475,7 @@ List<Payment> groupPaymentsByYear(List<Payment> payments) {
       totalRemainingSpecialPayment = payments[j].remainingSpecialPayment;
       totalInterestRebate += payments[j].interestRebate;
       totalDepreciation += payments[j].depreciation;
+      totalExcess += payments[j].excess;
     }
 
     annualPayments.add(Payment(
@@ -472,6 +487,7 @@ List<Payment> groupPaymentsByYear(List<Payment> payments) {
       remainingSpecialPayment: totalRemainingSpecialPayment,
       interestRebate: totalInterestRebate,
       depreciation: totalDepreciation,
+      excess: totalExcess,
     ));
   }
 

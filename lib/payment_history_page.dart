@@ -115,6 +115,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
           DataColumn(label: Text('Verbl. Sonderzahlung')),
           DataColumn(label: Text('Zinsvorteil')),
           DataColumn(label: Text('Abschreibung')),
+          DataColumn(label: Text('Überschuss')), // New column for excess
         ],
         rows: payments.map((payment) {
           return DataRow(cells: [
@@ -133,6 +134,8 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
                 Text(GermanCurrencyFormatter.format(payment.interestRebate))),
             DataCell(
                 Text(GermanCurrencyFormatter.format(payment.depreciation))),
+            DataCell(Text(GermanCurrencyFormatter.format(
+                payment.excess))), // New cell for excess
           ]);
         }).toList(),
       ),
@@ -163,6 +166,8 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
                 'Zinsvorteil', result.totalInterestRebate, result.totalSum),
             _buildSummaryRowWithPercentage(
                 'Abschreibung', result.totalDepreciation, result.totalSum),
+            _buildSummaryRowWithPercentage('Überschuss', result.totalExcess,
+                result.totalSum), // New row for total excess
             _buildSummaryRowWithPercentage(
                 'Eigenkapital', mortgage.equity, result.totalSum),
             Divider(),
