@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:immo24calculator/calculations/annuität.dart';
 import 'package:immo24calculator/widgets/german_currency_converter.dart';
-import 'package:immo24calculator/app_scaffold.dart';
 import 'package:provider/provider.dart';
 
 class PaymentHistoryPage extends StatefulWidget {
@@ -15,6 +14,7 @@ class PaymentHistoryPage extends StatefulWidget {
 
 class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
   String _selectedView = 'summary';
+  bool _isDetailsExpanded = false;
 
   @override
   Widget build(BuildContext context) {
@@ -106,40 +106,148 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
       scrollDirection: Axis.horizontal,
       child: DataTable(
         columnSpacing: 24,
-        columns: [
-          DataColumn(label: Text(_selectedView == 'yearly' ? 'Jahr' : 'Monat')),
-          DataColumn(label: Text('Restschuld')),
-          DataColumn(label: Text('Tilgung')),
-          DataColumn(label: Text('Zinsen')),
-          DataColumn(label: Text('Sonderzahlung')),
-          DataColumn(label: Text('Verbl. Sonderzahlung')),
-          DataColumn(label: Text('Zinsvorteil')),
-          DataColumn(label: Text('Abschreibung')),
-          DataColumn(label: Text('Überschuss')), // New column for excess
-        ],
-        rows: payments.map((payment) {
-          return DataRow(cells: [
-            DataCell(Text(payment.month.toString())),
-            DataCell(
-                Text(GermanCurrencyFormatter.format(payment.remainingBalance))),
-            DataCell(
-                Text(GermanCurrencyFormatter.format(payment.principalPayment))),
-            DataCell(
-                Text(GermanCurrencyFormatter.format(payment.interestPayment))),
-            DataCell(
-                Text(GermanCurrencyFormatter.format(payment.specialPayment))),
-            DataCell(Text(GermanCurrencyFormatter.format(
-                payment.remainingSpecialPayment))),
-            DataCell(
-                Text(GermanCurrencyFormatter.format(payment.interestRebate))),
-            DataCell(
-                Text(GermanCurrencyFormatter.format(payment.depreciation))),
-            DataCell(Text(GermanCurrencyFormatter.format(
-                payment.excess))), // New cell for excess
-          ]);
-        }).toList(),
+        columns: _buildColumns(),
+        rows: payments.map((payment) => _buildDataRow(payment)).toList(),
       ),
     );
+  }
+
+  List<DataColumn> _buildColumns() {
+    List<DataColumn> columns = [
+      DataColumn(
+        label: Row(
+          children: [
+            Text(_selectedView == 'yearly' ? 'Jahr' : 'Monat'),
+            SizedBox(width: 8),
+            _buildExpandButton(),
+          ],
+        ),
+      ),
+      DataColumn(label: Text('Restschuld')),
+      DataColumn(label: Text('Gesamttilgung')),
+      DataColumn(label: Text('Zinsen')),
+    ];
+
+    if (_isDetailsExpanded) {
+      columns.addAll([
+        DataColumn(
+          label: Container(
+            color: Colors.blue[50],
+            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            child: Text('Tilgung', style: TextStyle(color: Colors.blue[800])),
+          ),
+        ),
+        DataColumn(
+          label: Container(
+            color: Colors.blue[50],
+            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            child: Text('Sonderzahlung',
+                style: TextStyle(color: Colors.blue[800])),
+          ),
+        ),
+        DataColumn(
+          label: Container(
+            color: Colors.blue[50],
+            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            child:
+                Text('Zinsvorteil', style: TextStyle(color: Colors.blue[800])),
+          ),
+        ),
+        DataColumn(
+          label: Container(
+            color: Colors.blue[50],
+            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            child:
+                Text('Abschreibung', style: TextStyle(color: Colors.blue[800])),
+          ),
+        ),
+      ]);
+    }
+
+    columns.addAll([
+      DataColumn(label: Text('Verbl. Sonderzahlung')),
+      DataColumn(label: Text('Überschuss')),
+    ]);
+
+    return columns;
+  }
+
+  Widget _buildExpandButton() {
+    return InkWell(
+      onTap: () {
+        setState(() {
+          _isDetailsExpanded = !_isDetailsExpanded;
+        });
+      },
+      child: Container(
+        padding: EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(color: Colors.blue),
+        ),
+        child: Icon(
+          _isDetailsExpanded ? Icons.remove : Icons.add,
+          size: 16,
+          color: Colors.blue,
+        ),
+      ),
+    );
+  }
+
+  DataRow _buildDataRow(Payment payment) {
+    double totalRepayment = payment.principalPayment +
+        payment.specialPayment +
+        payment.interestRebate +
+        payment.depreciation;
+
+    List<DataCell> cells = [
+      DataCell(Text(payment.month.toString())),
+      DataCell(Text(GermanCurrencyFormatter.format(payment.remainingBalance))),
+      DataCell(Text(GermanCurrencyFormatter.format(totalRepayment))),
+      DataCell(Text(GermanCurrencyFormatter.format(payment.interestPayment))),
+    ];
+
+    if (_isDetailsExpanded) {
+      cells.addAll([
+        DataCell(
+          Container(
+            color: Colors.blue[50],
+            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            child:
+                Text(GermanCurrencyFormatter.format(payment.principalPayment)),
+          ),
+        ),
+        DataCell(
+          Container(
+            color: Colors.blue[50],
+            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            child: Text(GermanCurrencyFormatter.format(payment.specialPayment)),
+          ),
+        ),
+        DataCell(
+          Container(
+            color: Colors.blue[50],
+            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            child: Text(GermanCurrencyFormatter.format(payment.interestRebate)),
+          ),
+        ),
+        DataCell(
+          Container(
+            color: Colors.blue[50],
+            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            child: Text(GermanCurrencyFormatter.format(payment.depreciation)),
+          ),
+        ),
+      ]);
+    }
+
+    cells.addAll([
+      DataCell(Text(
+          GermanCurrencyFormatter.format(payment.remainingSpecialPayment))),
+      DataCell(Text(GermanCurrencyFormatter.format(payment.excess))),
+    ]);
+
+    return DataRow(cells: cells);
   }
 
   Widget _buildSummary(CalculationResult result) {
