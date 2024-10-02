@@ -20,14 +20,12 @@ class _BottomNavigationState extends State<BottomNavigation> {
   final List<Widget> _pageWidgets = [
     WelcomePage(),
     FactorsPage(),
-    ValuesPage(),
     _PaymentHistoryPageWrapper(),
   ];
 
   final List<String> _pageTitles = [
     'Willkommen',
-    'Hauptfaktoren',
-    'Rahmenwerte',
+    'Faktoren',
     'Ergebnis',
   ];
 
@@ -62,11 +60,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.calculate),
-            label: 'Hauptfaktoren',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Rahmenwerte',
+            label: 'Faktoren',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.history),

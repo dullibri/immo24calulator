@@ -1,0 +1,592 @@
+commit c6a10a0a854bb86fe434eda5f951132dc747266b
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Refactor CustomInputField widget: updated constructor, removed maxWidth, changed formatting and validation logic, and added tooltip and focus node management.
+
+commit fd26c83e6801490a9510807c71fe746bc5ef899e
+Merge: 4cdb597 008b6d5
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Merge branch 'main' of https://github.com/dullibri/immo24calulator
+
+commit 008b6d5ad24d9796f9927c2ad789e220b7b5358c
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Rearranged widgets in PaymentHistoryPage to swap order of label and value columns
+
+commit f96838ec13f95c43cefe7c47608281e97abf80eb
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    refactor summary with expandable for principal payments
+
+commit af061bc7c2ab5aa289cdf1352b5b955d5d0ceab8
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    relocate expand principal payments button
+
+commit 88dc5faab81dbcd3a8d12565d4ff0fb8644f7d02
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Expand button for total principal payments
+
+commit 34ca015de88a60753bdcc795f3bbed126588b919
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Added 'excess' field to Payment and CalculationResult classes, updated calculations and UI to include excess values.
+
+commit 4cdb59708e11dfc60d78104e19dd60c07cef7c7d
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Rearranged widgets in PaymentHistoryPage to swap order of label and value columns
+
+commit 8ec3621d909eda3b93159a8b1299aeb03f85a72c
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    refactor summary with expandable for principal payments
+
+commit 8322289167e16fe4b1fe210f463b74b21039fbac
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    relocate expand principal payments button
+
+commit 3ec96d689972ad68dcca59a17df18bfa590d66bc
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Expand button for total principal payments
+
+commit 689a980dd8bd29e304ca28679bbee62790b36856
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Added 'excess' field to Payment and CalculationResult classes, updated calculations and UI to include excess values.
+
+commit bd2853d852defcaa99999a1a7d36a24fef7ab5ae
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Added mortgage name field, updated Firestore service to generate unique mortgage names, and modified UI to display and update mortgage names.
+
+commit c03bead7bf06b07fc5f0434a23ffce2afa11bdd6
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    fixed failed merge conflict fixing
+
+commit 029a64da1cc910e9adfdb36f8f10005aa5dc3464
+Merge: 9d7711d 0f4bf8b
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    merge conflict
+
+commit 9d7711d461365c9467c089d5adf23b5e08385980
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Refactored Mortgage class, FactorsPage, and CustomInputField widget to update and display mortgage data
+
+commit dc79c42613d7cb21b90ff887eb2263f3383d643b
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    fixed customInputField
+
+commit 03f2982c0e298177ee12dae1f08a7cf65817502b
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Added mortgage name property to Mortgage class, updated FirestoreService to generate and store unique mortgage names, and modified MortgageDropdown to display mortgage name instead of house price.
+
+commit aa0c57bfdb09c7a08ba1ae79fc8f6079054c6f96
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Refactored FactorsPage and ValuesPage to use MortgageDropdown widget, extracted mortgage stream handling to FirestoreService
+
+commit 19c9722ca02cf5397e26fe636ad6f62cb26a63db
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Replace Provider with Consumer in ValuesPage
+
+commit 90fe8c254ea1187b8dc0e3f58ac3afd6d8051ad8
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Refactored Mortgage class, FactorsPage, and CustomInputField widget to update and display mortgage data
+
+commit 0f4bf8bda9caeafb300ca2587026022eccd92d6b
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Refactored Mortgage class, FactorsPage, and CustomInputField widget to update and display mortgage data
+
+commit 7586ef7db18f9c3037fc1923076c09bee4a08e41
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    fixed customInputField
+
+commit be63a75c336dec4faa80424e520c9bccc9a561d4
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    fixed customInputField
+
+commit 8f8dd522249ef943c582955d3847d46ba1f37229
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Added mortgage name property to Mortgage class, updated FirestoreService to generate and store unique mortgage names, and modified MortgageDropdown to display mortgage name instead of house price.
+
+commit 2c7e64e7db89b22dc1eddce618137f609b6ed875
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Refactored FactorsPage and ValuesPage to use MortgageDropdown widget, extracted mortgage stream handling to FirestoreService
+
+commit d2fe49b257300a2f056274db9259b6066ba012b0
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Replace Provider with Consumer in ValuesPage
+
+commit 6b018e8f1fa756434bced41cdf580710f03b3596
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Refactored Mortgage class, FactorsPage, and CustomInputField widget to update and display mortgage data
+
+commit a6a453929ff6c2b5a4f9a3a96f476d86db273990
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    updated pubspec.yml
+
+commit a1d5a1bb79fc9b5df71b5e7752924b96c4d9d1dc
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Added new fields to mortgage data in FirestoreService: squareMeters, letSquareMeters, notaryFeesRate, landRegistryFeesRate, brokerCommissionRate. Also added error handling for unauthenticated users.
+
+commit 2268356fecaae94f42172416b4dfa0163599afa9
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Removed unnecessary imports, added FirestoreService provider to main, and added new CustomInputFields to ValuesPage
+
+commit 8e6c46eafc7f8c3e7e4dc2618b42d95d16d89794
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Added password reset functionality to AuthService and LoginPage
+
+commit addc9d0b28b8ef6b5eb49b4f7cbcd851af50732f
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Updated auth service to handle Firebase authentication exceptions and login page to display error messages and loading state
+
+commit 7ff9469c8bc3006a2967f74d3e66c5c8917dd849
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Updated auth service to handle Firebase authentication exceptions and login page to display error messages and loading state
+
+commit 56d3293680b60b4d4e59c508ff846df86b374ef7
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Removed defaultTargetPlatform and TargetPlatform imports, updated flutter_lints version to ^4.0.0
+
+commit bd708def13e6fbd7082c424629fbfc303e354dc7
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Added FirestoreService import to FactorsPage, modified CustomInputFields, updated FirebaseOptions to use environment variable, and added FirestoreService import to ValuesPage.
+
+commit c9a182f1e6231d71db327970aa7652e239c9a7ce
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Added mortgage saving and loading functionality, updated FactorsPage and ValuesPage with save and load buttons, and refactored CustomInputFields.
+
+commit 98ffe6a0b8234b2dc4c4dd01fc4c679a02503e86
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Added Firebase authentication and Firestore service to the app, modified Mortgage class to save and retrieve data from Firestore, and updated main.dart and bottom_navigation.dart to integrate with Firebase authentication.
+
+commit 52964cb0789bacf28b4567dc478af0359c0687d0
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Removed android, ios, linux, macos, and windows platforms from .metadata migration section, leaving only root and web platforms.
+
+commit e6de72285e2188fdf04df3d5ae6f9d6e07baed9b
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    remove patterns_codelab
+
+commit 5abbe15d4074ac917b0e460e56f4b4a8783f176d
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    fix transfer errors
+
+commit c18bdfe10798764349013859a53e900fff9ccdc4
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    new bundleid requires new folder
+
+commit 6001775308b73f2076656f4d8d0678c4e27ee21c
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Refactored PaymentHistoryPage and WelcomePage, removed SummaryPage, and updated BottomNavigation
+
+commit 0c8542d93b45443718c2bc480bfbad2a95ca1fbf
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Refactor payment history page layout to use LayoutBuilder and adapt to different screen sizes
+
+commit 0197aadd495b80baa4475c4a78e2614aff798f24
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Refactor FactorsPage and PaymentHistoryPage: remove ElevatedButton from FactorsPage, modify PaymentHistoryPage to use AppScaffold, add view toggle buttons, and refactor data table and summary widgets.
+
+commit effcc3e8712431a2e4e32ad30424059f9e930572
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Refactored PaymentHistoryPage to use GermanCurrencyFormatter for formatting currency values, and updated WelcomePage feature item text.
+
+commit b10bccbfd22897c23bf2a913e267aba1ca202ceb
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Refactor app navigation: remove WelcomePage, update AppScaffold, and modify navigation in main.dart and other pages
+
+commit 22ba13d9a7e85446183e362a42b75f444d264b1e
+Merge: 1b3cdac 31963fe
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Merge pull request #1 from dullibri/input_refactoring
+
+commit 31963fe3ee817b19a4727e8fbf90b93a22645138
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Refactor FactorsPage and CustomInputField widgets: add calculateMinimumMonthlyPayment function, update input field properties, and modify error handling and validation logic.
+
+commit c7d02798f46da56774ef629be456e3da753adfda
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Updated max and min values for several input fields on ValuesPage
+
+commit 2480f38d09670ddf89a10cdf99749e52fce8b1c0
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Refactor ValuesPage: Replace GermanPercentageInput and GermanCurrencyInput with CustomInputField, and reorganize layout with Wrap and SizedBox widgets.
+
+commit 90db96485e294789fe7ae2cc494e8fb91fa6c01c
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Added min and max value validation, tooltips, and helper text to CustomInputField widget
+
+commit db5d708bc719ab357a5e34f4d0e5f13efdb646de
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Refactored input fields on FactorsPage to use CustomInputField widget, removed LayoutBuilder and _buildInputField method, and updated CustomInputField to handle width and formatting.
+
+commit de562ddfb1bf31e1f7abf53a11156a67943459bc
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Refactor FactorsPage to use CustomInputField, remove GermanCurrencyInput and GermanPercentageInput, add MaskedInputScreen and update dependencies in pubspec.yaml
+
+commit 630b53a63cc85efffb0a3ab1c4ee04fc3bfce192
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Refactor percentage inputs and handlers to work with decimal values instead of percentages multiplied by 100.
+
+commit 98a5aa57db7d81c12934312472caa18d2f5378ff
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Update annualInterestRate and maxSpecialPaymentPercent values, and adjust calculations accordingly.
+
+commit 28613ecdbc1c70e3f36fc2313c65f0ac29cb9909
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Refactor code: delete annuität file, update Mortgage class, modify FactorsPage and SummaryPage widgets, and remove buildInputField method.
+
+commit 0eb1346481ef1a3b8b96d6752774800458561c4c
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Replaced `toStringAsFixed(2)` with `GermanCurrencyFormatter.format()` for currency values in SummaryPage and ValuesPage.
+
+commit d53f1d550216d3e054d19d324438bf0ece755c03
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Refactor input fields on FactorsPage and ValuesPage to use GermanCurrencyInput widget
+
+commit d87a326bb05b44a4b9abbd4cfd34347b4b909fb9
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Renamed package from 'immo_credit' to 'immo24calculator' throughout the codebase.
+
+commit 1b3cdacc6502342b915d2cdc254f6158044c6356
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Updated Mortgage class constructor with new default values, added _housePriceOutput field, and modified calculation logic for principal and total house price.
+
+commit 96df0392c0d8fa2a311f286f6fa99a1d6d7cdd6d
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    create welcome page, add it to appscaffold and adjust main
+
+commit 3d8bbc501b0407369f795367f042719ac2971c4f
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Replace Scaffold with AppScaffold in FactorsPage, SummaryPage, and ValuesPage
+
+commit c07a6db6e3a9b10feb4a6389aeeedce60061d4fb
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Refactored MortgageCalculatorProvider and HousePriceProvider into a single Mortgage class, removed ChangeNotifierProxyProvider, and updated related widgets to use the new Mortgage class.
+
+commit d7165c5215df081947881eb5f19cc026f4d9f952
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Added new fields to CalculationResult class and updated MortgageCalculatorProvider and PaymentHistoryPage to accommodate the changes.
+
+commit 4450728f7c9dd1dab6646bea59e3c4a2afa18676
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Updated MortgageCalculatorProvider with new default values, added totalInterestRebate and totalDepreciation to CalculationResult, and modified calculation logic
+
+commit 2a77583f0b1c4d3309e3836dfde815fa40fbe777
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Added notifyListeners() calls in MortgageCalculatorProvider
+
+commit 28715cb11bf2ff0b3fda08da87d02859b325f74a
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Updated home page to navigate to PaymentHistoryPage instead of AnnualValuesPage and removed MonthlyValuesPage option
+
+commit bb667f056deb362cb811a37a9f863e9b2ada6e3e
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Refactored AnnualValuesPage, MortgageCalculatorProvider, and FactorsPage to update calculation logic, input fields, and navigation.
+
+commit 94db7dea6497aef0b2798877a0c9e8ca46e4cdcd
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Rename input field label from 'Eigenkapital' to 'Monatliche Rate'
+
+commit 987fcc060fe88f8d157a1de6fccdd1e523a0ecd5
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Refactor MortgageCalculatorProvider: adjust initial values, simplify calculation logic, and remove unused variables
+
+commit 13ed052aa1051c49f272a9145aaea4784264dd25
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Added import for monthly_values_page and a new ListTile for Monthly Values page navigation
+
+commit d63ab96792ced9b8ca280c6607ebc1bc300c0866
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Updated MortgageCalculatorProvider with new default values, added invalidation mechanism, and refactored calculation logic. Modified HousePriceProvider to use new default values. Changed FactorsPage to update principal based on purchase price and initial payment, and to navigate to
+
+commit a56e3be908e89edf15634a6b49b6ec953bf4c06b
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Refactor MortgageCalculatorProvider to depend on HousePriceProvider, update FactorsPage to use HousePriceProvider, and modify main.dart to use ChangeNotifierProxyProvider
+
+commit 509bd6f238b44f7b956eb374ed34c3732aae37c9
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Refactor SummaryPage to use Provider for data, remove SummaryPage constructor and navigation from FactorsPage
+
+commit 5be515963172be782cca1f7cef7647cb336ae04e
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Rename provider variable to mortgageProvider, update variable references and method calls in FactorsPage and ValuesPage
+
+commit 467e7fc1912cf23b1eee604a699a071ccaa71f3c
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Refactored HousePriceInput and HousePriceCalculator classes, updated ValuesPage and SummaryPage widgets, and modified code organization and structure.
+
+commit 755006bfbb6c971d0b75ae6dc01f6638bc6450c4
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Refactored SummaryPage to use HousePriceProvider and updated input fields to update corresponding providers.
+
+commit 8c6e90a61922b6ec99d2a221e3d58b2c0609237c
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Refactor code to use Provider for state management, introduce HousePriceProvider and MortgageCalculatorProvider, and update UI to reflect changes.
+
+commit 4662e2c41ed9951add8e2068060fb6f2a8f84902
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Added ChangeNotifier class MortgageCalculatorProvider, moved calculateMortgagePayments function inside it, and renamed original function to calculateMortgagePaymentsFunction.
+
+commit 64d514ab4af4c80aee5aef06db55a1bf5fc1920d
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Added comments and refactored values
+
+commit 4bb79b783ee30a05ce487f4baca339d7003bb181
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Added Provider package and implemented MultiProvider in main.dart
+
+commit 7e3a840e77f94a8bb0fde11b2e147a121c3ed2b3
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Removed MortgageCalculatorPage and related code, replaced with HomePage import
+
+commit 8a74e2bf9567f1e53a3f12e0e8b5a1387760d5c2
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Updated DefaultTabController length to 4, added two new tabs 'Zusammenfassung' and 'Jährliche Werte', and moved buildSummary() to the new 'Zusammenfassung' tab.
+
+commit 7e609176be574479e7b9b38769d376a94667c784
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Added .DS_Store to .gitignore
+
+commit 547f35f026c8277511faf34e6685da6650b6a8c2
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Refactor to implement dry
+
+commit fe4d52a2bef494bda28776a3397f5e4304a76112
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Add non-negativity and price>eigenkapital clause
+
+commit f83a58ef6446ed4b09531df55daf031c425b9d08
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Refactor column namings
+
+commit 6b6533ec52bab37052fdde9eb48727e93a959e88
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Add annual values and separate less important values
+
+commit ad500f292ff21a5a08bb4555cfe579000f58d65e
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Fix house
+
+commit 35005bd8a10415223c6a8e1a204063aaa5a364db
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Add personal files to gitignore
+
+commit 8c5ab86e9d931219ecea92503fa20c20768381b7
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Add terraform to gitignore
+
+commit 8a62bcd1dfaf2b894231cfe361fc76a91e3f09ce
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Delete unused data.dart
+
+commit 35cea6c142aedc44be09a15eeabd16a5ec995bff
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Change import to account for new project structure
+
+commit 489e73de798762133d3fd5c7eccb6e041429b6b5
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Add house
+
+commit 50254358ad76774cf63eaf9ecf942c8a60aa596b
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Refactor rents
+
+commit 2ff8b3ae167cc895bf5c3624965b066e576e8ec3
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Add rents
+
+commit cf8eb220e5ed276dedf2748575ef722b3c90350a
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Add sums of results
+
+commit e5ccc34281d4bd6dfeb3fac34373e721a14769ec
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Update initial values
+
+commit 5a733ebbba977ac821c3733418b5e7f9288494b0
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Change name in readme
+
+commit 9ee9232ba1ad63b7bee35243224b4abfd8c390cd
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Add terraform infrastructure
+
+commit 3e3904a3ca9b1a9426ebabdf6eb25dd7daef8058
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Add FAB for toggling and untoggling
+
+commit ef93ec1ce3cf74c32f730b3ccfcfd245e30230bc
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Add toggle to columns
+
+commit 9ade47c39090c27c5160a780bcc6cbbca8965978
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Remove decimals
+
+commit 933bde24af032f53ca0f42528752a064b721e57b
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Rename app
+
+commit 7fdb4ac378d55554a1fab1bb76953e5ea894f39a
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Extract datacolumns and input field widgets
+
+commit 193cf5c6a6758f24c2c208c46a0aa5fbac9d2714
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Refactor cols to include sorting
+
+commit 5f64cec5466f0c65b879fbb520dcc8c24a264ea1
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Add more cols
+
+commit 08afa835cbafb9875a3ba46544f258975c33efcc
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Beautify columns
+
+commit 207bf9bb155909f7d01f246ed034f9c792d25f2f
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Refactor UI to include default values as tooltips
+
+commit b079126fc74e3ed142a9e214b44511150f6a6417
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Adding fields to change values
+
+commit 8b2e890ed3cb492b2a90ebfc6aa42433d1bb7ea2
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Add initial UI
+
+commit bcf56161dfc0b4621b1c79eb530d638b633ace2e
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Comment out example code
+
+commit 56a96b73d0aac717448c068bbe6d71ca978c70f5
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Refactor Remaining Special Payment to account for depreciation and interestRebate
+
+commit 564876393d6d5ac2c3cdc9a7f76a8881a8c36108
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Refactor depreciation to include toptaxrate
+
+commit 47fba0ed60049c0c829ad92b3e65beeeff1e01b8
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Fixed taxrebate and depreciation to be effitive after 18 months the first time
+
+commit 3d21af4136ca19245d316f82e72809bf14405df8
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    Better visualization, interestRebate refactored
+
+commit 5c9204c2ed14f7a1125e78ec87d47038fa43e5a7
+Author: Dirk Ulbricht <dirk.ulbricht@gmail.com>
+
+    initial commit
