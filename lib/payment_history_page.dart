@@ -123,15 +123,13 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
 
   List<DataColumn> _buildColumns() {
     List<DataColumn> columns = [
-      DataColumn(
-        label: Text(_selectedView == 'yearly' ? 'Jahr' : 'Monat'),
-      ),
+      DataColumn(label: Text(_selectedView == 'yearly' ? 'Jahr' : 'Monat')),
       DataColumn(label: Text('Restschuld')),
       DataColumn(label: Text('Zinsen')),
       DataColumn(
         label: Row(
           children: [
-            Text('Gesamttilgung'),
+            Text('Tilgung'),
             SizedBox(width: 8),
             _buildExpandButton(),
           ],
@@ -145,7 +143,8 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
           label: Container(
             color: Colors.blue[50],
             padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            child: Text('Tilgung', style: TextStyle(color: Colors.blue[800])),
+            child: Text('Reguläre Tilgung',
+                style: TextStyle(color: Colors.blue[800])),
           ),
         ),
         DataColumn(
@@ -158,18 +157,18 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
         ),
         DataColumn(
           label: Container(
-            color: Colors.blue[50],
+            color: Colors.green[50],
             padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             child:
-                Text('Zinsvorteil', style: TextStyle(color: Colors.blue[800])),
+                Text('Zinsvorteil', style: TextStyle(color: Colors.green[800])),
           ),
         ),
         DataColumn(
           label: Container(
-            color: Colors.blue[50],
+            color: Colors.green[50],
             padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            child:
-                Text('Abschreibung', style: TextStyle(color: Colors.blue[800])),
+            child: Text('Abschreibung',
+                style: TextStyle(color: Colors.green[800])),
           ),
         ),
       ]);
@@ -181,6 +180,60 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
     ]);
 
     return columns;
+  }
+
+  DataRow _buildDataRow(Payment payment) {
+    double totalRepayment = payment.principalPayment + payment.specialPayment;
+    double taxBenefits = payment.interestRebate + payment.depreciation;
+
+    List<DataCell> cells = [
+      DataCell(Text(payment.month.toString())),
+      DataCell(Text(GermanCurrencyFormatter.format(payment.remainingBalance))),
+      DataCell(Text(GermanCurrencyFormatter.format(payment.interestPayment))),
+      DataCell(Text(GermanCurrencyFormatter.format(totalRepayment))),
+    ];
+
+    if (_isDetailsExpanded) {
+      cells.addAll([
+        DataCell(
+          Container(
+            color: Colors.blue[50],
+            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            child:
+                Text(GermanCurrencyFormatter.format(payment.principalPayment)),
+          ),
+        ),
+        DataCell(
+          Container(
+            color: Colors.blue[50],
+            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            child: Text(GermanCurrencyFormatter.format(payment.specialPayment)),
+          ),
+        ),
+        DataCell(
+          Container(
+            color: Colors.green[50],
+            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            child: Text(GermanCurrencyFormatter.format(payment.interestRebate)),
+          ),
+        ),
+        DataCell(
+          Container(
+            color: Colors.green[50],
+            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            child: Text(GermanCurrencyFormatter.format(payment.depreciation)),
+          ),
+        ),
+      ]);
+    }
+
+    cells.addAll([
+      DataCell(Text(
+          GermanCurrencyFormatter.format(payment.remainingSpecialPayment))),
+      DataCell(Text(GermanCurrencyFormatter.format(payment.excess))),
+    ]);
+
+    return DataRow(cells: cells);
   }
 
   Widget _buildExpandButton() {
@@ -205,68 +258,12 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
     );
   }
 
-  DataRow _buildDataRow(Payment payment) {
-    double totalRepayment = payment.principalPayment +
-        payment.specialPayment +
-        payment.interestRebate +
-        payment.depreciation;
-
-    List<DataCell> cells = [
-      DataCell(Text(payment.month.toString())),
-      DataCell(Text(GermanCurrencyFormatter.format(payment.remainingBalance))),
-      DataCell(Text(GermanCurrencyFormatter.format(totalRepayment))),
-      DataCell(Text(GermanCurrencyFormatter.format(payment.interestPayment))),
-    ];
-
-    if (_isDetailsExpanded) {
-      cells.addAll([
-        DataCell(
-          Container(
-            color: Colors.blue[50],
-            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            child:
-                Text(GermanCurrencyFormatter.format(payment.principalPayment)),
-          ),
-        ),
-        DataCell(
-          Container(
-            color: Colors.blue[50],
-            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            child: Text(GermanCurrencyFormatter.format(payment.specialPayment)),
-          ),
-        ),
-        DataCell(
-          Container(
-            color: Colors.blue[50],
-            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            child: Text(GermanCurrencyFormatter.format(payment.interestRebate)),
-          ),
-        ),
-        DataCell(
-          Container(
-            color: Colors.blue[50],
-            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            child: Text(GermanCurrencyFormatter.format(payment.depreciation)),
-          ),
-        ),
-      ]);
-    }
-
-    cells.addAll([
-      DataCell(Text(
-          GermanCurrencyFormatter.format(payment.remainingSpecialPayment))),
-      DataCell(Text(GermanCurrencyFormatter.format(payment.excess))),
-    ]);
-
-    return DataRow(cells: cells);
-  }
-
   Widget _buildSummary(CalculationResult result) {
     final mortgage = Provider.of<Mortgage>(context, listen: false);
-    double totalRepayment = result.totalPrincipalPayment +
-        result.totalSpecialPayment +
-        result.totalInterestRebate +
-        result.totalDepreciation;
+    double totalRegularRepayment = result.totalPrincipalPayment;
+    double totalSpecialPayment = result.totalSpecialPayment;
+    double totalTaxBenefits =
+        result.totalInterestRebate + result.totalDepreciation;
 
     return Card(
       margin: EdgeInsets.all(16),
@@ -279,10 +276,15 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             SizedBox(height: 16),
             _buildSummaryRow('Gesamtlaufzeit', '${result.totalMonths} Monate'),
-            _buildExpandableRepaymentRow(
-                'Gesamttilgung', totalRepayment, result.totalSum, [
-              ('Tilgung', result.totalPrincipalPayment),
-              ('Sonderzahlungen', result.totalSpecialPayment),
+            _buildExpandableRepaymentRow('Gesamttilgung',
+                totalRegularRepayment + totalSpecialPayment, result.totalSum, [
+              ('Reguläre Tilgung', totalRegularRepayment),
+              ('Sonderzahlungen', totalSpecialPayment),
+            ]),
+            _buildSummaryRowWithPercentage(
+                'Steuerliche Vorteile', totalTaxBenefits, result.totalSum),
+            _buildExpandableRepaymentRow('Steuerliche Vorteile Details',
+                totalTaxBenefits, result.totalSum, [
               ('Zinsvorteil', result.totalInterestRebate),
               ('Abschreibung', result.totalDepreciation),
             ]),
@@ -294,8 +296,6 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
                 'Eigenkapital', mortgage.equity, result.totalSum),
             Divider(),
             _buildSummaryRow('Summe aller Zahlungen', result.totalSum),
-            _buildSummaryRowWithPercentage('Gesamte Steuerrückzahlung',
-                result.totalTaxRepayment, result.totalSum),
             Divider(),
             _buildSummaryRow('Interne Rendite (IRR)',
                 '${(_irrValue * 100).toStringAsFixed(2)}%'),
