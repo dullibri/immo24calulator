@@ -2,8 +2,20 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Hilfsfunktion zur Überprüfung der Authentifizierung
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Beispiel für eine spezifische Sammlung (z.B. 'mortgages')
+    match /mortgages/{mortgageId} {
+      // Lesen und Schreiben erlauben, wenn authentifiziert
+      allow read, write: if isAuthenticated();
+    }
+
+    // Standardregel für alle anderen Dokumente
     match /{document=**} {
-      allow read, write: if false;
+      allow read, write: if isAuthenticated();
     }
   }
 }

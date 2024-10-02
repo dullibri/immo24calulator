@@ -22,8 +22,11 @@ void main() async {
       FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
       await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
       print('Emulators are connected');
+
+      // Anmeldung für den Emulator
+      await signInToEmulator();
     } catch (e) {
-      print('Failed to connect to emulators: $e');
+      print('Failed to connect to emulators or sign in: $e');
     }
   }
 
@@ -37,6 +40,19 @@ void main() async {
       child: MyApp(),
     ),
   );
+}
+
+Future<void> signInToEmulator() async {
+  try {
+    // Anonyme Anmeldung für den Emulator
+    UserCredential userCredential =
+        await FirebaseAuth.instance.signInAnonymously();
+
+    print(
+        'Signed in to emulator successfully with UID: ${userCredential.user?.uid}');
+  } catch (e) {
+    print('Failed to sign in to emulator: $e');
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -120,33 +136,10 @@ class AuthWrapper extends StatelessWidget {
       builder: (_, AsyncSnapshot<User?> snapshot) {
         if (snapshot.connectionState == ConnectionState.active) {
           final User? user = snapshot.data;
-          if (user == null) {
-            // Wenn kein Benutzer angemeldet ist, führen Sie den Auto-Login durch
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              autoLogin(context);
-            });
-            return LoginPage();
-          } else {
-            return BottomNavigation();
-          }
+          return user == null ? LoginPage() : BottomNavigation();
         }
         return Scaffold(body: Center(child: CircularProgressIndicator()));
       },
     );
-  }
-
-  Future<void> autoLogin(BuildContext context) async {
-    if (kDebugMode) {
-      try {
-        // Ersetzen Sie dies mit den Anmeldeinformationen Ihres Test-Users
-        await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: "dirk@test.de",
-          password: "testpassword",
-        );
-        print("Auto-login successful");
-      } catch (e) {
-        print("Auto-login failed: $e");
-      }
-    }
   }
 }

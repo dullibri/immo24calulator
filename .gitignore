@@ -50,3 +50,5 @@ terraform.log
 playgroung.dart
 .DS_Store
 lib/firebase_options.dart
+firestore-debug.log
+firebase-debug.log
