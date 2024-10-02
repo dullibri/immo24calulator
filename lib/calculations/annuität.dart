@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/foundation.dart';
 
 import 'package:immo24calculator/calculations/house.dart';
@@ -94,6 +96,9 @@ class Mortgage with ChangeNotifier {
   double _topTaxRate;
   double _annualDepreciationRate;
   String _mortgageName;
+
+  double _irrValue = 0.0;
+  double get irrValue => _irrValue;
 
   late HousePriceOutput _housePriceOutput;
   CalculationResult? _lastCalculationResult;
@@ -373,6 +378,56 @@ class Mortgage with ChangeNotifier {
     return _lastCalculationResult!;
   }
 
+  void calculateIRR() {
+    _irrValue = calculateIRRWithoutNotifying();
+    notifyListeners();
+  }
+
+  double calculateIRRWithoutNotifying() {
+    List<double> cashFlows = [-_housePriceOutput.totalHousePrice];
+    CalculationResult result = calculateMortgagePayments();
+
+    for (var payment in groupPaymentsByYear(result.payments)) {
+      double yearlyInflow = (payment.rentSaved + payment.rentalIncome);
+      yearlyInflow -= (payment.principalPayment +
+          payment.interestPayment +
+          payment.specialPayment);
+      yearlyInflow += payment.interestRebate + payment.depreciation;
+      cashFlows.add(yearlyInflow);
+    }
+
+    // Add final year's inflow (assuming property is sold at the original price)
+    cashFlows[cashFlows.length - 1] += _housePriceOutput.totalHousePrice;
+
+    return _calculateIRR(cashFlows);
+  }
+
+  double _calculateIRR(List<double> cashFlows, {double precision = 0.00001}) {
+    double low = -1.0;
+    double high = 1.0;
+    double guess = (low + high) / 2;
+
+    while ((high - low) > precision) {
+      double npv = _calculateNPV(cashFlows, guess);
+      if (npv > 0) {
+        low = guess;
+      } else {
+        high = guess;
+      }
+      guess = (low + high) / 2;
+    }
+
+    return guess;
+  }
+
+  double _calculateNPV(List<double> cashFlows, double rate) {
+    double npv = 0;
+    for (int i = 0; i < cashFlows.length; i++) {
+      npv += cashFlows[i] / pow(1 + rate, i);
+    }
+    return npv;
+  }
+
   final FirestoreService _firestoreService = FirestoreService();
 
   Future<void> save() async {
@@ -404,7 +459,7 @@ CalculationResult calculateMortgagePaymentsFunction({
   required double monthlyRentalIncome,
 }) {
   final double monthlyInterestRate = annualInterestRate / 12;
-  final double maxAnnualSpecialPayment = principal * (maxSpecialPaymentPercent);
+  final double maxAnnualSpecialPayment = principal * maxSpecialPaymentPercent;
 
   List<Payment> payments = [];
   double remainingBalance = principal;
@@ -459,9 +514,12 @@ CalculationResult calculateMortgagePaymentsFunction({
 
     totalSpecialPaymentsPerYear += totalSpecialWithRebateAndDepreciation;
 
-    remainingBalance -=
-        (principalPayment + totalSpecialWithRebateAndDepreciation);
-    if (remainingBalance < 0) remainingBalance = 0;
+    // Adjust the remaining balance reduction
+    double balanceReduction = principalPayment + specialPayment;
+    if (balanceReduction > remainingBalance) {
+      balanceReduction = remainingBalance;
+    }
+    remainingBalance -= balanceReduction;
 
     double rentSaved = monthlyRentSaved;
     double rentalIncome = monthlyRentalIncome;

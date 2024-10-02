@@ -60,6 +60,20 @@ class FactorsPage extends StatelessWidget {
 
             SizedBox(height: 20),
             _buildSummary(mortgage),
+
+            // IRR Berechnung und Anzeige
+            SizedBox(height: 20),
+            ElevatedButton(
+              child: Text('IRR berechnen'),
+              onPressed: () {
+                mortgage.calculateIRR();
+              },
+            ),
+            SizedBox(height: 10),
+            Text(
+              'Interne Rendite (IRR): ${(mortgage.irrValue * 100).toStringAsFixed(2)}%',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
           ],
         ),
       ),
