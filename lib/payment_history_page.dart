@@ -15,7 +15,15 @@ class PaymentHistoryPage extends StatefulWidget {
 class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
   String _selectedView = 'summary';
   bool _isDetailsExpanded = false;
-  bool _isRepaymentExpanded = false; // Add this line
+  bool _isRepaymentExpanded = false;
+  late double _irrValue;
+
+  @override
+  void initState() {
+    super.initState();
+    final mortgage = Provider.of<Mortgage>(context, listen: false);
+    _irrValue = mortgage.calculateIRRWithoutNotifying();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -288,6 +296,9 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
             _buildSummaryRow('Summe aller Zahlungen', result.totalSum),
             _buildSummaryRowWithPercentage('Gesamte Steuerrückzahlung',
                 result.totalTaxRepayment, result.totalSum),
+            Divider(),
+            _buildSummaryRow('Interne Rendite (IRR)',
+                '${(_irrValue * 100).toStringAsFixed(2)}%'),
           ],
         ),
       ),
