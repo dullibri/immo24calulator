@@ -4,6 +4,8 @@ import 'package:immo24calculator/calculations/annuität.dart';
 import 'package:immo24calculator/widgets/bottom_navigation.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'firebase_options.dart';
 import 'auth_service.dart';
 import 'login_page.dart';
@@ -14,6 +16,17 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  if (kDebugMode) {
+    try {
+      FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
+      await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
+      print('Emulators are connected');
+    } catch (e) {
+      print('Failed to connect to emulators: $e');
+    }
+  }
+
   runApp(
     MultiProvider(
       providers: [
@@ -107,10 +120,33 @@ class AuthWrapper extends StatelessWidget {
       builder: (_, AsyncSnapshot<User?> snapshot) {
         if (snapshot.connectionState == ConnectionState.active) {
           final User? user = snapshot.data;
-          return user == null ? LoginPage() : BottomNavigation();
+          if (user == null) {
+            // Wenn kein Benutzer angemeldet ist, führen Sie den Auto-Login durch
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              autoLogin(context);
+            });
+            return LoginPage();
+          } else {
+            return BottomNavigation();
+          }
         }
         return Scaffold(body: Center(child: CircularProgressIndicator()));
       },
     );
+  }
+
+  Future<void> autoLogin(BuildContext context) async {
+    if (kDebugMode) {
+      try {
+        // Ersetzen Sie dies mit den Anmeldeinformationen Ihres Test-Users
+        await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: "dirk@test.de",
+          password: "testpassword",
+        );
+        print("Auto-login successful");
+      } catch (e) {
+        print("Auto-login failed: $e");
+      }
+    }
   }
 }

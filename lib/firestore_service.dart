@@ -2,10 +2,20 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:immo24calculator/calculations/annuität.dart';
 import 'package:immo24calculator/naming.dart';
+import 'package:flutter/foundation.dart';
 
 class FirestoreService {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore;
+  final FirebaseAuth _auth;
+
+  FirestoreService()
+      : _firestore = FirebaseFirestore.instance,
+        _auth = FirebaseAuth.instance {
+    if (kDebugMode) {
+      _firestore.useFirestoreEmulator('localhost', 8080);
+      _auth.useAuthEmulator('localhost', 9099);
+    }
+  }
 
   Future<String> generateUniqueMortgageName() async {
     final user = _auth.currentUser;
