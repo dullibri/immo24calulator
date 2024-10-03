@@ -175,6 +175,8 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
     }
 
     columns.addAll([
+      DataColumn(label: Text('Mietersparnis')),
+      DataColumn(label: Text('Mieteinnahmen')),
       DataColumn(label: Text('Verbl. Sonderzahlung')),
       DataColumn(label: Text('Überschuss')),
     ]);
@@ -228,6 +230,8 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
     }
 
     cells.addAll([
+      DataCell(Text(GermanCurrencyFormatter.format(payment.rentSaved))),
+      DataCell(Text(GermanCurrencyFormatter.format(payment.rentalIncome))),
       DataCell(Text(
           GermanCurrencyFormatter.format(payment.remainingSpecialPayment))),
       DataCell(Text(GermanCurrencyFormatter.format(payment.excess))),
@@ -276,6 +280,8 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             SizedBox(height: 16),
             _buildSummaryRow('Gesamtlaufzeit', '${result.totalMonths} Monate'),
+            _buildSummaryRowWithPercentage(
+                'Eigenkapital', result.equity, result.totalSum),
             _buildExpandableRepaymentRow('Gesamttilgung',
                 totalRegularRepayment + totalSpecialPayment, result.totalSum, [
               ('Reguläre Tilgung', totalRegularRepayment),
@@ -299,6 +305,10 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
             Divider(),
             _buildSummaryRow('Interne Rendite (IRR)',
                 '${(_irrValue * 100).toStringAsFixed(2)}%'),
+            _buildSummaryRowWithPercentage(
+                'Mietersparnis', result.totalRentSaved, result.totalSum),
+            _buildSummaryRowWithPercentage(
+                'Mieteinnahmen', result.totalRentalIncome, result.totalSum),
           ],
         ),
       ),

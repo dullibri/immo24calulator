@@ -206,7 +206,7 @@ class FactorsPage extends StatelessWidget {
         tooltip: 'Jährliche Abschreibungsrate für die Immobilie',
       ),
       CustomInputField(
-        label: 'Monatliche Mietsparung',
+        label: 'Monatliche Mieteinsparung',
         suffix: '€',
         initialValue: mortgage.monthlyRentSaved,
         onChanged: (value) => mortgage.updateMonthlyRentSaved(value),
@@ -214,6 +214,16 @@ class FactorsPage extends StatelessWidget {
         minValue: 0,
         maxValue: 10000,
         tooltip: 'Monatliche Miete, die durch Eigennutzung gespart wird',
+      ),
+      CustomInputField(
+        label: 'Jährliche Steigerung Mieteinsparung',
+        suffix: '%',
+        initialValue: mortgage.annualRentSavedIncrease,
+        onChanged: (value) => mortgage.updateAnnualRentSavedIncrease(value),
+        isPercentage: true,
+        minValue: 0,
+        maxValue: 0.10,
+        tooltip: 'Jährliche prozentuale Steigerung der Mieteinsparung',
       ),
       CustomInputField(
         label: 'Monatliche Mieteinnahmen',
@@ -224,6 +234,16 @@ class FactorsPage extends StatelessWidget {
         minValue: 0,
         maxValue: 10000,
         tooltip: 'Erwartete monatliche Mieteinnahmen bei Vermietung',
+      ),
+      CustomInputField(
+        label: 'Jährliche Steigerung Mieteinnahmen',
+        suffix: '%',
+        initialValue: mortgage.annualRentalIncomeIncrease,
+        onChanged: (value) => mortgage.updateAnnualRentalIncomeIncrease(value),
+        isPercentage: true,
+        minValue: 0,
+        maxValue: 0.10,
+        tooltip: 'Jährliche prozentuale Steigerung der Mieteinnahmen',
       ),
     ];
   }

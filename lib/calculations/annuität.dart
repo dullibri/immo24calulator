@@ -47,9 +47,11 @@ class CalculationResult {
   final double totalExcess;
   final double totalRentSaved;
   final double totalRentalIncome;
+  final double equity;
 
   CalculationResult({
     required this.payments,
+    required this.equity,
     required this.totalMonths,
     required this.totalSum,
     required this.totalTaxRepayment,
@@ -84,6 +86,8 @@ class Mortgage with ChangeNotifier {
   double _brokerCommissionRate;
   double _monthlyRentSaved;
   double _monthlyRentalIncome;
+  double _annualRentSavedIncrease;
+  double _annualRentalIncomeIncrease;
 
   // Mortgage calculation related properties
   double _equity;
@@ -120,6 +124,8 @@ class Mortgage with ChangeNotifier {
     double annualDepreciationRate = 0.03,
     double monthlyRentSaved = 0,
     double monthlyRentalIncome = 0,
+    double annualRentSavedIncrease = 0,
+    double annualRentalIncomeIncrease = 0,
     String? mortgageName,
   })  : _squareMeters = squareMeters,
         _housePrice = housePrice,
@@ -140,7 +146,9 @@ class Mortgage with ChangeNotifier {
         _mortgageName = mortgageName ?? naming(),
         _annualDepreciationRate = annualDepreciationRate,
         _monthlyRentSaved = monthlyRentSaved,
-        _monthlyRentalIncome = monthlyRentalIncome {
+        _monthlyRentalIncome = monthlyRentalIncome,
+        _annualRentSavedIncrease = annualRentSavedIncrease,
+        _annualRentalIncomeIncrease = annualRentalIncomeIncrease {
     calculateTotalHousePrice();
     _updatePrincipal();
   }
@@ -167,6 +175,9 @@ class Mortgage with ChangeNotifier {
   HousePriceOutput get housePriceOutput => _housePriceOutput;
   double get monthlyRentSaved => _monthlyRentSaved;
   double get monthlyRentalIncome => _monthlyRentalIncome;
+
+  double get annualRentSavedIncrease => _annualRentSavedIncrease;
+  double get annualRentalIncomeIncrease => _annualRentalIncomeIncrease;
 
   // Methods to update properties
 
@@ -302,6 +313,22 @@ class Mortgage with ChangeNotifier {
     }
   }
 
+  void updateAnnualRentSavedIncrease(double value) {
+    if (_annualRentSavedIncrease != value) {
+      _annualRentSavedIncrease = value;
+      invalidateCalculations();
+      notifyListeners();
+    }
+  }
+
+  void updateAnnualRentalIncomeIncrease(double value) {
+    if (_annualRentalIncomeIncrease != value) {
+      _annualRentalIncomeIncrease = value;
+      invalidateCalculations();
+      notifyListeners();
+    }
+  }
+
   void updateMortgageName(String newName) {
     if (_mortgageName != newName) {
       _mortgageName = newName;
@@ -373,6 +400,8 @@ class Mortgage with ChangeNotifier {
       annualDepreciationRate: _annualDepreciationRate,
       monthlyRentSaved: _monthlyRentSaved,
       monthlyRentalIncome: _monthlyRentalIncome,
+      annualRentSavedIncrease: _annualRentSavedIncrease,
+      annualRentalIncomeIncrease: _annualRentalIncomeIncrease,
     );
 
     return _lastCalculationResult!;
@@ -388,12 +417,14 @@ class Mortgage with ChangeNotifier {
     CalculationResult result = calculateMortgagePayments();
 
     for (var payment in groupPaymentsByYear(result.payments)) {
-      double yearlyInflow = (payment.rentSaved + payment.rentalIncome);
-      yearlyInflow -= (payment.principalPayment +
+      double yearlyInflow = payment.rentSaved + payment.rentalIncome;
+      double yearlyOutflow = payment.principalPayment +
           payment.interestPayment +
-          payment.specialPayment);
-      yearlyInflow += payment.interestRebate + payment.depreciation;
-      cashFlows.add(yearlyInflow);
+          payment.specialPayment;
+      double yearlyTaxBenefits = payment.interestRebate + payment.depreciation;
+
+      double netCashFlow = yearlyInflow - yearlyOutflow + yearlyTaxBenefits;
+      cashFlows.add(netCashFlow);
     }
 
     // Add final year's inflow (assuming property is sold at the original price)
@@ -457,6 +488,8 @@ CalculationResult calculateMortgagePaymentsFunction({
   required double annualDepreciationRate,
   required double monthlyRentSaved,
   required double monthlyRentalIncome,
+  required double annualRentSavedIncrease,
+  required double annualRentalIncomeIncrease,
 }) {
   final double monthlyInterestRate = annualInterestRate / 12;
   final double maxAnnualSpecialPayment = principal * maxSpecialPaymentPercent;
@@ -476,6 +509,9 @@ CalculationResult calculateMortgagePaymentsFunction({
   double totalExcess = 0;
   double totalRentSaved = 0;
   double totalRentalIncome = 0;
+  double currentMonthlyRentSaved = monthlyRentSaved;
+  double currentMonthlyRentalIncome = monthlyRentalIncome;
+  int currentYear = 1;
 
   while (remainingBalance > 0) {
     if ((month - 1) % 12 == 0) {
@@ -497,7 +533,12 @@ CalculationResult calculateMortgagePaymentsFunction({
       depreciation = calculateDepreciation(
           purchasePrice, annualDepreciationRate, topTaxRate);
     }
-
+    if (month % 12 == 1 && month > 1) {
+      // Jährliche Steigerung zum 1. Monat eines neuen Jahres
+      currentMonthlyRentSaved *= (1 + annualRentSavedIncrease);
+      currentMonthlyRentalIncome *= (1 + annualRentalIncomeIncrease);
+      currentYear++;
+    }
     double specialPayment = monthlySpecialPayment;
     double totalSpecialWithRebateAndDepreciation =
         specialPayment + interestRebate + depreciation;
@@ -521,8 +562,8 @@ CalculationResult calculateMortgagePaymentsFunction({
     }
     remainingBalance -= balanceReduction;
 
-    double rentSaved = monthlyRentSaved;
-    double rentalIncome = monthlyRentalIncome;
+    double rentSaved = currentMonthlyRentSaved;
+    double rentalIncome = currentMonthlyRentalIncome;
 
     totalRentSaved += rentSaved;
     totalRentalIncome += rentalIncome;
@@ -555,9 +596,11 @@ CalculationResult calculateMortgagePaymentsFunction({
 
     if (remainingBalance < 0.01) break;
   }
+  totalSum += equity;
 
   return CalculationResult(
     payments: payments,
+    equity: equity,
     totalMonths: month - 1,
     totalSum: totalSum,
     totalTaxRepayment: totalTaxRepayment,
@@ -586,7 +629,7 @@ List<Payment> groupPaymentsByYear(List<Payment> payments) {
     double totalDepreciation = 0;
     double totalExcess = 0;
     double totalRentSaved = 0;
-    double totalRentIncome = 0;
+    double totalRentalIncome = 0;
 
     for (int j = i; j < i + 12 && j < payments.length; j++) {
       totalRemainingBalance = payments[j].remainingBalance;
@@ -597,8 +640,8 @@ List<Payment> groupPaymentsByYear(List<Payment> payments) {
       totalInterestRebate += payments[j].interestRebate;
       totalDepreciation += payments[j].depreciation;
       totalExcess += payments[j].excess;
-      totalRentSaved += payments[j].excess;
-      totalRentIncome += payments[j].excess;
+      totalRentSaved += payments[j].rentSaved;
+      totalRentalIncome += payments[j].rentalIncome;
     }
 
     annualPayments.add(Payment(
@@ -612,7 +655,7 @@ List<Payment> groupPaymentsByYear(List<Payment> payments) {
       depreciation: totalDepreciation,
       excess: totalExcess,
       rentSaved: totalRentSaved,
-      rentalIncome: totalRentIncome,
+      rentalIncome: totalRentalIncome,
     ));
   }
 
