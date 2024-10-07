@@ -37,6 +37,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   _buildViewToggle(),
+                  _buildInitialLoanInfo(),
                   _buildSelectedView(constraints),
                 ],
               ),
@@ -44,6 +45,32 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildInitialLoanInfo() {
+    final mortgage = Provider.of<Mortgage>(context, listen: false);
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Startkredit',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              SizedBox(height: 8),
+              Text(
+                  'Anfängliche Kreditsumme: ${GermanCurrencyFormatter.format(mortgage.principal)}'),
+              SizedBox(height: 8),
+              Text(
+                  'Hinweis: Die Restschuld in der Tabelle zeigt den Stand am Ende des jeweiligen ${_selectedView == 'yearly' ? 'Jahres' : 'Monats'}.',
+                  style: TextStyle(fontStyle: FontStyle.italic)),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
