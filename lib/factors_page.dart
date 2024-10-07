@@ -324,6 +324,26 @@ class FactorsPage extends StatelessWidget {
         maxValue: mortgage.squareMeters,
         tooltip: 'Sonstige geschäftlich genutzte Fläche der Immobilie',
       ),
+      CustomInputField(
+        label: 'Bodenrichtwert',
+        suffix: '€/m²',
+        initialValue: mortgage.bodenrichtwert,
+        onChanged: (value) => mortgage.updateBodenrichtwert(value),
+        decimalPlaces: 2,
+        minValue: 0,
+        maxValue: 10000,
+        tooltip: 'Bodenrichtwert pro Quadratmeter',
+      ),
+      CustomInputField(
+        label: 'Grundstücksfläche',
+        suffix: 'm²',
+        initialValue: mortgage.grundstuecksflaeche,
+        onChanged: (value) => mortgage.updateGrundstuecksflaeche(value),
+        decimalPlaces: 1,
+        minValue: 0,
+        maxValue: 10000,
+        tooltip: 'Gesamtfläche des Grundstücks',
+      ),
     ];
   }
 
@@ -342,6 +362,10 @@ class FactorsPage extends StatelessWidget {
         Text(
             'Quadratmeterpreis: ${GermanCurrencyFormatter.format(mortgage.housePrice / mortgage.squareMeters as num)}'),
         Text('Gewerblicher Anteil: ${mortgage.taxDeductibleShare * 100}'),
+        Text(
+            'Bodenwert: ${GermanCurrencyFormatter.format(mortgage.calculateBodenwert())}'),
+        Text(
+            'Abschreibungsfähiger Gebäudewert: ${GermanCurrencyFormatter.format(mortgage.calculateAbschreibungsfaehigerGebaeudewert())}'),
       ],
     );
   }
