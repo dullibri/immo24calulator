@@ -51,12 +51,19 @@ class FactorsPage extends StatelessWidget {
 
             // Hauptfaktoren
             _buildSectionTitle('Hauptfaktoren'),
-            _buildFactorsGrid(context, mortgage, isMainFactors: true),
+            _buildFactorsGrid(context, mortgage,
+                factorsList: _buildMainFactors(context, mortgage)),
             SizedBox(height: 24),
 
             // Rahmenfaktoren
             _buildSectionTitle('Rahmenfaktoren'),
-            _buildFactorsGrid(context, mortgage, isMainFactors: false),
+            _buildFactorsGrid(context, mortgage,
+                factorsList: _buildFrameFactors(context, mortgage)),
+            SizedBox(height: 24),
+
+            _buildSectionTitle('Wirtschaftliche Nutzung'),
+            _buildFactorsGrid(context, mortgage,
+                factorsList: _buildCommercialFactors(context, mortgage)),
 
             SizedBox(height: 20),
             _buildSummary(mortgage),
@@ -91,10 +98,8 @@ class FactorsPage extends StatelessWidget {
   }
 
   Widget _buildFactorsGrid(BuildContext context, Mortgage mortgage,
-      {required bool isMainFactors}) {
-    List<Widget> factors = isMainFactors
-        ? _buildMainFactors(context, mortgage)
-        : _buildFrameFactors(context, mortgage);
+      {required List<Widget> factorsList}) {
+    List<Widget> factors = factorsList;
 
     return Wrap(
       spacing: 16,
@@ -176,36 +181,6 @@ class FactorsPage extends StatelessWidget {
         tooltip: 'Maximaler Prozentsatz für jährliche Sondertilgungen',
       ),
       CustomInputField(
-        label: 'Mietanteil',
-        suffix: '%',
-        initialValue: mortgage.rentalShare,
-        onChanged: (value) => mortgage.updateRentalShare(value),
-        isPercentage: true,
-        minValue: 0,
-        maxValue: 1,
-        tooltip: 'Anteil der vermieteten Fläche',
-      ),
-      CustomInputField(
-        label: 'Spitzensteuersatz',
-        suffix: '%',
-        initialValue: mortgage.topTaxRate,
-        onChanged: (value) => mortgage.updateTopTaxRate(value),
-        isPercentage: true,
-        minValue: 0,
-        maxValue: 0.45,
-        tooltip: 'Ihr persönlicher Spitzensteuersatz',
-      ),
-      CustomInputField(
-        label: 'Jährliche Abschreibung',
-        suffix: '%',
-        initialValue: mortgage.annualDepreciationRate,
-        onChanged: (value) => mortgage.updateAnnualDepreciationRate(value),
-        isPercentage: true,
-        minValue: 0,
-        maxValue: 0.05,
-        tooltip: 'Jährliche Abschreibungsrate für die Immobilie',
-      ),
-      CustomInputField(
         label: 'Monatliche Mieteinsparung',
         suffix: '€',
         initialValue: mortgage.monthlyRentSaved,
@@ -224,26 +199,6 @@ class FactorsPage extends StatelessWidget {
         minValue: 0,
         maxValue: 0.10,
         tooltip: 'Jährliche prozentuale Steigerung der Mieteinsparung',
-      ),
-      CustomInputField(
-        label: 'Monatliche Mieteinnahmen',
-        suffix: '€',
-        initialValue: mortgage.monthlyRentalIncome,
-        onChanged: (value) => mortgage.updateMonthlyRentalIncome(value),
-        decimalPlaces: 0,
-        minValue: 0,
-        maxValue: 10000,
-        tooltip: 'Erwartete monatliche Mieteinnahmen bei Vermietung',
-      ),
-      CustomInputField(
-        label: 'Jährliche Steigerung Mieteinnahmen',
-        suffix: '%',
-        initialValue: mortgage.annualRentalIncomeIncrease,
-        onChanged: (value) => mortgage.updateAnnualRentalIncomeIncrease(value),
-        isPercentage: true,
-        minValue: 0,
-        maxValue: 0.10,
-        tooltip: 'Jährliche prozentuale Steigerung der Mieteinnahmen',
       ),
     ];
   }
@@ -290,15 +245,34 @@ class FactorsPage extends StatelessWidget {
         maxValue: 0.5,
         tooltip: 'Maximaler Prozentsatz für jährliche Sondertilgungen',
       ),
+
       CustomInputField(
-        label: 'Mietanteil',
+        label: 'Quadratmeter',
+        suffix: 'm²',
+        initialValue: mortgage.squareMeters,
+        onChanged: (value) => mortgage.updateSquareMeters(value),
+        decimalPlaces: 1,
+        minValue: 0,
+        maxValue: 1000,
+        tooltip: 'Gesamte Wohnfläche der Immobilie',
+      ),
+
+      // Fügen Sie hier die restlichen Rahmenfaktoren hinzu
+    ];
+  }
+
+  List<Widget> _buildCommercialFactors(
+      BuildContext context, Mortgage mortgage) {
+    return [
+      CustomInputField(
+        label: 'Jährliche Abschreibung',
         suffix: '%',
-        initialValue: mortgage.rentalShare,
-        onChanged: (value) => mortgage.updateRentalShare(value),
+        initialValue: mortgage.annualDepreciationRate,
+        onChanged: (value) => mortgage.updateAnnualDepreciationRate(value),
         isPercentage: true,
         minValue: 0,
-        maxValue: 1,
-        tooltip: 'Anteil der vermieteten Fläche',
+        maxValue: 0.05,
+        tooltip: 'Jährliche Abschreibungsrate für die Immobilie',
       ),
       CustomInputField(
         label: 'Spitzensteuersatz',
@@ -311,24 +285,34 @@ class FactorsPage extends StatelessWidget {
         tooltip: 'Ihr persönlicher Spitzensteuersatz',
       ),
       CustomInputField(
-        label: 'Jährliche Abschreibung',
-        suffix: '%',
-        initialValue: mortgage.annualDepreciationRate,
-        onChanged: (value) => mortgage.updateAnnualDepreciationRate(value),
-        isPercentage: true,
+        label: 'Monatliche Mieteinnahmen',
+        suffix: '€',
+        initialValue: mortgage.monthlyRentalIncome,
+        onChanged: (value) => mortgage.updateMonthlyRentalIncome(value),
+        decimalPlaces: 0,
         minValue: 0,
-        maxValue: 0.03,
-        tooltip: 'Jährliche Abschreibungsrate für die Immobilie',
+        maxValue: 10000,
+        tooltip: 'Erwartete monatliche Mieteinnahmen bei Vermietung',
       ),
       CustomInputField(
-        label: 'Quadratmeter',
-        suffix: 'm²',
-        initialValue: mortgage.squareMeters,
-        onChanged: (value) => mortgage.updateSquareMeters(value),
-        decimalPlaces: 1,
+        label: 'Jährliche Steigerung Mieteinnahmen',
+        suffix: '%',
+        initialValue: mortgage.annualRentalIncomeIncrease,
+        onChanged: (value) => mortgage.updateAnnualRentalIncomeIncrease(value),
+        isPercentage: true,
         minValue: 0,
-        maxValue: 1000,
-        tooltip: 'Gesamte Wohnfläche der Immobilie',
+        maxValue: 0.10,
+        tooltip: 'Jährliche prozentuale Steigerung der Mieteinnahmen',
+      ),
+      CustomInputField(
+        label: 'Mietanteil',
+        suffix: '%',
+        initialValue: mortgage.rentalShare,
+        onChanged: (value) => mortgage.updateRentalShare(value),
+        isPercentage: true,
+        minValue: 0,
+        maxValue: 1,
+        tooltip: 'Anteil der vermieteten Fläche',
       ),
       CustomInputField(
         label: 'Vermietete Quadratmeter',
@@ -340,8 +324,6 @@ class FactorsPage extends StatelessWidget {
         maxValue: mortgage.squareMeters,
         tooltip: 'Vermietete Wohnfläche der Immobilie',
       ),
-
-      // Fügen Sie hier die restlichen Rahmenfaktoren hinzu
     ];
   }
 
