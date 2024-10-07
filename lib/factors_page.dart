@@ -341,6 +341,7 @@ class FactorsPage extends StatelessWidget {
             'Maklerprovision: ${GermanCurrencyFormatter.format(mortgage.housePriceOutput.brokerCommission as num)}'),
         Text(
             'Quadratmeterpreis: ${GermanCurrencyFormatter.format(mortgage.housePrice / mortgage.squareMeters as num)}'),
+        Text('Gewerblicher Anteil: ${mortgage.taxDeductibleShare * 100}'),
       ],
     );
   }
