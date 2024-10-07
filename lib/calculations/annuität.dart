@@ -74,8 +74,14 @@ double calculateInterestRebate(
 }
 
 double calculateDepreciation(
-    double purchasePrice, double annualDepreciationRate, double topTaxRate) {
-  return purchasePrice * annualDepreciationRate * topTaxRate;
+    double purchasePrice,
+    double annualDepreciationRate,
+    double topTaxRate,
+    double taxDeductibleShare) {
+  return purchasePrice *
+      annualDepreciationRate *
+      topTaxRate *
+      taxDeductibleShare;
 }
 
 class Mortgage with ChangeNotifier {
@@ -112,22 +118,22 @@ class Mortgage with ChangeNotifier {
 
   Mortgage({
     double squareMeters = 291,
-    double housePrice = 490800,
+    double housePrice = 695000.0,
     double letSquareMeters = 155.5,
     double otherBusinessUsedArea = 55.0,
     double notaryFeesRate = 0.015,
     double landRegistryFeesRate = 0.065,
     double brokerCommissionRate = 0.0,
-    double equity = 180000,
+    double equity = 194600.0,
     double annualInterestRate = 0.0365,
-    double monthlyPayment = 2495,
+    double monthlyPayment = 2618,
     double monthlySpecialPayment = 1185,
     double maxSpecialPaymentPercent = 0.05,
     double taxDeductibleShare = 155 / 291,
     double topTaxRate = 0.42,
     double annualDepreciationRate = 0.03,
-    double monthlyRentSaved = 1500,
-    double monthlyRentalIncome = 1500,
+    double monthlyRentSaved = 1450,
+    double monthlyRentalIncome = 1471,
     double annualRentSavedIncrease = 0.01,
     double annualRentalIncomeIncrease = 0.01,
     String? mortgageName,
@@ -550,8 +556,8 @@ CalculationResult calculateMortgagePaymentsFunction({
     if (month > 12 && (month - 6) % 12 == 0) {
       interestRebate = calculateInterestRebate(
           interestPayment * 12, topTaxRate, taxDeductibleShare);
-      depreciation = calculateDepreciation(
-          purchasePrice, annualDepreciationRate, topTaxRate);
+      depreciation = calculateDepreciation(purchasePrice,
+          annualDepreciationRate, topTaxRate, taxDeductibleShare);
     }
     if (month % 12 == 1 && month > 1) {
       // Jährliche Steigerung zum 1. Monat eines neuen Jahres
