@@ -4,6 +4,12 @@ import 'package:flutter/foundation.dart';
 class AuthService with ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
+  // Getter für den aktuellen Benutzer
+  User? get currentUser => _auth.currentUser;
+
+  // Methode zum Überprüfen, ob ein Benutzer angemeldet ist
+  bool get isSignedIn => currentUser != null;
+
   // auth change user stream
   Stream<User?> get user => _auth.authStateChanges();
 

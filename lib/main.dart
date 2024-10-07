@@ -18,16 +18,7 @@ void main() async {
   );
 
   if (kDebugMode) {
-    try {
-      FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
-      await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
-      print('Emulators are connected');
-
-      // Anmeldung für den Emulator
-      await signInToEmulator();
-    } catch (e) {
-      print('Failed to connect to emulators or sign in: $e');
-    }
+    await _connectToEmulators();
   }
 
   runApp(
@@ -42,16 +33,31 @@ void main() async {
   );
 }
 
-Future<void> signInToEmulator() async {
+Future<void> _connectToEmulators() async {
   try {
-    // Anonyme Anmeldung für den Emulator
-    UserCredential userCredential =
-        await FirebaseAuth.instance.signInAnonymously();
+    await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
+    FirebaseFirestore.instance.settings = const Settings(
+      host: 'localhost:8080',
+      sslEnabled: false,
+      persistenceEnabled: false,
+    );
+    print('Emulators are connected');
 
-    print(
-        'Signed in to emulator successfully with UID: ${userCredential.user?.uid}');
+    // Try to sign in anonymously
+    await _signInAnonymously();
   } catch (e) {
-    print('Failed to sign in to emulator: $e');
+    print('Error connecting to emulators: $e');
+  }
+}
+
+Future<void> _signInAnonymously() async {
+  try {
+    final userCredential = await FirebaseAuth.instance.signInAnonymously();
+    print('Signed in anonymously with UID: ${userCredential.user?.uid}');
+  } on FirebaseAuthException catch (e) {
+    print('Failed to sign in anonymously: ${e.code} - ${e.message}');
+  } catch (e) {
+    print('Unexpected error during anonymous sign in: $e');
   }
 }
 
@@ -136,8 +142,15 @@ class AuthWrapper extends StatelessWidget {
       builder: (_, AsyncSnapshot<User?> snapshot) {
         if (snapshot.connectionState == ConnectionState.active) {
           final User? user = snapshot.data;
-          return user == null ? LoginPage() : BottomNavigation();
+          if (user != null) {
+            // Benutzer ist angemeldet (anonym oder nicht)
+            return BottomNavigation();
+          } else {
+            // Kein Benutzer angemeldet
+            return LoginPage();
+          }
         }
+        // Warten auf Authentifizierungsstatus
         return Scaffold(body: Center(child: CircularProgressIndicator()));
       },
     );

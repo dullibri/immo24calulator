@@ -79,6 +79,8 @@ double calculateDepreciation(
     double annualDepreciationRate,
     double topTaxRate,
     double taxDeductibleShare) {
+  print(
+      "purchasePrice: $purchasePrice, annualDepreciationRate: $annualDepreciationRate, topTaxRate: $topTaxRate, taxDeductiableShare: $taxDeductibleShare");
   return purchasePrice *
       annualDepreciationRate *
       topTaxRate *
@@ -166,7 +168,6 @@ class Mortgage with ChangeNotifier {
         _monthlyRentalIncome = monthlyRentalIncome,
         _annualRentSavedIncrease = annualRentSavedIncrease,
         _annualRentalIncomeIncrease = annualRentalIncomeIncrease {
-    _calculateTaxDeductibleShare();
     _calculateTaxDeductibleShare();
     calculateTotalHousePrice();
     _updatePrincipal();
@@ -609,7 +610,7 @@ CalculationResult calculateMortgagePaymentsFunction({
     if (month > 12 && (month - 6) % 12 == 0) {
       interestRebate = calculateInterestRebate(
           interestPayment * 12, topTaxRate, taxDeductibleShare);
-      depreciation = calculateDepreciation(purchasePrice,
+      depreciation = calculateDepreciation(abschreibungsfaehigerGebaeudewert,
           annualDepreciationRate, topTaxRate, taxDeductibleShare);
     }
     if (month % 12 == 1 && month > 1) {
