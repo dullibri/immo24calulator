@@ -115,6 +115,8 @@ class Mortgage with ChangeNotifier {
   double _topTaxRate;
   double _annualDepreciationRate;
   String _mortgageName;
+  double _bodenrichtwert;
+  double _grundstuecksflaeche;
 
   double _irrValue = 0.0;
   double get irrValue => _irrValue;
@@ -144,8 +146,12 @@ class Mortgage with ChangeNotifier {
     double monthlyRentalIncome = 1471,
     double annualRentSavedIncrease = 0.01,
     double annualRentalIncomeIncrease = 0.01,
+    double bodenrichtwert = 134.0,
+    double grundstuecksflaeche = 190.0,
     String? mortgageName,
-  })  : _squareMeters = squareMeters,
+  })  : _bodenrichtwert = bodenrichtwert,
+        _grundstuecksflaeche = grundstuecksflaeche,
+        _squareMeters = squareMeters,
         _housePrice = housePrice,
         _letSquareMeters = letSquareMeters,
         _notaryFeesRate = notaryFeesRate,
@@ -204,6 +210,8 @@ class Mortgage with ChangeNotifier {
 
   double get annualRentSavedIncrease => _annualRentSavedIncrease;
   double get annualRentalIncomeIncrease => _annualRentalIncomeIncrease;
+  double get bodenrichtwert => _bodenrichtwert;
+  double get grundstuecksflaeche => _grundstuecksflaeche;
 
   // Methods to update properties
 
@@ -396,6 +404,42 @@ class Mortgage with ChangeNotifier {
     }
   }
 
+  void updateBodenrichtwert(double value) {
+    if (_bodenrichtwert != value) {
+      _bodenrichtwert = value;
+      invalidateCalculations();
+      notifyListeners();
+    }
+  }
+
+  void updateGrundstuecksflaeche(double value) {
+    if (_grundstuecksflaeche != value) {
+      _grundstuecksflaeche = value;
+      invalidateCalculations();
+      notifyListeners();
+    }
+  }
+
+  double calculateBodenwert() {
+    return _bodenrichtwert * _grundstuecksflaeche;
+  }
+
+  // Methode zur Berechnung des abschreibungsfähigen Gebäudewerts
+  double calculateAbschreibungsfaehigerGebaeudewert() {
+    double bodenwert = calculateBodenwert();
+    return _housePrice - bodenwert > 0 ? _housePrice - bodenwert : 0;
+  }
+
+  // Aktualisierte Methode zur Berechnung der Abschreibung
+  double calculateDepreciation(double topTaxRate, double taxDeductibleShare) {
+    double abschreibungsfaehigerWert =
+        calculateAbschreibungsfaehigerGebaeudewert();
+    return abschreibungsfaehigerWert *
+        _annualDepreciationRate *
+        topTaxRate *
+        taxDeductibleShare;
+  }
+
   void updateFromMortgage(Mortgage other) {
     print('updateFromMortgage called with housePrice: ${other.housePrice}');
     _housePrice = other.housePrice;
@@ -464,6 +508,8 @@ class Mortgage with ChangeNotifier {
       monthlyRentalIncome: _monthlyRentalIncome,
       annualRentSavedIncrease: _annualRentSavedIncrease,
       annualRentalIncomeIncrease: _annualRentalIncomeIncrease,
+      abschreibungsfaehigerGebaeudewert:
+          calculateAbschreibungsfaehigerGebaeudewert(),
     );
 
     return _lastCalculationResult!;
@@ -553,6 +599,7 @@ CalculationResult calculateMortgagePaymentsFunction({
   required double monthlyRentalIncome,
   required double annualRentSavedIncrease,
   required double annualRentalIncomeIncrease,
+  required double abschreibungsfaehigerGebaeudewert,
 }) {
   final double monthlyInterestRate = annualInterestRate / 12;
   final double maxAnnualSpecialPayment = principal * maxSpecialPaymentPercent;
@@ -574,6 +621,11 @@ CalculationResult calculateMortgagePaymentsFunction({
   double totalRentalIncome = 0;
   double currentMonthlyRentSaved = monthlyRentSaved;
   double currentMonthlyRentalIncome = monthlyRentalIncome;
+  double depreciation = abschreibungsfaehigerGebaeudewert *
+      annualDepreciationRate *
+      topTaxRate *
+      taxDeductibleShare;
+
   int currentYear = 1;
 
   while (remainingBalance > 0) {
