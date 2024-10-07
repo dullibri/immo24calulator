@@ -339,6 +339,8 @@ class FactorsPage extends StatelessWidget {
             'Grundbuchgebühren: ${GermanCurrencyFormatter.format(mortgage.housePriceOutput.landRegistryFees as num)}'),
         Text(
             'Maklerprovision: ${GermanCurrencyFormatter.format(mortgage.housePriceOutput.brokerCommission as num)}'),
+        Text(
+            'Quadratmeterpreis: ${GermanCurrencyFormatter.format(mortgage.housePrice / mortgage.squareMeters as num)}'),
       ],
     );
   }
