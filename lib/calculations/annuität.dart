@@ -1,3 +1,4 @@
+import 'dart:core';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
@@ -49,7 +50,6 @@ class CalculationResult {
   final double totalRentalIncome;
   final double equity;
   final double taxDeductibleShare;
-  final double taxDeductibleShare;
 
   CalculationResult({
     required this.payments,
@@ -66,13 +66,10 @@ class CalculationResult {
     required this.totalRentSaved,
     required this.totalRentalIncome,
     required this.taxDeductibleShare,
-    required this.taxDeductibleShare,
   });
 }
 
 double calculateInterestRebate(
-    double interestForRebate, double topTaxRate, double taxDeductibleShare) {
-  return interestForRebate * topTaxRate * taxDeductibleShare;
     double interestForRebate, double topTaxRate, double taxDeductibleShare) {
   return interestForRebate * topTaxRate * taxDeductibleShare;
 }
@@ -110,8 +107,6 @@ class Mortgage with ChangeNotifier {
   double _maxSpecialPaymentPercent;
   double _otherBusinessUsedArea;
   double _taxDeductibleShare;
-  double _otherBusinessUsedArea;
-  double _taxDeductibleShare;
   double _topTaxRate;
   double _annualDepreciationRate;
   String _mortgageName;
@@ -119,7 +114,6 @@ class Mortgage with ChangeNotifier {
   double _grundstuecksflaeche;
 
   double _irrValue = 0.0;
-  double get irrValue => _irrValue;
 
   late HousePriceOutput _housePriceOutput;
   CalculationResult? _lastCalculationResult;
@@ -128,8 +122,7 @@ class Mortgage with ChangeNotifier {
     double squareMeters = 291,
     double housePrice = 695000.0,
     double letSquareMeters = 155.5,
-    double otherBusinessUsedArea = 55.0,
-    double otherBusinessUsedArea = 55.0,
+    double otherBusinessUsedArea = 50.0,
     double notaryFeesRate = 0.015,
     double landRegistryFeesRate = 0.065,
     double brokerCommissionRate = 0.0,
@@ -138,7 +131,6 @@ class Mortgage with ChangeNotifier {
     double monthlyPayment = 2618,
     double monthlySpecialPayment = 1185,
     double maxSpecialPaymentPercent = 0.05,
-    double taxDeductibleShare = 155 / 291,
     double taxDeductibleShare = 155 / 291,
     double topTaxRate = 0.42,
     double annualDepreciationRate = 0.03,
@@ -167,8 +159,6 @@ class Mortgage with ChangeNotifier {
         _maxSpecialPaymentPercent = maxSpecialPaymentPercent,
         _otherBusinessUsedArea = otherBusinessUsedArea,
         _taxDeductibleShare = taxDeductibleShare,
-        _otherBusinessUsedArea = otherBusinessUsedArea,
-        _taxDeductibleShare = taxDeductibleShare,
         _topTaxRate = topTaxRate,
         _mortgageName = mortgageName ?? naming(),
         _annualDepreciationRate = annualDepreciationRate,
@@ -183,6 +173,7 @@ class Mortgage with ChangeNotifier {
   }
 
   // Getters for all properties
+  double get irrValue => _irrValue;
   double get squareMeters => _squareMeters;
   double get housePrice => _housePrice;
   double get letSquareMeters => _letSquareMeters;
@@ -197,17 +188,12 @@ class Mortgage with ChangeNotifier {
   double get maxSpecialPaymentPercent => _maxSpecialPaymentPercent;
   double get otherBusinessUsedArea => _otherBusinessUsedArea;
   double get taxDeductibleShare => _taxDeductibleShare;
-  double get otherBusinessUsedArea => _otherBusinessUsedArea;
-  double get taxDeductibleShare => _taxDeductibleShare;
   double get topTaxRate => _topTaxRate;
   double get annualDepreciationRate => _annualDepreciationRate;
   String get mortgageName => _mortgageName;
-
-  // House price output
   HousePriceOutput get housePriceOutput => _housePriceOutput;
   double get monthlyRentSaved => _monthlyRentSaved;
   double get monthlyRentalIncome => _monthlyRentalIncome;
-
   double get annualRentSavedIncrease => _annualRentSavedIncrease;
   double get annualRentalIncomeIncrease => _annualRentalIncomeIncrease;
   double get bodenrichtwert => _bodenrichtwert;
@@ -298,28 +284,8 @@ class Mortgage with ChangeNotifier {
     if (_otherBusinessUsedArea != value) {
       _otherBusinessUsedArea = value;
       _calculateTaxDeductibleShare();
-      _calculateTaxDeductibleShare();
       notifyListeners();
     }
-  }
-
-  void updateOtherBusinessUsedArea(double value) {
-    if (_otherBusinessUsedArea != value) {
-      _otherBusinessUsedArea = value;
-      _calculateTaxDeductibleShare();
-      notifyListeners();
-    }
-  }
-
-  void _calculateTaxDeductibleShare() {
-    if (_squareMeters > 0) {
-      _taxDeductibleShare =
-          (_letSquareMeters + _otherBusinessUsedArea) / _squareMeters;
-      if (_taxDeductibleShare > 1) _taxDeductibleShare = 1;
-    } else {
-      _taxDeductibleShare = 0;
-    }
-    invalidateCalculations();
   }
 
   void _calculateTaxDeductibleShare() {
@@ -501,7 +467,6 @@ class Mortgage with ChangeNotifier {
       monthlySpecialPayment: _monthlySpecialPayment,
       maxSpecialPaymentPercent: _maxSpecialPaymentPercent,
       taxDeductibleShare: _taxDeductibleShare,
-      taxDeductibleShare: _taxDeductibleShare,
       topTaxRate: _topTaxRate,
       annualDepreciationRate: _annualDepreciationRate,
       monthlyRentSaved: _monthlyRentSaved,
@@ -591,7 +556,6 @@ CalculationResult calculateMortgagePaymentsFunction({
   required double monthlyPayment,
   required double monthlySpecialPayment,
   required double maxSpecialPaymentPercent,
-  required double taxDeductibleShare,
   required double taxDeductibleShare,
   required double topTaxRate,
   required double annualDepreciationRate,
@@ -727,7 +691,6 @@ CalculationResult calculateMortgagePaymentsFunction({
     totalExcess: totalExcess,
     totalRentSaved: totalRentSaved,
     totalRentalIncome: totalRentalIncome,
-    taxDeductibleShare: taxDeductibleShare,
     taxDeductibleShare: taxDeductibleShare,
   );
 }
