@@ -305,16 +305,6 @@ class FactorsPage extends StatelessWidget {
         tooltip: 'Jährliche prozentuale Steigerung der Mieteinnahmen',
       ),
       CustomInputField(
-        label: 'Mietanteil',
-        suffix: '%',
-        initialValue: mortgage.rentalShare,
-        onChanged: (value) => mortgage.updateRentalShare(value),
-        isPercentage: true,
-        minValue: 0,
-        maxValue: 1,
-        tooltip: 'Anteil der vermieteten Fläche',
-      ),
-      CustomInputField(
         label: 'Vermietete Quadratmeter',
         suffix: 'm²',
         initialValue: mortgage.letSquareMeters,
@@ -323,6 +313,16 @@ class FactorsPage extends StatelessWidget {
         minValue: 0,
         maxValue: mortgage.squareMeters,
         tooltip: 'Vermietete Wohnfläche der Immobilie',
+      ),
+      CustomInputField(
+        label: 'Sonstige geschäftlich genutzte Fläche',
+        suffix: 'm²',
+        initialValue: mortgage.otherBusinessUsedArea,
+        onChanged: (value) => mortgage.updateOtherBusinessUsedArea(value),
+        decimalPlaces: 1,
+        minValue: 0,
+        maxValue: mortgage.squareMeters,
+        tooltip: 'Sonstige geschäftlich genutzte Fläche der Immobilie',
       ),
     ];
   }
