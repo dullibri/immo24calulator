@@ -48,6 +48,7 @@ class CalculationResult {
   final double totalRentSaved;
   final double totalRentalIncome;
   final double equity;
+  final double taxDeductibleShare;
 
   CalculationResult({
     required this.payments,
@@ -63,12 +64,13 @@ class CalculationResult {
     required this.totalExcess,
     required this.totalRentSaved,
     required this.totalRentalIncome,
+    required this.taxDeductibleShare,
   });
 }
 
 double calculateInterestRebate(
-    double interestForRebate, double topTaxRate, double rentalShare) {
-  return interestForRebate * topTaxRate * rentalShare;
+    double interestForRebate, double topTaxRate, double taxDeductibleShare) {
+  return interestForRebate * topTaxRate * taxDeductibleShare;
 }
 
 double calculateDepreciation(
@@ -96,7 +98,8 @@ class Mortgage with ChangeNotifier {
   double _monthlyPayment;
   double _monthlySpecialPayment;
   double _maxSpecialPaymentPercent;
-  double _rentalShare;
+  double _otherBusinessUsedArea;
+  double _taxDeductibleShare;
   double _topTaxRate;
   double _annualDepreciationRate;
   String _mortgageName;
@@ -111,6 +114,7 @@ class Mortgage with ChangeNotifier {
     double squareMeters = 291,
     double housePrice = 490800,
     double letSquareMeters = 155.5,
+    double otherBusinessUsedArea = 0,
     double notaryFeesRate = 0.015,
     double landRegistryFeesRate = 0.065,
     double brokerCommissionRate = 0.0,
@@ -119,7 +123,7 @@ class Mortgage with ChangeNotifier {
     double monthlyPayment = 2495,
     double monthlySpecialPayment = 1185,
     double maxSpecialPaymentPercent = 0.05,
-    double rentalShare = 1.0,
+    double taxDeductibleShare = 155 / 291,
     double topTaxRate = 0.42,
     double annualDepreciationRate = 0.03,
     double monthlyRentSaved = 0,
@@ -141,7 +145,8 @@ class Mortgage with ChangeNotifier {
         _monthlyPayment = monthlyPayment,
         _monthlySpecialPayment = monthlySpecialPayment,
         _maxSpecialPaymentPercent = maxSpecialPaymentPercent,
-        _rentalShare = rentalShare,
+        _otherBusinessUsedArea = otherBusinessUsedArea,
+        _taxDeductibleShare = taxDeductibleShare,
         _topTaxRate = topTaxRate,
         _mortgageName = mortgageName ?? naming(),
         _annualDepreciationRate = annualDepreciationRate,
@@ -149,6 +154,7 @@ class Mortgage with ChangeNotifier {
         _monthlyRentalIncome = monthlyRentalIncome,
         _annualRentSavedIncrease = annualRentSavedIncrease,
         _annualRentalIncomeIncrease = annualRentalIncomeIncrease {
+    _calculateTaxDeductibleShare();
     calculateTotalHousePrice();
     _updatePrincipal();
   }
@@ -166,7 +172,8 @@ class Mortgage with ChangeNotifier {
   double get monthlyPayment => _monthlyPayment;
   double get monthlySpecialPayment => _monthlySpecialPayment;
   double get maxSpecialPaymentPercent => _maxSpecialPaymentPercent;
-  double get rentalShare => _rentalShare;
+  double get otherBusinessUsedArea => _otherBusinessUsedArea;
+  double get taxDeductibleShare => _taxDeductibleShare;
   double get topTaxRate => _topTaxRate;
   double get annualDepreciationRate => _annualDepreciationRate;
   String get mortgageName => _mortgageName;
@@ -227,14 +234,6 @@ class Mortgage with ChangeNotifier {
     }
   }
 
-  void updateRentalShare(double value) {
-    if (_rentalShare != value) {
-      _rentalShare = value;
-      invalidateCalculations();
-      notifyListeners();
-    }
-  }
-
   void updateTopTaxRate(double value) {
     if (_topTaxRate != value) {
       _topTaxRate = value;
@@ -254,6 +253,7 @@ class Mortgage with ChangeNotifier {
   void updateSquareMeters(double value) {
     if (_squareMeters != value) {
       _squareMeters = value;
+      _calculateTaxDeductibleShare();
       notifyListeners();
     }
   }
@@ -261,8 +261,28 @@ class Mortgage with ChangeNotifier {
   void updateLetSquareMeters(double value) {
     if (_letSquareMeters != value) {
       _letSquareMeters = value;
+      _calculateTaxDeductibleShare();
       notifyListeners();
     }
+  }
+
+  void updateOtherBusinessUsedArea(double value) {
+    if (_otherBusinessUsedArea != value) {
+      _otherBusinessUsedArea = value;
+      _calculateTaxDeductibleShare();
+      notifyListeners();
+    }
+  }
+
+  void _calculateTaxDeductibleShare() {
+    if (_squareMeters > 0) {
+      _taxDeductibleShare =
+          (_letSquareMeters + _otherBusinessUsedArea) / _squareMeters;
+      if (_taxDeductibleShare > 1) _taxDeductibleShare = 1;
+    } else {
+      _taxDeductibleShare = 0;
+    }
+    invalidateCalculations();
   }
 
   void updateHousePrice(double value) {
@@ -344,7 +364,7 @@ class Mortgage with ChangeNotifier {
     _monthlyPayment = other.monthlyPayment;
     _monthlySpecialPayment = other.monthlySpecialPayment;
     _maxSpecialPaymentPercent = other.maxSpecialPaymentPercent;
-    _rentalShare = other.rentalShare;
+    _taxDeductibleShare = other.taxDeductibleShare;
     _topTaxRate = other.topTaxRate;
     _annualDepreciationRate = other.annualDepreciationRate;
     _squareMeters = other.squareMeters;
@@ -395,7 +415,7 @@ class Mortgage with ChangeNotifier {
       monthlyPayment: _monthlyPayment,
       monthlySpecialPayment: _monthlySpecialPayment,
       maxSpecialPaymentPercent: _maxSpecialPaymentPercent,
-      rentalShare: _rentalShare,
+      taxDeductibleShare: _taxDeductibleShare,
       topTaxRate: _topTaxRate,
       annualDepreciationRate: _annualDepreciationRate,
       monthlyRentSaved: _monthlyRentSaved,
@@ -483,7 +503,7 @@ CalculationResult calculateMortgagePaymentsFunction({
   required double monthlyPayment,
   required double monthlySpecialPayment,
   required double maxSpecialPaymentPercent,
-  required double rentalShare,
+  required double taxDeductibleShare,
   required double topTaxRate,
   required double annualDepreciationRate,
   required double monthlyRentSaved,
@@ -529,7 +549,7 @@ CalculationResult calculateMortgagePaymentsFunction({
     double depreciation = 0;
     if (month > 12 && (month - 6) % 12 == 0) {
       interestRebate = calculateInterestRebate(
-          interestPayment * 12, topTaxRate, rentalShare);
+          interestPayment * 12, topTaxRate, taxDeductibleShare);
       depreciation = calculateDepreciation(
           purchasePrice, annualDepreciationRate, topTaxRate);
     }
@@ -612,6 +632,7 @@ CalculationResult calculateMortgagePaymentsFunction({
     totalExcess: totalExcess,
     totalRentSaved: totalRentSaved,
     totalRentalIncome: totalRentalIncome,
+    taxDeductibleShare: taxDeductibleShare,
   );
 }
 
