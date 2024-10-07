@@ -79,8 +79,6 @@ double calculateDepreciation(
     double annualDepreciationRate,
     double topTaxRate,
     double taxDeductibleShare) {
-  print(
-      "purchasePrice: $purchasePrice, annualDepreciationRate: $annualDepreciationRate, topTaxRate: $topTaxRate, taxDeductiableShare: $taxDeductibleShare");
   return purchasePrice *
       annualDepreciationRate *
       topTaxRate *
