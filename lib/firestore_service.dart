@@ -59,11 +59,13 @@ class FirestoreService {
           'monthlyPayment': mortgage.monthlyPayment,
           'monthlySpecialPayment': mortgage.monthlySpecialPayment,
           'maxSpecialPaymentPercent': mortgage.maxSpecialPaymentPercent,
-          'rentalShare': mortgage.rentalShare,
+          'taxDeductibleShare':
+              mortgage.taxDeductibleShare, // Updated from rentalShare
           'topTaxRate': mortgage.topTaxRate,
           'annualDepreciationRate': mortgage.annualDepreciationRate,
           'squareMeters': mortgage.squareMeters,
           'letSquareMeters': mortgage.letSquareMeters,
+          'otherBusinessUsedArea': mortgage.otherBusinessUsedArea, // New field
           'notaryFeesRate': mortgage.notaryFeesRate,
           'landRegistryFeesRate': mortgage.landRegistryFeesRate,
           'brokerCommissionRate': mortgage.brokerCommissionRate,
@@ -99,11 +101,13 @@ class FirestoreService {
                     monthlySpecialPayment: data['monthlySpecialPayment'] ?? 0,
                     maxSpecialPaymentPercent:
                         data['maxSpecialPaymentPercent'] ?? 0,
-                    rentalShare: data['rentalShare'] ?? 0,
+                    // taxDeductibleShare is now calculated automatically, so we don't need to load it
                     topTaxRate: data['topTaxRate'] ?? 0,
                     annualDepreciationRate: data['annualDepreciationRate'] ?? 0,
                     squareMeters: data['squareMeters'] ?? 0,
                     letSquareMeters: data['letSquareMeters'] ?? 0,
+                    otherBusinessUsedArea:
+                        data['otherBusinessUsedArea'] ?? 0, // New field
                     notaryFeesRate: data['notaryFeesRate'] ?? 0,
                     landRegistryFeesRate: data['landRegistryFeesRate'] ?? 0,
                     brokerCommissionRate: data['brokerCommissionRate'] ?? 0,
