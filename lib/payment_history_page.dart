@@ -287,8 +287,6 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
               ('Reguläre Tilgung', totalRegularRepayment),
               ('Sonderzahlungen', totalSpecialPayment),
             ]),
-            _buildSummaryRowWithPercentage(
-                'Steuerliche Vorteile', totalTaxBenefits, result.totalSum),
             _buildExpandableRepaymentRow('Steuerliche Vorteile Details',
                 totalTaxBenefits, result.totalSum, [
               ('Zinsvorteil', result.totalInterestRebate),
@@ -298,8 +296,6 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
                 'Zinszahlungen', result.totalInterestPayment, result.totalSum),
             _buildSummaryRowWithPercentage(
                 'Überschuss', result.totalExcess, result.totalSum),
-            _buildSummaryRowWithPercentage(
-                'Eigenkapital', mortgage.equity, result.totalSum),
             Divider(),
             _buildSummaryRow('Summe aller Zahlungen', result.totalSum),
             Divider(),
