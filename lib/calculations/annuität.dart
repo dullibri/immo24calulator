@@ -593,7 +593,9 @@ CalculationResult calculateMortgagePaymentsFunction({
   double currentMonthlyRentSaved = monthlyRentSaved;
   double currentMonthlyRentalIncome = monthlyRentalIncome;
 
-  int currentYear = 1;
+  int currentYear = 0;
+  List<double> annualInterestPayments = [];
+  double annualInterestPayment = 0;
 
   while (remainingBalance > 0) {
     if ((month - 1) % 12 == 0) {
@@ -601,6 +603,11 @@ CalculationResult calculateMortgagePaymentsFunction({
     }
 
     double interestPayment = remainingBalance * monthlyInterestRate;
+    annualInterestPayment += interestPayment;
+    if (month % 12 == 0 && month > 1) {
+      annualInterestPayments.add(annualInterestPayment);
+    }
+
     double principalPayment = monthlyPayment - interestPayment;
 
     if (principalPayment > remainingBalance) {
@@ -610,8 +617,10 @@ CalculationResult calculateMortgagePaymentsFunction({
     double interestRebate = 0;
     double depreciation = 0;
     if (month > 12 && (month - 6) % 12 == 0) {
+      double lastYearsInterestPayments =
+          annualInterestPayments[currentYear - 1];
       interestRebate = calculateInterestRebate(
-          interestPayment * 12, topTaxRate, taxDeductibleShare);
+          lastYearsInterestPayments, topTaxRate, taxDeductibleShare);
       depreciation = depreciationAmount;
     }
 
