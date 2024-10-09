@@ -348,25 +348,83 @@ class FactorsPage extends StatelessWidget {
   }
 
   Widget _buildSummary(Mortgage mortgage) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-            'Gesamthauspreis: ${GermanCurrencyFormatter.format(mortgage.housePriceOutput.totalHousePrice as num)}'),
-        Text(
-            'Notargebühren: ${GermanCurrencyFormatter.format(mortgage.housePriceOutput.notaryFees as num)}'),
-        Text(
-            'Grundbuchgebühren: ${GermanCurrencyFormatter.format(mortgage.housePriceOutput.landRegistryFees as num)}'),
-        Text(
-            'Maklerprovision: ${GermanCurrencyFormatter.format(mortgage.housePriceOutput.brokerCommission as num)}'),
-        Text(
-            'Quadratmeterpreis: ${GermanCurrencyFormatter.format(mortgage.housePrice / mortgage.squareMeters as num)}'),
-        Text('Gewerblicher Anteil: ${mortgage.taxDeductibleShare * 100}'),
-        Text(
-            'Bodenwert: ${GermanCurrencyFormatter.format(mortgage.calculateBodenwert())}'),
-        Text(
-            'Abschreibungsfähiger Gebäudewert: ${GermanCurrencyFormatter.format(mortgage.calculateAbschreibungsfaehigerGebaeudewert())}'),
-      ],
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Zusammenfassung',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Gesamthauspreis:'),
+                Text(GermanCurrencyFormatter.format(
+                    mortgage.housePriceOutput.totalHousePrice as num)),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Notargebühren:'),
+                Text(GermanCurrencyFormatter.format(
+                    mortgage.housePriceOutput.notaryFees as num)),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Grundbuchgebühren:'),
+                Text(GermanCurrencyFormatter.format(
+                    mortgage.housePriceOutput.landRegistryFees as num)),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Maklerprovision:'),
+                Text(GermanCurrencyFormatter.format(
+                    mortgage.housePriceOutput.brokerCommission as num)),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Quadratmeterpreis:'),
+                Text(GermanCurrencyFormatter.format(
+                    mortgage.housePrice / mortgage.squareMeters as num)),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Gewerblicher Anteil:'),
+                Text('${mortgage.taxDeductibleShare * 100}%'),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Bodenwert:'),
+                Text(GermanCurrencyFormatter.format(
+                    mortgage.calculateBodenwert())),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Abschreibungsfähiger Gebäudewert:'),
+                Text(GermanCurrencyFormatter.format(
+                    mortgage.calculateAbschreibungsfaehigerGebaeudewert())),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 
