@@ -613,10 +613,6 @@ CalculationResult calculateMortgagePaymentsFunction({
 
     double principalPayment = monthlyPayment - interestPayment;
 
-    if (principalPayment > remainingBalance) {
-      principalPayment = remainingBalance;
-    }
-
     double interestRebate = 0;
     double depreciation = 0;
     if (month > 12 && (month - 6) % 12 == 0) {
@@ -627,12 +623,6 @@ CalculationResult calculateMortgagePaymentsFunction({
       depreciation = depreciationAmount;
     }
 
-    if (month % 12 == 1 && month > 1) {
-      // Jährliche Steigerung zum 1. Monat eines neuen Jahres
-      currentMonthlyRentSaved *= (1 + annualRentSavedIncrease);
-      currentMonthlyRentalIncome *= (1 + annualRentalIncomeIncrease);
-      currentYear++;
-    }
     double specialPayment = monthlySpecialPayment;
     double totalSpecialWithRebateAndDepreciation =
         specialPayment + interestRebate + depreciation;
