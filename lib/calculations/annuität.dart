@@ -640,7 +640,8 @@ CalculationResult calculateMortgagePaymentsFunction({
     totalSpecialPaymentsPerYear += totalSpecialWithRebateAndDepreciation;
 
     // Adjust the remaining balance reduction
-    double balanceReduction = principalPayment + specialPayment;
+    double balanceReduction =
+        principalPayment + totalSpecialWithRebateAndDepreciation;
     if (balanceReduction > remainingBalance) {
       balanceReduction = remainingBalance;
     }
