@@ -66,9 +66,5 @@ This project is licensed under the [MIT License](https://opensource.org/licenses
 ## Authors
 
 
-* [Your Name]
+* Dirk Ulbricht
 
-## Acknowledgments
-
-
-* [List any thirdparty libraries or resources used in the project]
