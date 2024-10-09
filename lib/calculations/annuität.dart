@@ -643,6 +643,7 @@ CalculationResult calculateMortgagePaymentsFunction({
     double balanceReduction =
         principalPayment + totalSpecialWithRebateAndDepreciation;
     if (balanceReduction > remainingBalance) {
+      excess = balanceReduction - remainingBalance;
       balanceReduction = remainingBalance;
     }
     remainingBalance -= balanceReduction;
