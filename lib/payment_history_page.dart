@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:immo24calculator/calculations/annuität.dart';
 import 'package:immo24calculator/widgets/german_currency_converter.dart';
 import 'package:provider/provider.dart';
+import 'package:data_table_2/data_table_2.dart';
 
 class PaymentHistoryPage extends StatefulWidget {
   final CalculationResult calculationResult;
@@ -78,7 +79,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 16, horizontal: 8),
       decoration: BoxDecoration(
-        color: Colors.amber[100], // Heller, warmer Hintergrund
+        color: Colors.amber[100],
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
@@ -138,22 +139,36 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
   }
 
   Widget _buildDataTable(List<Payment> payments, BoxConstraints constraints) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: DataTable(
-        columnSpacing: 24,
-        columns: _buildColumns(),
+    final columns = _buildColumns();
+    final minWidth = _isDetailsExpanded ? 1200.0 : 800.0;
+
+    return Container(
+      width: constraints.maxWidth,
+      height: constraints.maxHeight - 200, // Adjust this value as needed
+      child: DataTable2(
+        columnSpacing: 12,
+        horizontalMargin: 12,
+        minWidth: minWidth,
+        columns: columns,
         rows: payments.map((payment) => _buildDataRow(payment)).toList(),
+        fixedTopRows: 1,
+        fixedLeftColumns: 1,
+        smRatio: 0.4,
+        lmRatio: 2.0,
       ),
     );
   }
 
-  List<DataColumn> _buildColumns() {
-    List<DataColumn> columns = [
-      DataColumn(label: Text(_selectedView == 'yearly' ? 'Jahr' : 'Monat')),
-      DataColumn(label: Text('Restschuld')),
-      DataColumn(label: Text('Zinsen')),
-      DataColumn(
+  List<DataColumn2> _buildColumns() {
+    List<DataColumn2> columns = [
+      DataColumn2(
+        label: Text(_selectedView == 'yearly' ? 'Jahr' : 'Monat'),
+        size: ColumnSize.S,
+        fixedWidth: 60,
+      ),
+      DataColumn2(label: Text('Restschuld'), size: ColumnSize.L),
+      DataColumn2(label: Text('Zinsen'), size: ColumnSize.M),
+      DataColumn2(
         label: Row(
           children: [
             Text('Tilgung'),
@@ -161,51 +176,56 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
             _buildExpandButton(),
           ],
         ),
+        size: ColumnSize.L,
       ),
     ];
 
     if (_isDetailsExpanded) {
       columns.addAll([
-        DataColumn(
+        DataColumn2(
           label: Container(
             color: Colors.blue[50],
             padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             child: Text('Reguläre Tilgung',
                 style: TextStyle(color: Colors.blue[800])),
           ),
+          size: ColumnSize.M,
         ),
-        DataColumn(
+        DataColumn2(
           label: Container(
             color: Colors.blue[50],
             padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             child: Text('Sonderzahlung',
                 style: TextStyle(color: Colors.blue[800])),
           ),
+          size: ColumnSize.M,
         ),
-        DataColumn(
+        DataColumn2(
           label: Container(
             color: Colors.green[50],
             padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             child:
                 Text('Zinsvorteil', style: TextStyle(color: Colors.green[800])),
           ),
+          size: ColumnSize.M,
         ),
-        DataColumn(
+        DataColumn2(
           label: Container(
             color: Colors.green[50],
             padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             child: Text('Abschreibung',
                 style: TextStyle(color: Colors.green[800])),
           ),
+          size: ColumnSize.M,
         ),
       ]);
     }
 
     columns.addAll([
-      DataColumn(label: Text('Mietersparnis')),
-      DataColumn(label: Text('Mieteinnahmen')),
-      DataColumn(label: Text('Verbl. Sonderzahlung')),
-      DataColumn(label: Text('Überschuss')),
+      DataColumn2(label: Text('Mietersparnis'), size: ColumnSize.M),
+      DataColumn2(label: Text('Mieteinnahmen'), size: ColumnSize.M),
+      DataColumn2(label: Text('Verbl. Sonderzahlung'), size: ColumnSize.L),
+      DataColumn2(label: Text('Überschuss'), size: ColumnSize.M),
     ]);
 
     return columns;
