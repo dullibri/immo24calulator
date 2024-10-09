@@ -480,8 +480,8 @@ class Mortgage with ChangeNotifier {
       monthlyRentalIncome: _monthlyRentalIncome,
       annualRentSavedIncrease: _annualRentSavedIncrease,
       annualRentalIncomeIncrease: _annualRentalIncomeIncrease,
-      abschreibungsfaehigerGebaeudewert:
-          calculateAbschreibungsfaehigerGebaeudewert(),
+      depreciationAmount:
+          calculateDepreciation(_topTaxRate, _taxDeductibleShare),
     );
 
     return _lastCalculationResult!;
@@ -570,7 +570,7 @@ CalculationResult calculateMortgagePaymentsFunction({
   required double monthlyRentalIncome,
   required double annualRentSavedIncrease,
   required double annualRentalIncomeIncrease,
-  required double abschreibungsfaehigerGebaeudewert,
+  required double depreciationAmount,
 }) {
   final double monthlyInterestRate = annualInterestRate / 12;
   final double maxAnnualSpecialPayment = principal * maxSpecialPaymentPercent;
@@ -592,10 +592,6 @@ CalculationResult calculateMortgagePaymentsFunction({
   double totalRentalIncome = 0;
   double currentMonthlyRentSaved = monthlyRentSaved;
   double currentMonthlyRentalIncome = monthlyRentalIncome;
-  double depreciation = abschreibungsfaehigerGebaeudewert *
-      annualDepreciationRate *
-      topTaxRate *
-      taxDeductibleShare;
 
   int currentYear = 1;
 
@@ -616,9 +612,9 @@ CalculationResult calculateMortgagePaymentsFunction({
     if (month > 12 && (month - 6) % 12 == 0) {
       interestRebate = calculateInterestRebate(
           interestPayment * 12, topTaxRate, taxDeductibleShare);
-      depreciation = calculateDepreciation(abschreibungsfaehigerGebaeudewert,
-          annualDepreciationRate, topTaxRate, taxDeductibleShare);
+      depreciation = depreciationAmount;
     }
+
     if (month % 12 == 1 && month > 1) {
       // Jährliche Steigerung zum 1. Monat eines neuen Jahres
       currentMonthlyRentSaved *= (1 + annualRentSavedIncrease);
