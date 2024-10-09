@@ -200,6 +200,14 @@ class Mortgage with ChangeNotifier {
 
   // Methods to update properties
 
+  int getMonthsUntilExpiry() {
+    if (_lastCalculationResult != null) {
+      return _lastCalculationResult!.totalMonths;
+    }
+    // Wenn noch keine Berechnung durchgeführt wurde, führen wir sie jetzt durch
+    return calculateMortgagePayments().totalMonths;
+  }
+
   void updateEquity(double value) {
     if (_equity != value) {
       _equity = value;

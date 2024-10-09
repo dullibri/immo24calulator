@@ -24,64 +24,59 @@ class FactorsPage extends StatelessWidget {
     return AppScaffold(
       title: 'Hypothekenfaktoren',
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            ElevatedButton(
-              child: Text('Hypothek speichern'),
-              onPressed: () async {
-                try {
-                  await firestoreService.saveMortgage(mortgage);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Hypothek erfolgreich gespeichert')),
-                  );
-                } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Fehler beim Speichern: $e')),
-                  );
-                }
-              },
-            ),
-            SizedBox(height: 16),
-            MortgageDropdown(),
-            SizedBox(height: 16),
-            Text('Aktuelle Hypothek: ${mortgage.mortgageName}'),
-            SizedBox(height: 24),
-
-            // Hauptfaktoren
-            _buildSectionTitle('Hauptfaktoren'),
-            _buildFactorsGrid(context, mortgage,
-                factorsList: _buildMainFactors(context, mortgage)),
-            SizedBox(height: 24),
-
-            // Rahmenfaktoren
-            _buildSectionTitle('Rahmenfaktoren'),
-            _buildFactorsGrid(context, mortgage,
-                factorsList: _buildFrameFactors(context, mortgage)),
-            SizedBox(height: 24),
-
-            _buildSectionTitle('Wirtschaftliche Nutzung'),
-            _buildFactorsGrid(context, mortgage,
-                factorsList: _buildCommercialFactors(context, mortgage)),
-
-            SizedBox(height: 20),
-            _buildSummary(mortgage),
-
-            // IRR Berechnung und Anzeige
-            SizedBox(height: 20),
-            ElevatedButton(
-              child: Text('IRR berechnen'),
-              onPressed: () {
-                mortgage.calculateIRR();
-              },
-            ),
-            SizedBox(height: 10),
-            Text(
-              'Interne Rendite (IRR): ${(mortgage.irrValue * 100).toStringAsFixed(2)}%',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _buildSummary(mortgage),
+              SizedBox(height: 16),
+              ElevatedButton(
+                child: Text('Hypothek speichern'),
+                onPressed: () async {
+                  try {
+                    await firestoreService.saveMortgage(mortgage);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                          content: Text('Hypothek erfolgreich gespeichert')),
+                    );
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Fehler beim Speichern: $e')),
+                    );
+                  }
+                },
+              ),
+              SizedBox(height: 16),
+              MortgageDropdown(),
+              SizedBox(height: 16),
+              Text('Aktuelle Hypothek: ${mortgage.mortgageName}'),
+              SizedBox(height: 24),
+              _buildSectionTitle('Hauptfaktoren'),
+              _buildFactorsGrid(context, mortgage,
+                  factorsList: _buildMainFactors(context, mortgage)),
+              SizedBox(height: 24),
+              _buildSectionTitle('Rahmenfaktoren'),
+              _buildFactorsGrid(context, mortgage,
+                  factorsList: _buildFrameFactors(context, mortgage)),
+              SizedBox(height: 24),
+              _buildSectionTitle('Wirtschaftliche Nutzung'),
+              _buildFactorsGrid(context, mortgage,
+                  factorsList: _buildCommercialFactors(context, mortgage)),
+              SizedBox(height: 20),
+              ElevatedButton(
+                child: Text('IRR berechnen'),
+                onPressed: () {
+                  mortgage.calculateIRR();
+                },
+              ),
+              SizedBox(height: 10),
+              Text(
+                'Interne Rendite (IRR): ${(mortgage.irrValue * 100).toStringAsFixed(2)}%',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -99,12 +94,10 @@ class FactorsPage extends StatelessWidget {
 
   Widget _buildFactorsGrid(BuildContext context, Mortgage mortgage,
       {required List<Widget> factorsList}) {
-    List<Widget> factors = factorsList;
-
     return Wrap(
       spacing: 16,
       runSpacing: 16,
-      children: factors,
+      children: factorsList,
     );
   }
 
@@ -203,6 +196,10 @@ class FactorsPage extends StatelessWidget {
     ];
   }
 
+  double calculateMinimumMonthlyPayment(Mortgage mortgage) {
+    return (mortgage.annualInterestRate * mortgage.principal / 12) + 1;
+  }
+
   List<Widget> _buildFrameFactors(BuildContext context, Mortgage mortgage) {
     return [
       CustomInputField(
@@ -245,7 +242,6 @@ class FactorsPage extends StatelessWidget {
         maxValue: 0.5,
         tooltip: 'Maximaler Prozentsatz für jährliche Sondertilgungen',
       ),
-
       CustomInputField(
         label: 'Quadratmeter',
         suffix: 'm²',
@@ -256,8 +252,6 @@ class FactorsPage extends StatelessWidget {
         maxValue: 1000,
         tooltip: 'Gesamte Wohnfläche der Immobilie',
       ),
-
-      // Fügen Sie hier die restlichen Rahmenfaktoren hinzu
     ];
   }
 
@@ -349,6 +343,7 @@ class FactorsPage extends StatelessWidget {
 
   Widget _buildSummary(Mortgage mortgage) {
     return Card(
+      margin: EdgeInsets.all(16),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -359,76 +354,50 @@ class FactorsPage extends StatelessWidget {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Gesamthauspreis:'),
-                Text(GermanCurrencyFormatter.format(
-                    mortgage.housePriceOutput.totalHousePrice as num)),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Notargebühren:'),
-                Text(GermanCurrencyFormatter.format(
-                    mortgage.housePriceOutput.notaryFees as num)),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Grundbuchgebühren:'),
-                Text(GermanCurrencyFormatter.format(
-                    mortgage.housePriceOutput.landRegistryFees as num)),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Maklerprovision:'),
-                Text(GermanCurrencyFormatter.format(
-                    mortgage.housePriceOutput.brokerCommission as num)),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Quadratmeterpreis:'),
-                Text(GermanCurrencyFormatter.format(
-                    mortgage.housePrice / mortgage.squareMeters as num)),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Gewerblicher Anteil:'),
-                Text('${mortgage.taxDeductibleShare * 100}%'),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Bodenwert:'),
-                Text(GermanCurrencyFormatter.format(
-                    mortgage.calculateBodenwert())),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Abschreibungsfähiger Gebäudewert:'),
-                Text(GermanCurrencyFormatter.format(
-                    mortgage.calculateAbschreibungsfaehigerGebaeudewert())),
-              ],
-            ),
+            _buildSummaryRow(
+                'Gesamthauspreis:', mortgage.housePriceOutput.totalHousePrice),
+            _buildSummaryRow(
+                'Notargebühren:', mortgage.housePriceOutput.notaryFees),
+            _buildSummaryRow('Grundbuchgebühren:',
+                mortgage.housePriceOutput.landRegistryFees),
+            _buildSummaryRow(
+                'Maklerprovision:', mortgage.housePriceOutput.brokerCommission),
+            _buildSummaryRow('Quadratmeterpreis:',
+                mortgage.housePrice / mortgage.squareMeters),
+            _buildSummaryRow(
+                'Gewerblicher Anteil:', mortgage.taxDeductibleShare,
+                isPercentage: true),
+            _buildSummaryRow('Bodenwert:', mortgage.calculateBodenwert()),
+            _buildSummaryRow('Abschreibungsfähiger Gebäudewert:',
+                mortgage.calculateAbschreibungsfaehigerGebaeudewert()),
+            _buildSummaryRow(
+                'Monate bis Ablauf:', mortgage.getMonthsUntilExpiry()),
           ],
         ),
       ),
     );
   }
 
-  double calculateMinimumMonthlyPayment(Mortgage mortgage) {
-    return (mortgage.annualInterestRate * mortgage.principal / 12) + 1;
+  Widget _buildSummaryRow(String label, dynamic value,
+      {bool isPercentage = false}) {
+    String formattedValue;
+    if (isPercentage) {
+      formattedValue = '${(value * 100).toStringAsFixed(2)}%';
+    } else if (value is num) {
+      formattedValue = GermanCurrencyFormatter.format(value);
+    } else {
+      formattedValue = value.toString();
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label),
+          Text(formattedValue),
+        ],
+      ),
+    );
   }
 }
