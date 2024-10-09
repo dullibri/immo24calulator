@@ -63,18 +63,6 @@ class FactorsPage extends StatelessWidget {
               _buildSectionTitle('Wirtschaftliche Nutzung'),
               _buildFactorsGrid(context, mortgage,
                   factorsList: _buildCommercialFactors(context, mortgage)),
-              SizedBox(height: 20),
-              ElevatedButton(
-                child: Text('IRR berechnen'),
-                onPressed: () {
-                  mortgage.calculateIRR();
-                },
-              ),
-              SizedBox(height: 10),
-              Text(
-                'Interne Rendite (IRR): ${(mortgage.irrValue * 100).toStringAsFixed(2)}%',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
             ],
           ),
         ),
@@ -371,7 +359,11 @@ class FactorsPage extends StatelessWidget {
             _buildSummaryRow('Abschreibungsfähiger Gebäudewert:',
                 mortgage.calculateAbschreibungsfaehigerGebaeudewert()),
             _buildSummaryRow(
-                'Monate bis Ablauf:', mortgage.getMonthsUntilExpiry()),
+                'Monate bis Ablauf:', mortgage.getMonthsUntilExpiry(),
+                isMonths: true),
+            _buildSummaryRow('Interne Rendite (IRR):',
+                mortgage.calculateIRRWithoutNotifying(),
+                isPercentage: true),
           ],
         ),
       ),
@@ -379,9 +371,11 @@ class FactorsPage extends StatelessWidget {
   }
 
   Widget _buildSummaryRow(String label, dynamic value,
-      {bool isPercentage = false}) {
+      {bool isPercentage = false, bool isMonths = false}) {
     String formattedValue;
-    if (isPercentage) {
+    if (isMonths) {
+      formattedValue = value.toString(); // Display months as a simple integer
+    } else if (isPercentage) {
       formattedValue = '${(value * 100).toStringAsFixed(2)}%';
     } else if (value is num) {
       formattedValue = GermanCurrencyFormatter.format(value);
