@@ -15,8 +15,10 @@ class PaymentHistoryPage extends StatefulWidget {
 
 class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
   String _selectedView = 'summary';
-  bool _isDetailsExpanded = false;
-  bool _isRepaymentExpanded = false;
+  bool _isTaxesExpandedTable = false;
+  bool _isTaxesExpandedSummary = false;
+  bool _isRepaymentExpandedTable = false;
+  bool _isRepaymentExpandedSummary = false;
   late double _irrValue;
 
   @override
@@ -46,32 +48,6 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
           ),
         );
       },
-    );
-  }
-
-  Widget _buildInitialLoanInfo() {
-    final mortgage = Provider.of<Mortgage>(context, listen: false);
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Startkredit',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              SizedBox(height: 8),
-              Text(
-                  'Anfängliche Kreditsumme: ${GermanCurrencyFormatter.format(mortgage.principal)}'),
-              SizedBox(height: 8),
-              Text(
-                  'Hinweis: Die Restschuld in der Tabelle zeigt den Stand am Ende des jeweiligen ${_selectedView == 'yearly' ? 'Jahres' : 'Monats'}.',
-                  style: TextStyle(fontStyle: FontStyle.italic)),
-            ],
-          ),
-        ),
-      ),
     );
   }
 
@@ -123,6 +99,32 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
     );
   }
 
+  Widget _buildInitialLoanInfo() {
+    final mortgage = Provider.of<Mortgage>(context, listen: false);
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Startkredit',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              SizedBox(height: 8),
+              Text(
+                  'Anfängliche Kreditsumme: ${GermanCurrencyFormatter.format(mortgage.principal)}'),
+              SizedBox(height: 8),
+              Text(
+                  'Hinweis: Die Restschuld in der Tabelle zeigt den Stand am Ende des jeweiligen ${_selectedView == 'yearly' ? 'Jahres' : 'Monats'}.',
+                  style: TextStyle(fontStyle: FontStyle.italic)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildSelectedView(BoxConstraints constraints) {
     switch (_selectedView) {
       case 'monthly':
@@ -140,7 +142,8 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
 
   Widget _buildDataTable(List<Payment> payments, BoxConstraints constraints) {
     final columns = _buildColumns();
-    final minWidth = _isDetailsExpanded ? 1200.0 : 800.0;
+    final minWidth =
+        _isTaxesExpandedTable || _isRepaymentExpandedTable ? 1200.0 : 800.0;
 
     return Container(
       width: constraints.maxWidth,
@@ -173,14 +176,14 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
           children: [
             Text('Tilgung'),
             SizedBox(width: 8),
-            _buildExpandButton(),
+            _buildExpandButton('repayment'),
           ],
         ),
         size: ColumnSize.L,
       ),
     ];
 
-    if (_isDetailsExpanded) {
+    if (_isRepaymentExpandedTable) {
       columns.addAll([
         DataColumn2(
           label: Container(
@@ -200,6 +203,33 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
           ),
           size: ColumnSize.M,
         ),
+        DataColumn2(
+          label: Container(
+            color: Colors.blue[50],
+            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            child: Text('Steuerrückzahlungen',
+                style: TextStyle(color: Colors.blue[800])),
+          ),
+          size: ColumnSize.M,
+        ),
+      ]);
+    }
+
+    columns.add(
+      DataColumn2(
+        label: Row(
+          children: [
+            Text('Steuerrückzahlungen'),
+            SizedBox(width: 8),
+            _buildExpandButton('taxes'),
+          ],
+        ),
+        size: ColumnSize.L,
+      ),
+    );
+
+    if (_isTaxesExpandedTable) {
+      columns.addAll([
         DataColumn2(
           label: Container(
             color: Colors.green[50],
@@ -232,8 +262,9 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
   }
 
   DataRow _buildDataRow(Payment payment) {
-    double totalRepayment = payment.principalPayment + payment.specialPayment;
     double taxBenefits = payment.interestRebate + payment.depreciation;
+    double totalRepayment =
+        payment.principalPayment + payment.specialPayment + taxBenefits;
 
     List<DataCell> cells = [
       DataCell(Text(payment.month.toString())),
@@ -242,7 +273,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
       DataCell(Text(GermanCurrencyFormatter.format(totalRepayment))),
     ];
 
-    if (_isDetailsExpanded) {
+    if (_isRepaymentExpandedTable) {
       cells.addAll([
         DataCell(
           Container(
@@ -259,6 +290,17 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
             child: Text(GermanCurrencyFormatter.format(payment.specialPayment)),
           ),
         ),
+        DataCell(Container(
+            color: Colors.blue[50],
+            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            child: Text(GermanCurrencyFormatter.format(taxBenefits)))),
+      ]);
+    }
+
+    cells.add(DataCell(Text(GermanCurrencyFormatter.format(taxBenefits))));
+
+    if (_isTaxesExpandedTable) {
+      cells.addAll([
         DataCell(
           Container(
             color: Colors.green[50],
@@ -287,11 +329,18 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
     return DataRow(cells: cells);
   }
 
-  Widget _buildExpandButton() {
+  Widget _buildExpandButton(String expandableType) {
+    bool isExpanded = expandableType == 'taxes'
+        ? _isTaxesExpandedTable
+        : _isRepaymentExpandedTable;
     return InkWell(
       onTap: () {
         setState(() {
-          _isDetailsExpanded = !_isDetailsExpanded;
+          if (expandableType == 'taxes') {
+            _isTaxesExpandedTable = !_isTaxesExpandedTable;
+          } else {
+            _isRepaymentExpandedTable = !_isRepaymentExpandedTable;
+          }
         });
       },
       child: Container(
@@ -301,7 +350,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
           border: Border.all(color: Colors.blue),
         ),
         child: Icon(
-          _isDetailsExpanded ? Icons.remove : Icons.add,
+          isExpanded ? Icons.remove : Icons.add,
           size: 16,
           color: Colors.blue,
         ),
@@ -329,16 +378,26 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
             _buildSummaryRow('Gesamtlaufzeit', '${result.totalMonths} Monate'),
             _buildSummaryRowWithPercentage(
                 'Eigenkapital', result.equity, result.totalSum),
-            _buildExpandableRepaymentRow('Gesamttilgung',
-                totalRegularRepayment + totalSpecialPayment, result.totalSum, [
-              ('Reguläre Tilgung', totalRegularRepayment),
-              ('Sonderzahlungen', totalSpecialPayment),
-            ]),
-            _buildExpandableRepaymentRow('Steuerliche Vorteile Details',
-                totalTaxBenefits, result.totalSum, [
-              ('Zinsvorteil', result.totalInterestRebate),
-              ('Abschreibung', result.totalDepreciation),
-            ]),
+            _buildExpandableRepaymentRow(
+              'Gesamttilgung',
+              totalRegularRepayment + totalSpecialPayment,
+              result.totalSum,
+              [
+                ('Reguläre Tilgung', totalRegularRepayment),
+                ('Sonderzahlungen', totalSpecialPayment),
+              ],
+              'repayment',
+            ),
+            _buildExpandableRepaymentRow(
+              'Steuerliche Vorteile',
+              totalTaxBenefits,
+              result.totalSum,
+              [
+                ('Zinsvorteil', result.totalInterestRebate),
+                ('Abschreibung', result.totalDepreciation),
+              ],
+              'taxes',
+            ),
             _buildSummaryRowWithPercentage(
                 'Zinszahlungen', result.totalInterestPayment, result.totalSum),
             _buildSummaryRowWithPercentage(
@@ -359,7 +418,10 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
   }
 
   Widget _buildExpandableRepaymentRow(String label, double value, double total,
-      List<(String, double)> details) {
+      List<(String, double)> details, String expandableType) {
+    bool isExpanded = expandableType == 'taxes'
+        ? _isTaxesExpandedSummary
+        : _isRepaymentExpandedSummary;
     return Column(
       children: [
         Row(
@@ -372,11 +434,16 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
                 InkWell(
                   onTap: () {
                     setState(() {
-                      _isRepaymentExpanded = !_isRepaymentExpanded;
+                      if (expandableType == 'repayment') {
+                        _isRepaymentExpandedSummary =
+                            !_isRepaymentExpandedSummary;
+                      } else if (expandableType == 'taxes') {
+                        _isTaxesExpandedSummary = !_isTaxesExpandedSummary;
+                      }
                     });
                   },
                   child: Icon(
-                    _isRepaymentExpanded ? Icons.remove : Icons.add,
+                    isExpanded ? Icons.remove : Icons.add,
                     size: 20,
                     color: Colors.blue,
                   ),
@@ -397,7 +464,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
             ),
           ],
         ),
-        if (_isRepaymentExpanded)
+        if (isExpanded)
           Padding(
             padding: EdgeInsets.only(left: 16, top: 8),
             child: Column(
