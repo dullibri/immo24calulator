@@ -600,6 +600,7 @@ CalculationResult calculateMortgagePaymentsFunction({
   while (remainingBalance > 0) {
     if ((month) % 12 == 1 && month > 1) {
       totalSpecialPaymentsPerYear = 0;
+      annualInterestPayment = 0;
       currentMonthlyRentSaved *= (1 + annualRentSavedIncrease);
       currentMonthlyRentalIncome *= (1 + annualRentalIncomeIncrease);
       currentYear++;
