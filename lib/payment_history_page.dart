@@ -16,7 +16,11 @@ class PaymentHistoryPage extends StatefulWidget {
 class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
   String _selectedView = 'summary';
   bool _isDetailsExpanded = false;
+  bool _isTaxesExpandedTable = false;
+  bool _isTaxesExpandedSummary = false;
   bool _isRepaymentExpanded = false;
+  bool _isRepaymentExpandedTable = false;
+  bool _isRepaymentExpandedSummary = false;
   late double _irrValue;
 
   @override
@@ -173,14 +177,14 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
           children: [
             Text('Tilgung'),
             SizedBox(width: 8),
-            _buildExpandButton(),
+            _buildExpandButton('repayment'),
           ],
         ),
         size: ColumnSize.L,
       ),
     ];
 
-    if (_isDetailsExpanded) {
+    if (_isRepaymentExpandedTable) {
       columns.addAll([
         DataColumn2(
           label: Container(
@@ -200,6 +204,23 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
           ),
           size: ColumnSize.M,
         ),
+      ]);
+    }
+    columns.addAll([
+      DataColumn2(
+        label: Row(
+          children: [
+            Text('Steuerrückzahlungen'),
+            SizedBox(width: 8),
+            _buildExpandButton('taxes'),
+          ],
+        ),
+        size: ColumnSize.L,
+      ),
+    ]);
+
+    if (_isTaxesExpandedTable) {
+      columns.addAll([
         DataColumn2(
           label: Container(
             color: Colors.green[50],
@@ -242,7 +263,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
       DataCell(Text(GermanCurrencyFormatter.format(totalRepayment))),
     ];
 
-    if (_isDetailsExpanded) {
+    if (_isRepaymentExpandedTable) {
       cells.addAll([
         DataCell(
           Container(
@@ -259,6 +280,14 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
             child: Text(GermanCurrencyFormatter.format(payment.specialPayment)),
           ),
         ),
+      ]);
+    }
+    cells.addAll([
+      DataCell(Text(GermanCurrencyFormatter.format(
+          payment.depreciation + payment.interestRebate))),
+    ]);
+    if (_isTaxesExpandedTable) {
+      cells.addAll([
         DataCell(
           Container(
             color: Colors.green[50],
@@ -287,11 +316,15 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
     return DataRow(cells: cells);
   }
 
-  Widget _buildExpandButton() {
+  Widget _buildExpandButton(String expandableType) {
     return InkWell(
       onTap: () {
         setState(() {
-          _isDetailsExpanded = !_isDetailsExpanded;
+          if (expandableType == "taxes") {
+            _isTaxesExpandedTable = !_isTaxesExpandedTable;
+          } else if (expandableType == "repayment") {
+            _isRepaymentExpandedTable = !_isRepaymentExpandedTable;
+          }
         });
       },
       child: Container(
@@ -329,16 +362,24 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
             _buildSummaryRow('Gesamtlaufzeit', '${result.totalMonths} Monate'),
             _buildSummaryRowWithPercentage(
                 'Eigenkapital', result.equity, result.totalSum),
-            _buildExpandableRepaymentRow('Gesamttilgung',
-                totalRegularRepayment + totalSpecialPayment, result.totalSum, [
-              ('Reguläre Tilgung', totalRegularRepayment),
-              ('Sonderzahlungen', totalSpecialPayment),
-            ]),
-            _buildExpandableRepaymentRow('Steuerliche Vorteile Details',
-                totalTaxBenefits, result.totalSum, [
-              ('Zinsvorteil', result.totalInterestRebate),
-              ('Abschreibung', result.totalDepreciation),
-            ]),
+            _buildExpandableRepaymentRow(
+                'Gesamttilgung',
+                totalRegularRepayment + totalSpecialPayment,
+                result.totalSum,
+                [
+                  ('Reguläre Tilgung', totalRegularRepayment),
+                  ('Sonderzahlungen', totalSpecialPayment),
+                ],
+                'repayments'),
+            _buildExpandableRepaymentRow(
+                'Steuerliche Vorteile Details',
+                totalTaxBenefits,
+                result.totalSum,
+                [
+                  ('Zinsvorteil', result.totalInterestRebate),
+                  ('Abschreibung', result.totalDepreciation),
+                ],
+                'taxes'),
             _buildSummaryRowWithPercentage(
                 'Zinszahlungen', result.totalInterestPayment, result.totalSum),
             _buildSummaryRowWithPercentage(
@@ -359,7 +400,7 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
   }
 
   Widget _buildExpandableRepaymentRow(String label, double value, double total,
-      List<(String, double)> details) {
+      List<(String, double)> details, String expandableType) {
     return Column(
       children: [
         Row(
@@ -372,7 +413,11 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
                 InkWell(
                   onTap: () {
                     setState(() {
-                      _isRepaymentExpanded = !_isRepaymentExpanded;
+                      if (expandableType == "repayments") {
+                        _isRepaymentExpanded = !_isRepaymentExpanded;
+                      } else if (expandableType == "taxes") {
+                        _isTaxesExpandedTable = !_isTaxesExpandedTable;
+                      }
                     });
                   },
                   child: Icon(
