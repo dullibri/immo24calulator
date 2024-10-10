@@ -274,7 +274,6 @@ class Mortgage with ChangeNotifier {
     if (_squareMeters != value) {
       _squareMeters = value;
       _calculateTaxDeductibleShare();
-      _calculateTaxDeductibleShare();
       notifyListeners();
     }
   }
