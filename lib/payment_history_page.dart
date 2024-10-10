@@ -203,6 +203,15 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
           ),
           size: ColumnSize.M,
         ),
+        DataColumn2(
+          label: Container(
+            color: Colors.blue[50],
+            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            child: Text('Steuerrückzahlungen',
+                style: TextStyle(color: Colors.blue[800])),
+          ),
+          size: ColumnSize.M,
+        ),
       ]);
     }
 
@@ -253,8 +262,9 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
   }
 
   DataRow _buildDataRow(Payment payment) {
-    double totalRepayment = payment.principalPayment + payment.specialPayment;
     double taxBenefits = payment.interestRebate + payment.depreciation;
+    double totalRepayment =
+        payment.principalPayment + payment.specialPayment + taxBenefits;
 
     List<DataCell> cells = [
       DataCell(Text(payment.month.toString())),
@@ -280,6 +290,10 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
             child: Text(GermanCurrencyFormatter.format(payment.specialPayment)),
           ),
         ),
+        DataCell(Container(
+            color: Colors.blue[50],
+            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            child: Text(GermanCurrencyFormatter.format(taxBenefits)))),
       ]);
     }
 
