@@ -399,6 +399,10 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
               'taxes',
             ),
             _buildSummaryRowWithPercentage(
+                'Mietersparnis', result.totalRentSaved, result.totalSum),
+            _buildSummaryRowWithPercentage(
+                'Mieteinnahmen', result.totalRentalIncome, result.totalSum),
+            _buildSummaryRowWithPercentage(
                 'Zinszahlungen', result.totalInterestPayment, result.totalSum),
             _buildSummaryRowWithPercentage(
                 'Überschuss', result.totalExcess, result.totalSum),
@@ -407,10 +411,6 @@ class _PaymentHistoryPageState extends State<PaymentHistoryPage> {
             Divider(),
             _buildSummaryRow('Interne Rendite (IRR)',
                 '${(_irrValue * 100).toStringAsFixed(2)}%'),
-            _buildSummaryRowWithPercentage(
-                'Mietersparnis', result.totalRentSaved, result.totalSum),
-            _buildSummaryRowWithPercentage(
-                'Mieteinnahmen', result.totalRentalIncome, result.totalSum),
           ],
         ),
       ),
